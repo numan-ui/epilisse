@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EPILISSE | Luxury Beauty Care Munich</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#5f5e5a",
+                    "primary-container": "#c5a021",
+                    "on-primary-fixed-variant": "#574500",
+                    "on-error-container": "#93000a",
+                    "on-secondary-container": "#656460",
+                    "tertiary-container": "#a3a4a4",
+                    "secondary-container": "#e5e2dc",
+                    "outline": "#7f7663",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#d0c5af",
+                    "primary-fixed-dim": "#eac243",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#483800",
+                    "surface": "#fcf9f8",
+                    "error": "#ba1a1a",
+                    "on-tertiary-container": "#383a3b",
+                    "tertiary-fixed": "#e2e2e2",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-surface-variant": "#4d4635",
+                    "inverse-surface": "#313030",
+                    "surface-dim": "#dcd9d9",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "surface-container-high": "#eae7e7",
+                    "surface-tint": "#745b00",
+                    "inverse-on-surface": "#f3f0ef",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed": "#241a00",
+                    "surface-variant": "#e5e2e1",
+                    "on-background": "#1c1b1b",
+                    "surface-container-highest": "#e5e2e1",
+                    "primary-fixed": "#ffe089",
+                    "surface-container": "#f0eded",
+                    "secondary-fixed": "#e5e2dc",
+                    "secondary-fixed-dim": "#c9c6c1",
+                    "background": "#fcf9f8",
+                    "surface-bright": "#fcf9f8",
+                    "on-secondary-fixed-variant": "#474743",
+                    "on-secondary-fixed": "#1c1c18",
+                    "on-primary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "primary": "#745b00",
+                    "inverse-primary": "#eac243",
+                    "surface-container-low": "#f6f3f2",
+                    "tertiary": "#5d5f5f",
+                    "on-surface": "#1c1b1b",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "unit": "8px",
+                    "section-gap": "80px",
+                    "container-max-width": "1440px",
+                    "gutter": "24px",
+                    "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Playfair Display"],
+                    "headline-lg-mobile": ["Playfair Display"],
+                    "body-lg": ["Manrope"],
+                    "headline-sm": ["Playfair Display"],
+                    "body-sm": ["Manrope"],
+                    "headline-lg": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "body-md": ["Manrope"],
+                    "label-caps": ["Manrope"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .story-slide { display: none; }
+        .story-slide.active { display: block; }
+        .progress-bar-inner { transition: width 10s linear; }
+        .glass-nav { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .lux-shadow { box-shadow: 0px 4px 20px rgba(0,0,0,0.04); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 bg-surface/80 dark:bg-inverse-surface/80 backdrop-blur-md border-b border-outline-variant/30">
+<div class="font-display-lg text-headline-md tracking-widest text-primary dark:text-primary-fixed-dim">EPILISSE</div>
+<div class="hidden md:flex items-center gap-10">
+<a class="font-label-caps text-label-caps text-primary border-b border-primary transition-colors duration-300" href="#">Behandlungen</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300" href="#">Preise</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300" href="#">Über Uns</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300" href="#">Kontakt</a>
+</div>
+<div class="flex items-center gap-6">
+<span class="hidden md:inline font-label-caps text-label-caps text-secondary">DE | EN | TR</span>
+<button class="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-95 hover:scale-100 duration-200">
+                TERMIN BUCHEN
+            </button>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</nav>
+<!-- Hero Section: Instagram-style Story Slider -->
+<section class="relative h-[921px] md:h-screen w-full overflow-hidden mt-0">
+<!-- Progress Bars Overlay -->
+<div class="absolute top-24 left-0 w-full px-margin-mobile md:px-margin-desktop z-30 flex gap-2">
+<div class="h-1 bg-white/20 flex-1 overflow-hidden"><div class="progress-bar-inner h-full bg-white w-0" id="pb-1"></div></div>
+<div class="h-1 bg-white/20 flex-1 overflow-hidden"><div class="progress-bar-inner h-full bg-white w-0" id="pb-2"></div></div>
+<div class="h-1 bg-white/20 flex-1 overflow-hidden"><div class="progress-bar-inner h-full bg-white w-0" id="pb-3"></div></div>
+<div class="h-1 bg-white/20 flex-1 overflow-hidden"><div class="progress-bar-inner h-full bg-white w-0" id="pb-4"></div></div>
+</div>
+<!-- Slides -->
+<div class="story-slide active absolute inset-0 transition-opacity duration-1000" id="slide-1">
+<div class="absolute inset-0 bg-black/30 z-10"></div>
+<img class="w-full h-full object-cover" data-alt="A cinematic, high-end close-up shot of a luxury beauty treatment environment in Munich. Soft, golden morning light filters through sheer curtains onto a minimalist cream-colored treatment table. The atmosphere is serene and expensive, utilizing a palette of warm beiges, soft whites, and subtle gold accents. The visual style is polished and quiet luxury, emphasizing cleanliness and premium service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_YasW9q229vcdUMyOWhsXE0U56gXDW6IhxHCHslvhyudCbfAceKlPVs2XmGP2zRTNgbrCpnW7wLqysQlSs-XP9sR0JO7XReZFC7rVxns2gpe1h7jVgIztmgeZnC8P0gK6eqoAbqsiq_aXBWC0sFVsNmsdZg8ysh_1BdL-yWU858EORE7eXi0v1mssia4G2iXsFBhPOxJd618fsVSgIMKlsRJaBTUn8FqwRk8M5F9VQFNNmVgaWeU-KnCcASqRauKgP4vjhali-pMt"/>
+<div class="absolute inset-0 z-20 flex flex-col justify-center items-start px-margin-mobile md:px-margin-desktop">
+<h1 class="font-display-lg text-display-lg md:text-[80px] text-white max-w-2xl leading-none mb-6">Zeitlose Schönheit.</h1>
+<p class="font-body-lg text-body-lg text-white/90 max-w-lg mb-10">Entdecken Sie die Kunst der ästhetischen Perfektion in unserem Exklusiv-Studio in München.</p>
+<button class="bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-all">TERMIN BUCHEN</button>
+</div>
+</div>
+<div class="story-slide absolute inset-0 transition-opacity duration-1000" id="slide-2">
+<div class="absolute inset-0 bg-black/40 z-10"></div>
+<img class="w-full h-full object-cover" data-alt="A sophisticated macro photograph of a high-tech laser hair removal device being used on smooth skin. The lighting is clinical yet warm, with glowing gold highlights reflecting off the polished surface of the equipment. The background is a blurred, high-end salon interior with minimalist decor. The color scheme features deep blacks, primary gold, and clean skin tones, evoking a professional and luxurious mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB19c_exWt7H0n9vAsZz2kxGDGG-6ta5oPx7QUek7amnLk9lSKwX1U_2_UteAPk9YQWV_scOgE7XPR5xRwTS7UypBg55Iu2kTWSkUW7OqfwIwzNXIySxYdJxoUlzxitWwOn7KgNTrchQ3eQQbo5DN4XztJEAbo0D3vbPu97mCC59GSXoe7oe1x7mq3RC3iapMSvwggpNh8aqy0oMDqRZSfEq4tlt61cSnUlFuSXgKZjLrmBnJxSZ6geu2ibj9T1rqUv8BoIVmoSYDke"/>
+<div class="absolute inset-0 z-20 flex flex-col justify-center items-start px-margin-mobile md:px-margin-desktop">
+<h1 class="font-display-lg text-display-lg md:text-[80px] text-white max-w-2xl leading-none mb-6">Sanfte Glätte.</h1>
+<p class="font-body-lg text-body-lg text-white/90 max-w-lg mb-10">Präzise Laser-Haarentfernung für ein seidiges Hautgefühl, das bleibt. Schmerzfrei und effektiv.</p>
+<button class="bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-all">ERFAHREN SIE MEHR</button>
+</div>
+</div>
+<div class="story-slide absolute inset-0 transition-opacity duration-1000" id="slide-3">
+<div class="absolute inset-0 bg-black/20 z-10"></div>
+<img class="w-full h-full object-cover" data-alt="A portrait of a woman with radiant, flawless skin, eyes closed in relaxation. Her face is gently illuminated by a soft, directional light that highlights the natural contours of her face. The environment is a minimalist, luxury spa with a focus on 'Quiet Luxury' materials like marble and light oak. The image conveys pure serenity, trust, and high-end facial aesthetics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDCTVBkANRMCY5r7E2JLvTph0kXEA4T7GxktWv_bKMsgdG-AzO4MqdgFWvxeMIo4R4mlT3yzjHXFTmz2RMdSYBujyVKX-cIPUOMYrFBB2ecuVjcgYnes1xN_ami77RkyJfoZ850mfG5EwXU8-B_9qIIv66-_hQmWFSIruc6mQD8FuAZoQ9poHrEZJ1OhiQ92g2-Wr5bKJd6ZeyHf3zmq1k6SioVRtxAlftGRh3_AXEo5W9nWYw4m18vMFt9BX55pIVBkjVLW8zw2To"/>
+<div class="absolute inset-0 z-20 flex flex-col justify-center items-start px-margin-mobile md:px-margin-desktop">
+<h1 class="font-display-lg text-display-lg md:text-[80px] text-white max-w-2xl leading-none mb-6">Gesichtsästhetik.</h1>
+<p class="font-body-lg text-body-lg text-white/90 max-w-lg mb-10">Individuelle Behandlungen für eine strahlende Haut und natürliche Verjüngung.</p>
+<button class="bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-all">ZUM ANGEBOT</button>
+</div>
+</div>
+<div class="story-slide absolute inset-0 transition-opacity duration-1000" id="slide-4">
+<div class="absolute inset-0 bg-black/30 z-10"></div>
+<img class="w-full h-full object-cover" data-alt="A luxury manicure station with gold tools and designer nail polish bottles arranged symmetrically on a white marble tabletop. A vase of white peonies sits in the background. The lighting is bright and high-key, creating a clean light-mode aesthetic. The focus is on the premium nature of the service, blending beauty with a professional, high-end lifestyle environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAb0Xk8wJSTpOUGnUD4StyAC2X_a5HESgSsYNy02I50YB_F081P4wFEpLLa3HWYmPBVpi2nDPPOAy0_8C2Qdpfl2a9dZ-vx5kuLRWfWCnLSNk3pf7GP-8KlvRZUjHoayjhKxkAEfyVMfcA6MG2jqqpmCCqbmIqrxvAVImnfhZxf_0DcCu_hTAoRnkq3Dan1OvZbY3PTrpL-he-a5fk5zE2Pkg4ranUUJlJT3SVH73E1zMstR68y86JSpWTYQXQxapywC4Mypwk7ZMux"/>
+<div class="absolute inset-0 z-20 flex flex-col justify-center items-start px-margin-mobile md:px-margin-desktop">
+<h1 class="font-display-lg text-display-lg md:text-[80px] text-white max-w-2xl leading-none mb-6">Perfekte Pflege.</h1>
+<p class="font-body-lg text-body-lg text-white/90 max-w-lg mb-10">Maniküre &amp; Pediküre auf höchstem Niveau für Ihre Hände und Füße.</p>
+<button class="bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-all">JETZT BUCHEN</button>
+</div>
+</div>
+</section>
+<!-- Main Categories Section -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
+<div class="text-center mb-16">
+<h2 class="font-display-lg text-display-lg text-primary mb-4">Exklusive Behandlungen</h2>
+<div class="w-20 h-[2px] bg-primary-fixed-dim mx-auto"></div>
+</div>
+<!-- Bento Grid / Asymmetric Grid -->
+<div class="grid grid-cols-1 md:grid-cols-6 md:grid-rows-2 gap-gutter h-[1200px] md:h-[900px]">
+<!-- Laser-Haarentfernung -->
+<div class="md:col-span-3 md:row-span-2 group relative overflow-hidden bg-white border border-outline-variant/30 cursor-pointer">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Close-up of a professional aesthetic laser device emitting a soft amber light on a treatment table. The setting is a bright, minimalist room with cream walls and white leather furniture. High-end branding and a serene atmosphere are prioritized. The lighting is soft and flattering, emphasizing a luxurious beauty salon feel in Munich." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3IvtG-coL1R-rxRRkCnvRhXTeCycUg1nJq-MJ9OwNUG_hyq5EKihhgBnZ6-I8FAXVro5Kaa5XCJjLSIsa6Xb7xroT8mf9NdJM89YISQMXd0yIQ_HlT9Ex29xuoiRwoTc0hr0Yn3r8_n9K0e5RlFX-CeRmNZdVeFcpCDBQ0OB8n0Y6aBnvXrJX1wH1cWYO97zGEQPOmnnZE13-I2ZEY81xSze4Uv-GEDoHwfTQnB2_t-NNQGEPkoA5XgHE4w9KWM4CAJG-EdG8Cy_z"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8">
+<h3 class="font-headline-lg text-white mb-2">Laser-Haarentfernung</h3>
+<p class="text-white/80 font-body-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500">Dauerhafte Glätte durch modernste Technologie.</p>
+<span class="text-primary-fixed-dim font-label-caps mt-4 flex items-center gap-2">ENTDECKEN <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
+</div>
+</div>
+<!-- Gesichtsästhetik -->
+<div class="md:col-span-3 md:row-span-1 group relative overflow-hidden bg-white border border-outline-variant/30 cursor-pointer">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A high-end facial spa treatment scene. A professional in white uniform is applying a serum with a glass dropper. The client's face is partially visible, relaxed. Warm, soft focus lighting creates a luxurious, high-key light mode aesthetic. The background features expensive-looking skincare products on glass shelves." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrgLWhl7EjgUAhqHCfTK1D52PmXPF9J-BJYYc_ojdoV_gy4UGXEjkgANF3wWYjHqy53LTIplM-oEpi7cxFjRPMtQ1bDsidV5LBX3bL8Sfb-RDP7uopJFXAFj30wN3qxWCSR6iuYoaAF86bhNElVdByUZ2wKcEt_5GPybU5jCI8h0_dZa6oLHxRSXbODo0jVVObxQw5TcoKOL-Xy3V_7f0RZxvB2a9aoXyvX-0QNPChRJ8wJT_7b5ipFi3L6aybwqTrlQZMuPLtmWRQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8">
+<h3 class="font-headline-md text-white">Gesichtsästhetik</h3>
+<span class="text-primary-fixed-dim font-label-caps mt-2 flex items-center gap-2">DETAILS <span class="material-symbols-outlined text-sm">arrow_forward</span></span>
+</div>
+</div>
+<!-- Body Contouring -->
+<div class="md:col-span-1 md:row-span-1 group relative overflow-hidden bg-white border border-outline-variant/30 cursor-pointer">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Abstract, minimalist shot of body contours under soft, artistic lighting. The image focuses on form and elegance, using a palette of warm skin tones and soft whites. It suggests a high-end body shaping service without being overly clinical. Quiet luxury vibes." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAS7VEqn3YLIpzxeNRbM1gcyi8MJr1qDdhCbgVl3FgIek9EyqNPv0_RSpzK4D8Fj_sjWdLM3pAfQAOR3aelWP54bwPTkASLYexbRvDWiWqoOKudhs8auDngKhBI3OapBF6Q5nwLH0MoCdYY77ZDOyrZ4Utsa0vpTToujP6rCNRlUYOJkmc6h4lIkPVLpiYi_z5U9a40yt2bqbxzsI4U_adkDSi5HdYRzHkCtDQUSdtlUs2B7TFDMBv6Br8-tRgx1sCaravafH3RZyOU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4">
+<h3 class="font-headline-sm text-white text-[16px]">Body Contouring</h3>
+</div>
+</div>
+<!-- Injectables -->
+<div class="md:col-span-1 md:row-span-1 group relative overflow-hidden bg-white border border-outline-variant/30 cursor-pointer">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A professional aesthetic injector scene. Close-up of a glass vial and a fine syringe resting on a marble surface. The lighting is sophisticated and clean, emphasizing medical precision and luxury beauty standards. Soft neutral colors dominate." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2R1r5IBHzprIEBLdeHT1f02OFMOX85Ol0fXFMTE8Mn9Nlc1lMes1BoOgj1lwKVSGR-dIFS-r-gyxMLZZESLXUcH_zS9UBq5T3z81zaxMXyfkXaTN50ZQOxmiM9kMWb4FbuKoODmgwAvE3ta_i60Ekgbw0pVcC1SjtZtC__ZxTNJSwkcNaB_h8XguwNKKEQmQHrBovNuCFUoWvqMpN2bzbrTH7ZN2a66uUpCi_65MRDuC8j05691WrlUa-ULD7rQ27qkKsnnnR_7Q7"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4">
+<h3 class="font-headline-sm text-white text-[16px]">Injectables</h3>
+</div>
+</div>
+<!-- Maniküre -->
+<div class="md:col-span-1 md:row-span-1 group relative overflow-hidden bg-white border border-outline-variant/30 cursor-pointer">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Hands with a fresh, perfect nude manicure resting on a high-end leather handbag. The style is incredibly polished and high-class, reflecting a Munich luxury lifestyle. Soft lighting, neutral palette with subtle gold jewelry accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtJndxncsaGViuLmDZDBacgojv8siWTA93LPFPxNKQpEt2zcmQOehCknTGGJyu6i6UnkaiofOhED7An8f2QpALTSIozuiak5h3D6E_eJGWt9ZvHmvNcykq9-o53KhIoV6PlcBlXDxkJoMv-p60rCfkvezFpByYXAE-Nf2Yqu6Ce3WZ-puxUEYanR11hTB_J-X_htoKYgGVsUvScVZLae2VUaXdaKyQuFNuH1TxcUFPuaVWjKQRAg8BbvmnFqGiwILaxXwCVD4uJQFs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4">
+<h3 class="font-headline-sm text-white text-[16px]">Maniküre</h3>
+</div>
+</div>
+</div>
+</section>
+<!-- Promotional Section: Kombi-Paket -->
+<section class="mb-section-gap px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
+<div class="relative w-full h-[400px] overflow-hidden group">
+<div class="absolute inset-0 bg-secondary-container/30 z-10 border border-outline-variant/30"></div>
+<div class="absolute inset-0 flex flex-col md:flex-row items-center justify-between z-20 px-12 md:px-24">
+<div class="text-center md:text-left max-w-xl py-12 md:py-0">
+<span class="font-label-caps text-primary tracking-[0.3em] mb-4 block">EXKLUSIVES ANGEBOT</span>
+<h2 class="font-display-lg text-display-lg text-on-surface mb-6 leading-tight">Winter Glow <br/> Kombi-Paket</h2>
+<p class="font-body-md text-secondary mb-8">Erhalten Sie 20% Rabatt auf unsere exklusive Kombination aus Gesichtshydrierung und Maniküre. Gültig bis Ende Februar.</p>
+<div class="flex flex-col sm:flex-row gap-4">
+<button class="bg-primary text-on-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all">ANGEBOT SICHERN</button>
+<button class="border border-primary text-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary/5 transition-all">DETAILS ANSEHEN</button>
+</div>
+</div>
+<div class="hidden md:block w-[400px] h-full relative">
+<img class="w-full h-full object-cover shadow-2xl scale-110 group-hover:scale-100 transition-transform duration-1000" data-alt="A beautiful, artistic arrangement of luxury skincare bottles and white winter flowers on a mirror surface. The lighting creates shimmering reflections and a cold, elegant 'Winter Glow' atmosphere. Soft gold and silver tones mix with pure whites. High-end product photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvUxRPJ0wH6TMH-8xt3LJfxAs7ZqckEkTBSQxEydnrBF-ozc-9ipLIAEj5FOFjTx1bnbL-MJAqWMGAcA3d3OJr2yOEHLCuL88VZWLeb0mmZnd0oQKyDj_hiX27cKMprGd9-p8PbcSxHRdLS2KgRg3rowwcKs4lQ8NEE_DpmLYqD7mj32wd6hoFlnPHsRY-PIG8Lxqw92_U_egGTxeE3qgP_rQIZCXeUsjdF_EUa05hBzHXMgxyUL1RM_qc6fVz0YYpnb0OxO3TbKD4"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-surface-container-highest dark:bg-inverse-surface border-t border-outline-variant w-full px-margin-mobile md:px-margin-desktop py-section-gap grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="flex flex-col gap-6">
+<div class="font-display-lg text-headline-md text-primary dark:text-primary-fixed-dim">EPILISSE</div>
+<p class="font-body-sm text-secondary">Ihr Experte für exklusive Schönheit und dauerhafte Haarentfernung im Herzen von München. Qualität, Diskretion und Perfektion.</p>
+<div class="flex gap-4">
+<a class="text-primary hover:scale-110 transition-transform" href="#"><span class="material-symbols-outlined">brand_family</span></a>
+<a class="text-primary hover:scale-110 transition-transform" href="#"><span class="material-symbols-outlined">photo_camera</span></a>
+<a class="text-primary hover:scale-110 transition-transform" href="#"><span class="material-symbols-outlined">share</span></a>
+</div>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-primary mb-6">Behandlungen</h4>
+<ul class="flex flex-col gap-4 font-body-sm text-secondary">
+<li><a class="hover:text-primary transition-colors" href="#">Laser-Haarentfernung</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Gesichtsästhetik</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Body Contouring</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Maniküre &amp; Pediküre</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-primary mb-6">Studio</h4>
+<ul class="flex flex-col gap-4 font-body-sm text-secondary">
+<li>Maximilianstraße 12</li>
+<li>80539 München</li>
+<li>Mo - Sa: 09:00 - 20:00</li>
+<li>Tel: +49 (0) 89 123 456 78</li>
+</ul>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm text-primary mb-6">Rechtliches</h4>
+<ul class="flex flex-col gap-4 font-body-sm text-secondary">
+<li><a class="hover:text-primary transition-colors" href="#">Impressum</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Datenschutz</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">AGB</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Karriere</a></li>
+</ul>
+</div>
+<div class="md:col-span-4 border-t border-outline-variant/30 pt-8 mt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+<span class="font-body-sm text-secondary">© 2024 EPILISSE - Luxury Beauty Care Munich.</span>
+<div class="flex gap-8">
+<span class="font-label-caps text-[10px] text-secondary/60">MADE IN MUNICH</span>
+<span class="font-label-caps text-[10px] text-secondary/60">SECURE PAYMENT</span>
+</div>
+</div>
+</footer>
+<script>
+        // Story Slider Logic
+        let currentSlide = 1;
+        const totalSlides = 4;
+        const intervalTime = 10000; // Updated to 10 seconds (2x slowdown)
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.story-slide');
+            const progressBars = document.querySelectorAll('.progress-bar-inner');
+            
+            slides.forEach(s => s.classList.remove('active'));
+            progressBars.forEach(p => {
+                p.style.width = '0%';
+                p.style.transition = 'none';
+            });
+
+            const targetSlide = document.getElementById(`slide-${n}`);
+            const targetPb = document.getElementById(`pb-${n}`);
+
+            targetSlide.classList.add('active');
+            
+            // Force reflow for progress bar animation
+            setTimeout(() => {
+                targetPb.style.transition = `width ${intervalTime}ms linear`;
+                targetPb.style.width = '100%';
+            }, 50);
+        }
+
+        function nextSlide() {
+            currentSlide = currentSlide >= totalSlides ? 1 : currentSlide + 1;
+            showSlide(currentSlide);
+        }
+
+        // Initialize Slider
+        showSlide(1);
+        setInterval(nextSlide, intervalTime);
+
+        // Simple Intersection Observer for scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('section').forEach(section => {
+            section.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10');
+            observer.observe(section);
+        });
+    </script>
+</body></html>

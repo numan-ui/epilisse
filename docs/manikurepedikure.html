@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Maniküre &amp; Pediküre | EPILISSE Luxury Beauty Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#d0c5af",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#eac243",
+                    "primary": "#745b00",
+                    "surface-tint": "#745b00",
+                    "surface-container": "#f0eded",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#dcd9d9",
+                    "surface": "#fcf9f8",
+                    "on-secondary-fixed-variant": "#474743",
+                    "surface-container-low": "#f6f3f2",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#ffe089",
+                    "inverse-primary": "#eac243",
+                    "on-primary-fixed-variant": "#574500",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "on-surface": "#1c1b1b",
+                    "surface-bright": "#fcf9f8",
+                    "tertiary-fixed": "#e2e2e2",
+                    "primary-container": "#c5a021",
+                    "tertiary": "#5d5f5f",
+                    "on-tertiary": "#ffffff",
+                    "outline": "#7f7663",
+                    "on-secondary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "surface-container-highest": "#e5e2e1",
+                    "surface-container-high": "#eae7e7",
+                    "on-background": "#1c1b1b",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-container": "#383a3b",
+                    "on-secondary-fixed": "#1c1c18",
+                    "background": "#fcf9f8",
+                    "on-primary": "#ffffff",
+                    "inverse-surface": "#313030",
+                    "tertiary-container": "#a3a4a4",
+                    "secondary-fixed": "#e5e2dc",
+                    "secondary": "#5f5e5a",
+                    "on-primary-fixed": "#241a00",
+                    "on-primary-container": "#483800",
+                    "secondary-fixed-dim": "#c9c6c1",
+                    "surface-variant": "#e5e2e1",
+                    "inverse-on-surface": "#f3f0ef",
+                    "on-secondary-container": "#656460"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "section-gap": "80px",
+                    "unit": "8px",
+                    "container-max-width": "1440px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Manrope"],
+                    "body-md": ["Manrope"],
+                    "headline-md": ["Playfair Display"],
+                    "body-sm": ["Manrope"],
+                    "headline-sm": ["Playfair Display"],
+                    "headline-lg-mobile": ["Playfair Display"],
+                    "headline-lg": ["Playfair Display"],
+                    "label-caps": ["Manrope"],
+                    "display-lg": ["Playfair Display"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "label-caps": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .luxury-gradient {
+            background: linear-gradient(135deg, #fcf9f8 0%, #f0eded 100%);
+        }
+        .hover-gold-border {
+            transition: border-color 0.4s ease;
+        }
+        .hover-gold-border:hover {
+            border-color: #745b00;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30">
+<div class="font-display-lg text-headline-md tracking-widest text-primary">EPILISSE</div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300" href="#">Behandlungen</a>
+<a class="font-label-caps text-label-caps text-primary border-b border-primary" href="#">Preise</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300" href="#">Über Uns</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300" href="#">Kontakt</a>
+</div>
+<div class="flex items-center gap-6">
+<span class="hidden lg:block font-label-caps text-label-caps text-secondary">DE | EN | TR</span>
+<button class="bg-primary text-on-primary px-6 py-2 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all active:scale-95">
+                Termin Buchen
+            </button>
+</div>
+</nav>
+<!-- Hero Section -->
+<header class="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+<div class="absolute inset-0 -z-10 bg-surface-container-low"></div>
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
+<div class="md:col-span-6">
+<span class="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-4">ESTHETIC CARE</span>
+<h1 class="font-headline-lg text-display-lg md:text-[64px] mb-8 leading-tight">Maniküre &amp; Pediküre</h1>
+<p class="font-body-lg text-body-lg text-secondary mb-10 max-w-lg">
+                    Erleben Sie höchste Perfektion und luxuriöse Entspannung. Wir vereinen medizinische Sorgfalt mit ästhetischer Meisterschaft für Hände und Füße, die Ihre Persönlichkeit unterstreichen.
+                </p>
+<div class="flex gap-4">
+<button class="bg-primary text-on-primary px-8 py-4 font-label-caps text-label-caps tracking-widest uppercase hover:bg-primary-container transition-all">Jetzt Buchen</button>
+<button class="border border-outline text-primary px-8 py-4 font-label-caps text-label-caps tracking-widest uppercase hover:bg-surface-variant transition-all">Preisliste</button>
+</div>
+</div>
+<div class="md:col-span-6 relative mt-12 md:mt-0">
+<div class="aspect-[4/5] w-full bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up photograph of a luxury manicure process in a high-end salon. The scene features soft, warm lighting illuminating well-manicured hands resting on a plush cream-colored towel. A professional nail artist in a clean, minimalist setting is applying a translucent, elegant polish. The atmosphere is serene and professional, reflecting the EPILISSE brand aesthetic of quiet luxury." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMC2XempSi1q13AkuPZD0jro5M3Cy-jk-0Tg79ZCTOon0E7ePeCeOEko7Ce1lEheEEJqnC72riAC2idbS7WyP1HZiFrxapB5GnlNUlnCHUTMa8RN1KbnQfoicGtArMtc7ZnshyhJW6k0sFY7NHkGTllnvFDvXZUwW2z6bqfU2wE-BzwqX7oa0JGqR2h8QLMLOPRkO1b4GqQgDNYHIAaehkOJeUeH9KJPjmifA0DXnWhtAh2B_N5OmSAklFicD62qb65VKiRcOBhoBh"/>
+</div>
+<div class="absolute -bottom-6 -left-6 bg-white p-8 shadow-sm hidden md:block max-w-[240px]">
+<p class="font-headline-sm text-headline-sm italic text-primary">"Details machen die Perfektion, aber Perfektion ist kein Detail."</p>
+</div>
+</div>
+</div>
+</header>
+<!-- Hygiene & Quality Section -->
+<section class="py-section-gap bg-surface">
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="text-center mb-20">
+<h2 class="font-headline-lg text-headline-lg mb-4">Unser Qualitätsversprechen</h2>
+<div class="w-20 h-[1px] bg-primary mx-auto"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<div class="text-center px-4">
+<div class="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-high text-primary">
+<span class="material-symbols-outlined text-3xl">sanitizer</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-4">Höchste Hygiene</h3>
+<p class="font-body-md text-body-md text-secondary">Medizinische Sterilisation aller Instrumente und Einweg-Feilen sind bei uns Standard für Ihre Sicherheit.</p>
+</div>
+<div class="text-center px-4">
+<div class="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-high text-primary">
+<span class="material-symbols-outlined text-3xl">workspace_premium</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-4">Premium Produkte</h3>
+<p class="font-body-md text-body-md text-secondary">Wir verwenden ausschließlich exklusive Marken wie OPI, CND Shellac und vegane Pflegeserien für langanhaltende Ergebnisse.</p>
+</div>
+<div class="text-center px-4">
+<div class="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-surface-container-high text-primary">
+<span class="material-symbols-outlined text-3xl">spa</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-4">Spa-Atmosphäre</h3>
+<p class="font-body-md text-body-md text-secondary">Genießen Sie Ihre Behandlung in privaten Suiten mit ergonomischen Sesseln und einer Auswahl an Premium-Tees.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Visual Bento Grid -->
+<section class="pb-section-gap px-margin-mobile md:px-margin-desktop">
+<div class="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-gutter h-auto md:h-[600px]">
+<div class="md:col-span-8 overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" data-alt="Wide-angle architectural interior shot of a luxury nail salon. Soft cream and gold accents define the minimalist space. Large windows let in diffused morning light. High-end ergonomic treatment chairs are neatly arranged, suggesting an atmosphere of serenity and exclusivity. The image captures the 'Quiet Luxury' essence of the salon environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBC2Vx1tVrOjBga6OcMsXjgCQu8Rc28OfGGHQzIeJbGajTXzcXZAkVYozvE0yKWGkdUoDOkjZVjGzDhDsIy2TdIiWXKyfIvCXRnJyBPuYXGh2mdelWaT2ukI33fNQshQG8GD0bZIKqtmqOb63zZPtnubqSAIf0HKd7jwL5DURw_P1YYuGYUP_2KWDKCG96Sza2T4e_5-GdES7qbDT-6mwi7ELeJiCrGo2qm6SNSzYGHh1ubFxwd4xCXWSSPkueMT_ofIFn23u80ZX7M"/>
+</div>
+<div class="md:col-span-4 grid grid-rows-2 gap-gutter">
+<div class="overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" data-alt="Macro artistic shot of premium nail polish bottles arranged aesthetically on a marble surface. The colors are sophisticated nudes, muted golds, and deep burgundies. Gentle shadows and high-key lighting emphasize the premium quality of the products used at EPILISSE salon." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2Hx3vuWnUCdG302ANuLKXxRECXkZhPJMQhBTge4JCj7r0zbXF_mw0-b5XQTil8cw_hnxlyezWkvQV6BX77YBV4mJgewCDFthdvwXyNOQuhwLMKeNJQGpcU0dKZRTITouVexkonZC28FgwWc0a0q9jQSCTiA5kletSXtKhGO5F_EU3key0I0NFYyzqJvCgIexvRGOEhuFbBkRyLeuTjG-jeNv2R26LUbp7bKHw9E6IzSOQbTeOo-gHqCTUd0jMyYV8ptCaTZExeq98"/>
+</div>
+<div class="overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover hover:scale-105 transition-transform duration-700" data-alt="Close-up of a pedicure spa treatment. A foot is gently submerged in a bowl of warm water with floating rose petals and essential oils. The aesthetic is clean, spa-like, and incredibly relaxing, using a light color palette with organic textures." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAE23EybQaQHWO0EeGUMJ5MehRFpaLIeSCr14JFzPoTmxZIt0UDeVEqzpXK2bXrTQ8gR_gJpmKUDUtMKqZfIBttwR8VC7ysizB-Mh0D3huzKqOnZbsnnMlqSnrl5qc0RdYHqPgNqyqARUsDb6z7alIoUrs_hJOxZtD_2f6dTL6AJzi6RAd_3coRTuWUgWDQC1ns9FBBQ6_JuHxXXva_fBqK7gM76_StMcoaAyQhwcaN6PBYZFwEk-biFAnYdj3ugc-2s8e3-y0IPwhW"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Pricing Tables -->
+<section class="py-section-gap bg-surface-container-low">
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-20">
+<!-- Manicure & Shellac -->
+<div>
+<h2 class="font-headline-lg text-headline-lg mb-12 border-b border-outline-variant pb-4">Hände &amp; Finish</h2>
+<div class="space-y-8">
+<div class="flex justify-between items-baseline group cursor-default">
+<div>
+<h4 class="font-body-lg font-bold text-on-surface">Klassische Maniküre</h4>
+<p class="font-body-sm text-secondary">Formen, Nagelhautpflege, Massage &amp; Politur (45 Min)</p>
+</div>
+<span class="font-headline-md text-primary group-hover:scale-110 transition-transform">45 €</span>
+</div>
+<div class="flex justify-between items-baseline group cursor-default">
+<div>
+<h4 class="font-body-lg font-bold text-on-surface">EPILISSE Signature Shellac</h4>
+<p class="font-body-sm text-secondary">Inkl. Maniküre, kratzfest &amp; hochglänzend (75 Min)</p>
+</div>
+<span class="font-headline-md text-primary group-hover:scale-110 transition-transform">65 €</span>
+</div>
+<div class="flex justify-between items-baseline group cursor-default">
+<div>
+<h4 class="font-body-lg font-bold text-on-surface">Luxus Spa Maniküre</h4>
+<p class="font-body-sm text-secondary">Peeling, Packung, intensive Maske &amp; Massage (90 Min)</p>
+</div>
+<span class="font-headline-md text-primary group-hover:scale-110 transition-transform">85 €</span>
+</div>
+<div class="flex justify-between items-baseline group cursor-default">
+<div>
+<h4 class="font-body-lg font-bold text-on-surface">French Design / Nail Art</h4>
+<p class="font-body-sm text-secondary">Zusatzleistung pro Set</p>
+</div>
+<span class="font-headline-md text-primary group-hover:scale-110 transition-transform">ab 15 €</span>
+</div>
+</div>
+</div>
+<!-- Pedicure & Spa -->
+<div>
+<h2 class="font-headline-lg text-headline-lg mb-12 border-b border-outline-variant pb-4">Füße &amp; Wellness</h2>
+<div class="space-y-8">
+<div class="flex justify-between items-baseline group cursor-default">
+<div>
+<h4 class="font-body-lg font-bold text-on-surface">Medizinische Fußpflege</h4>
+<p class="font-body-sm text-secondary">Fachgerechte Behandlung &amp; Entspannung (50 Min)</p>
+</div>
+<span class="font-headline-md text-primary group-hover:scale-110 transition-transform">55 €</span>
+</div>
+<div class="flex justify-between items-baseline group cursor-default">
+<div>
+<h4 class="font-body-lg font-bold text-on-surface">Pediküre mit Shellac</h4>
+<p class="font-body-sm text-secondary">Perfekter Halt für Wochen (75 Min)</p>
+</div>
+<span class="font-headline-md text-primary group-hover:scale-110 transition-transform">75 €</span>
+</div>
+<div class="flex justify-between items-baseline group cursor-default">
+<div>
+<h4 class="font-body-lg font-bold text-on-surface">Royal Pediküre Spa</h4>
+<p class="font-body-sm text-secondary">Aromabad, Peeling, Paraffinbad &amp; Massage (90 Min)</p>
+</div>
+<span class="font-headline-md text-primary group-hover:scale-110 transition-transform">95 €</span>
+</div>
+<div class="flex justify-between items-baseline group cursor-default">
+<div>
+<h4 class="font-body-lg font-bold text-on-surface">Lackieren</h4>
+<p class="font-body-sm text-secondary">Mit klassischem Premium-Lack</p>
+</div>
+<span class="font-headline-md text-primary group-hover:scale-110 transition-transform">20 €</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Limited Edition Campaign -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop">
+<div class="max-w-[1440px] mx-auto bg-inverse-surface text-inverse-on-surface p-12 md:p-20 relative overflow-hidden flex flex-col md:flex-row items-center gap-12">
+<div class="absolute top-0 right-0 p-8">
+<span class="font-label-caps text-[10px] tracking-[0.4em] uppercase opacity-40">Seasonal Selection 2024</span>
+</div>
+<div class="md:w-1/2 z-10">
+<span class="bg-primary-container text-on-primary-container px-4 py-1 font-label-caps text-[12px] rounded-full mb-6 inline-block">LIMITED EDITION</span>
+<h2 class="font-headline-lg text-[40px] md:text-[56px] leading-tight mb-6">Velvet Touch Combo</h2>
+<p class="font-body-lg text-surface-variant mb-10 text-lg max-w-md">
+                    Gönnen Sie sich das ultimative Duo. Unsere exklusive Kombination aus Spa-Maniküre &amp; Spa-Pediküre inkl. Shellac und einer Flasche Champagner während der Behandlung.
+                </p>
+<div class="flex items-baseline gap-4 mb-10">
+<span class="font-display-lg text-primary-fixed">145 €</span>
+<span class="font-body-md line-through opacity-50">180 € Einzelpreis</span>
+</div>
+<button class="bg-primary-fixed text-on-primary-fixed px-10 py-5 font-label-caps text-label-caps tracking-[0.2em] uppercase hover:bg-primary-fixed-dim transition-all shadow-xl">Angebot Sichern</button>
+</div>
+<div class="md:w-1/2 relative h-[400px] w-full">
+<img class="w-full h-full object-cover" data-alt="A luxurious lifestyle shot representing the 'Velvet Touch Combo'. Two hands with perfectly manicured nude nails gently hold a crystal champagne glass. In the background, blurred hints of a luxury spa environment with soft candlelight and silk fabrics create a high-end, aspirational atmosphere. The lighting is golden and warm." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9Jgcgz1lnxvUeFEc6mJMhe2fEQ_S7p7HqKt66Xz-k9ENiAAqtl5TMcgoL8KLRf78R0-wppwEv-4FLWZqaQ-5eJphTdHeXT8VwSjV2KqVi_XldRkOSaQSereWSQNPe2HOnDACmji6f22QeEcZUQSqoZHT7oiyLRNYYPsb69N6HuRaI0SUP0BrdNcAW08nJmomDxLZadSl9ZKoER-eetlH2O2cNrFikoJfTnvg0pKM_AvPxwDxBPA6NpLhfP0TI-YyWHtuvNutTlkHk"/>
+<div class="absolute -bottom-4 -right-4 border border-primary-fixed w-full h-full -z-10"></div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-surface-container-highest border-t border-outline-variant">
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="col-span-1 md:col-span-2">
+<div class="font-display-lg text-headline-md text-primary mb-6">EPILISSE</div>
+<p class="font-body-md text-secondary max-w-sm mb-8">
+                    Ihr Rückzugsort für exzellente Beauty-Treatments in München. Wir definieren Schönheit durch Präzision und Ruhe neu.
+                </p>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-secondary hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">share</span>
+</a>
+<a class="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center text-secondary hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">camera</span>
+</a>
+</div>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm mb-6">Quick Links</h4>
+<ul class="space-y-4">
+<li><a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">Behandlungen</a></li>
+<li><a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">Preise</a></li>
+<li><a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">Über Uns</a></li>
+<li><a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">Karriere</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-headline-sm text-headline-sm mb-6">Rechtliches</h4>
+<ul class="space-y-4">
+<li><a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">Impressum</a></li>
+<li><a class="font-body-sm text-secondary hover:text-primary transition-colors underline" href="#">Datenschutz</a></li>
+<li><a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">AGB</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-8 border-t border-outline-variant/30 text-center">
+<p class="font-body-sm text-secondary">© 2024 EPILISSE - Luxury Beauty Care Munich.</p>
+</div>
+</footer>
+<script>
+        // Smooth reveal interaction for pricing items
+        const pricingItems = document.querySelectorAll('.group');
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                    }, index * 50);
+                }
+            });
+        }, observerOptions);
+
+        pricingItems.forEach(item => {
+            item.classList.add('opacity-0', 'translate-y-4', 'transition-all', 'duration-700');
+            observer.observe(item);
+        });
+
+        // Simple parallax effect for hero image
+        window.addEventListener('scroll', () => {
+            const scroll = window.pageYOffset;
+            const heroImage = document.querySelector('header img');
+            if (heroImage) {
+                heroImage.style.transform = `translateY(${scroll * 0.1}px)`;
+            }
+        });
+    </script>
+</body></html>

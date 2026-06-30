@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EPILISSE Admin | Luxury Beauty Management</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#5f5e5a",
+                    "primary-container": "#c5a021",
+                    "on-primary-fixed-variant": "#574500",
+                    "on-error-container": "#93000a",
+                    "on-secondary-container": "#656460",
+                    "tertiary-container": "#a3a4a4",
+                    "secondary-container": "#e5e2dc",
+                    "outline": "#7f7663",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#d0c5af",
+                    "primary-fixed-dim": "#eac243",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#483800",
+                    "surface": "#fcf9f8",
+                    "error": "#ba1a1a",
+                    "on-tertiary-container": "#383a3b",
+                    "tertiary-fixed": "#e2e2e2",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-surface-variant": "#4d4635",
+                    "inverse-surface": "#313030",
+                    "surface-dim": "#dcd9d9",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "surface-container-high": "#eae7e7",
+                    "surface-tint": "#745b00",
+                    "inverse-on-surface": "#f3f0ef",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed": "#241a00",
+                    "surface-variant": "#e5e2e1",
+                    "on-background": "#1c1b1b",
+                    "surface-container-highest": "#e5e2e1",
+                    "primary-fixed": "#ffe089",
+                    "surface-container": "#f0eded",
+                    "secondary-fixed": "#e5e2dc",
+                    "secondary-fixed-dim": "#c9c6c1",
+                    "background": "#fcf9f8",
+                    "surface-bright": "#fcf9f8",
+                    "on-secondary-fixed-variant": "#474743",
+                    "on-secondary-fixed": "#1c1c18",
+                    "on-primary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "primary": "#745b00",
+                    "inverse-primary": "#eac243",
+                    "surface-container-low": "#f6f3f2",
+                    "tertiary": "#5d5f5f",
+                    "on-surface": "#1c1b1b",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "unit": "8px",
+                    "section-gap": "80px",
+                    "container-max-width": "1440px",
+                    "gutter": "24px",
+                    "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Playfair Display"],
+                    "headline-lg-mobile": ["Playfair Display"],
+                    "body-lg": ["Manrope"],
+                    "headline-sm": ["Playfair Display"],
+                    "body-sm": ["Manrope"],
+                    "headline-lg": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "body-md": ["Manrope"],
+                    "label-caps": ["Manrope"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-tab {
+            box-shadow: inset 4px 0 0 0 #745b00;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d0c5af;
+            border-radius: 10px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md overflow-hidden flex h-screen">
+<!-- Sidebar Navigation -->
+<aside class="w-[280px] h-full bg-surface-container-low border-r border-outline-variant flex flex-col shrink-0">
+<div class="p-8">
+<h1 class="font-display-lg text-headline-sm text-primary tracking-widest uppercase">EPILISSE Admin</h1>
+<p class="font-label-caps text-[10px] text-outline mt-1 tracking-[0.2em]">MUNICH STUDIO</p>
+</div>
+<nav class="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
+<a class="flex items-center gap-4 px-4 py-3 bg-secondary-container/50 text-primary font-bold transition-all rounded-lg active-tab" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/30 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-body-md">Termine</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/30 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">content_cut</span>
+<span class="font-body-md">Behandlungen</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/30 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md">Kunden</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/30 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md">Einstellungen</span>
+</a>
+</nav>
+<div class="p-6 border-t border-outline-variant">
+<button class="w-full bg-primary text-on-primary py-3 px-4 flex items-center justify-center gap-2 rounded hover:brightness-90 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span class="font-label-caps uppercase">Neuer Termin</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-surface overflow-hidden">
+<!-- Top App Bar -->
+<header class="h-20 border-b border-outline-variant/30 flex items-center justify-between px-8 bg-surface/80 backdrop-blur-md sticky top-0 z-10">
+<div class="flex items-center gap-4">
+<h2 class="font-headline-md text-on-surface">Dashboard</h2>
+<span class="text-outline-variant">|</span>
+<p class="font-body-sm text-secondary">Willkommen zurück, Administrator</p>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full"></span>
+</div>
+<div class="flex items-center gap-3 pl-6 border-l border-outline-variant">
+<div class="text-right">
+<p class="font-label-caps text-on-surface">Admin Profile</p>
+<p class="font-label-caps text-[10px] text-outline uppercase tracking-wider">Premium Access</p>
+</div>
+<img class="w-10 h-10 rounded-full border border-primary/20 object-cover" data-alt="A professional headshot of a high-end salon manager, clean lighting, minimalist background, wearing professional attire in soft neutral tones, embodying the luxury beauty industry aesthetic of Epilisse Munich." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBFj21Om9XowLHsKiXG62w7PzaXF8RdWYzqa4mg5ri-be4v-1UrCAKkDss76kXoID-JIDcOrNWOIZRa5iCMgMFlKAs9LBP4OXHj9e5A7X6OpAeKBnJBbrtSgpanUDt59oSK64Z1U5pQUkwOq_TaN7uDsLX0Ecrkl5Z-TK8O0iq8UHZ-CFAOv_MRCsaFv3dH-fYTyYMMpXYPSy9n1nQ15R28FgHh654tPIHAcmte-wip1iU3Y8QOzDc_pfn6-iiZzCmZnQytdFCExnW"/>
+</div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-8 space-y-gutter custom-scrollbar">
+<!-- 1. Overview Area -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-6 rounded-xl flex flex-col justify-between hover:border-primary/30 transition-colors">
+<div>
+<p class="font-label-caps text-outline uppercase tracking-widest text-[10px]">Heute</p>
+<h3 class="font-headline-md mt-1">12 Termine</h3>
+</div>
+<div class="flex items-center gap-2 mt-4 text-primary">
+<span class="material-symbols-outlined text-[18px]">trending_up</span>
+<span class="font-body-sm">+15% vs. Gestern</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-6 rounded-xl flex flex-col justify-between hover:border-primary/30 transition-colors">
+<div>
+<p class="font-label-caps text-outline uppercase tracking-widest text-[10px]">Gesamt Kunden</p>
+<h3 class="font-headline-md mt-1">1,482</h3>
+</div>
+<div class="flex items-center gap-2 mt-4 text-primary">
+<span class="material-symbols-outlined text-[18px]">group</span>
+<span class="font-body-sm">48 Neuregistrierungen</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-6 rounded-xl flex flex-col justify-between hover:border-primary/30 transition-colors">
+<div>
+<p class="font-label-caps text-outline uppercase tracking-widest text-[10px]">Aktive Services</p>
+<h3 class="font-headline-md mt-1">24 Behandlungen</h3>
+</div>
+<div class="flex items-center gap-2 mt-4 text-primary">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span class="font-body-sm">In 5 Kategorien</span>
+</div>
+</div>
+</section>
+<!-- 2. Landing Page Management -->
+<section class="space-y-6">
+<div class="flex items-center justify-between border-b border-outline-variant pb-2">
+<h3 class="font-headline-sm">Landing Page Management</h3>
+<span class="font-label-caps text-[10px] text-outline">Live-Vorschau verfügbar</span>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<!-- Hero Section Editor -->
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-8 rounded-xl space-y-6">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-label-caps uppercase tracking-widest">Hero Sektion</span>
+</div>
+<div class="space-y-4">
+<div>
+<label class="font-label-caps text-[10px] text-outline uppercase block mb-2">Headline</label>
+<input class="w-full border-b border-outline-variant bg-transparent py-2 font-display-lg text-headline-sm focus:border-primary focus:ring-0 outline-none transition-all" type="text" value="Sanfte Epilation &amp; Luxus-Pflege"/>
+</div>
+<div>
+<label class="font-label-caps text-[10px] text-outline uppercase block mb-2">Subtext</label>
+<textarea class="w-full border-b border-outline-variant bg-transparent py-2 font-body-md focus:border-primary focus:ring-0 outline-none resize-none transition-all" rows="2">Erleben Sie die nächste Stufe der Haarentfernung im Herzen von München.</textarea>
+</div>
+<div>
+<label class="font-label-caps text-[10px] text-outline uppercase block mb-2">Hero Hintergrundbild</label>
+<div class="relative group h-40 w-full rounded-lg overflow-hidden border border-dashed border-outline-variant bg-surface-container flex items-center justify-center cursor-pointer">
+<div class="absolute inset-0 z-0 bg-cover bg-center opacity-50 transition-opacity group-hover:opacity-70" data-alt="A luxurious minimalist beauty salon interior in Munich, featuring warm white walls, golden accents, soft natural light streaming through large windows, and a serene, high-end atmosphere suitable for an aesthetic clinic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDIuAiDdbAK4CrXw6oHsfzE6njj8oU_GLTVmeN887IeJ9LSEhN3wMEyrsaniFNs6hCqZqiBWwa6T3DLyBT1xiUX-ltBxIZz1qmQ225pSUE2_r-F6xiecsWuxSwFSuALS27sTeLB-zBdRQH8wHKf238lSfEkgf6PS5Ui-fa1WSDmHkJrtrkSPfoxQ2avWCM-quoxjreGE1a1JTpQsscngWwDnXqKUEY6HX5K4eolmXmjl6n8XLFOAOvahUS_bUyEjdBhoQA5--HmLmCN')"></div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<span class="material-symbols-outlined text-primary">cloud_upload</span>
+<span class="font-body-sm text-secondary">Klicken zum Aktualisieren</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Stories Management -->
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-8 rounded-xl space-y-6">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="font-label-caps uppercase tracking-widest">Story Slides</span>
+</div>
+<button class="text-primary font-label-caps hover:underline">+ Slide hinzufügen</button>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<!-- Slide 1 -->
+<div class="relative aspect-[9/16] rounded-lg overflow-hidden group border border-outline-variant">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="Macro photography of a luxury beauty treatment, focusing on glowing, smooth skin and golden-toned professional equipment in a bright, clean-light setting, representing the premium services of Epilisse." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWHcPpLsvHE27On8-5zLgxlDUla9Pwrj7SILWOeQwlV_VAYpQLtihntjWZAL-DeKbSikcYvGLCrjLmWiZxPbcrkR39M0-uzyGLmU1BvftaSMpNJjplUHTYqn1gT1ssDswr7fl1ljk-qEwK7iK2QlDZfUvkfeAYbWyr6qO6Ze-oOtkOWpQyOsPKd6Lv_YZvchaPS3mW1N4Hzko6TVTJtpqfHhJPCkWXYGDmhb3KR949DabVzHw5uV-FR-mjatRfkmk2MLkiegCnP09J"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="bg-white/20 p-2 rounded-full hover:bg-white/40"><span class="material-symbols-outlined text-white text-[18px]">edit</span></button>
+<button class="bg-white/20 p-2 rounded-full hover:bg-error/40"><span class="material-symbols-outlined text-white text-[18px]">delete</span></button>
+</div>
+<div class="absolute bottom-2 left-2 right-2 text-white text-[8px] font-label-caps">Laser Treatment</div>
+</div>
+<!-- Slide 2 -->
+<div class="relative aspect-[9/16] rounded-lg overflow-hidden group border border-outline-variant">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="A high-end skincare product bottle placed on a marble surface with soft shadows, minimalist packaging, golden details, reflecting a luxury beauty experience in a high-key lighting environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx5NMh8S9zrndr8ixHqBwWCftv8kuWe4PG9tYTv2PiIE6iD_Qdz5BYaysSzGqdKYY3cTW1zTSGMwrs6b9ZktvLcXoMzzvSdOHSV_WXJQNDwHlN2N52P4gPQBGyOFZxSE5f2eJIT9Aik8uX6rzrpWrN4qU7BgsJg14Ty_75gushhgyVgn7qNORtqa8hzpTtd74aTPxJ6lbo_1QoMvWRqS6ap57XUHTm2jEu2c1eSTZ2GBDNmLquy_7N9iVSyO7JL-b8K5JzpWP6zy6T"/>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+<button class="bg-white/20 p-2 rounded-full hover:bg-white/40"><span class="material-symbols-outlined text-white text-[18px]">edit</span></button>
+<button class="bg-white/20 p-2 rounded-full hover:bg-error/40"><span class="material-symbols-outlined text-white text-[18px]">delete</span></button>
+</div>
+<div class="absolute bottom-2 left-2 right-2 text-white text-[8px] font-label-caps">Luxury Skin</div>
+</div>
+<!-- Slide Placeholder -->
+<div class="aspect-[9/16] rounded-lg border-2 border-dashed border-outline-variant bg-surface-container flex flex-col items-center justify-center text-outline-variant hover:text-primary hover:border-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-label-caps text-[10px] mt-2">Neu</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. Kategorien & Services -->
+<section class="space-y-6">
+<div class="flex items-center justify-between border-b border-outline-variant pb-2">
+<div class="flex items-baseline gap-4">
+<h3 class="font-headline-sm">Kategorien &amp; Services</h3>
+<span class="font-body-sm text-primary bg-primary-container/20 px-2 py-0.5 rounded">5/6 Slots belegt</span>
+</div>
+<p class="font-body-sm text-secondary italic text-right max-w-xs">Hinweis: Das Hinzufügen einer 6. Kategorie schaltet das Gitter-Layout der Live-Seite automatisch um.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Category Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-5 rounded-xl flex items-center justify-between group hover:shadow-sm transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-secondary-container/50 rounded flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">flare</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-body-lg">Laser Epilation</h4>
+<p class="font-body-sm text-outline">8 Services aktiv</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary cursor-pointer">chevron_right</span>
+</div>
+<!-- Category Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-5 rounded-xl flex items-center justify-between group hover:shadow-sm transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-secondary-container/50 rounded flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">spa</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-body-lg">Gesichtsbehandlung</h4>
+<p class="font-body-sm text-outline">5 Services aktiv</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary cursor-pointer">chevron_right</span>
+</div>
+<!-- Category Card 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-5 rounded-xl flex items-center justify-between group hover:shadow-sm transition-all">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-secondary-container/50 rounded flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">health_and_safety</span>
+</div>
+<div>
+<h4 class="font-headline-sm text-body-lg">Körperpflege</h4>
+<p class="font-body-sm text-outline">4 Services aktiv</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary cursor-pointer">chevron_right</span>
+</div>
+<!-- Add Category Placeholder -->
+<button class="border-2 border-dashed border-outline-variant bg-surface/50 rounded-xl p-5 flex items-center justify-center gap-3 text-outline hover:text-primary hover:border-primary transition-all group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">add_circle</span>
+<span class="font-label-caps uppercase tracking-widest">Neue Kategorie hinzufügen</span>
+</button>
+</div>
+</section>
+<!-- 4. Google Calendar Widget -->
+<section class="space-y-6">
+<div class="flex items-center justify-between border-b border-outline-variant pb-2">
+<h3 class="font-headline-sm">Google Calendar Integration</h3>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+<span class="font-label-caps text-[10px] text-green-600">Verbunden</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/50 rounded-xl overflow-hidden flex flex-col md:flex-row h-96">
+<div class="md:w-1/3 p-8 bg-surface-container-low border-r border-outline-variant/30 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 text-primary mb-4">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label-caps uppercase tracking-widest">Live Sync Status</span>
+</div>
+<p class="font-body-md text-on-surface">Alle Buchungen über 'Termin Buchen' werden automatisch mit Ihrem Münchener Studio-Kalender synchronisiert.</p>
+</div>
+<div class="space-y-3">
+<a class="flex items-center justify-between p-3 bg-white border border-outline-variant rounded hover:border-primary transition-all group" href="#">
+<span class="font-body-sm">Kalender öffnen</span>
+<span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">open_in_new</span>
+</a>
+<a class="flex items-center justify-between p-3 bg-white border border-outline-variant rounded hover:border-primary transition-all group" href="#">
+<span class="font-body-sm">Sync-Einstellungen</span>
+<span class="material-symbols-outlined text-[16px] group-hover:rotate-45 transition-transform">settings</span>
+</a>
+</div>
+</div>
+<div class="flex-1 bg-[#fcf9f8] p-4 flex items-center justify-center relative">
+<!-- Simulated Calendar Interface -->
+<div class="w-full h-full border border-outline-variant rounded shadow-inner bg-white overflow-hidden flex flex-col">
+<div class="h-10 border-b border-outline-variant/30 flex items-center px-4 justify-between bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">arrow_back_ios</span>
+<span class="font-label-caps text-[10px]">Oktober 2024</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward_ios</span>
+</div>
+<span class="font-label-caps text-[10px] bg-primary/10 px-2 py-0.5 rounded text-primary">Heute</span>
+</div>
+<div class="flex-1 grid grid-cols-7 gap-px bg-outline-variant/20 p-px">
+<!-- Calendar Grid Mock -->
+<script>
+                                    for(let i=0; i<35; i++) {
+                                        document.write(`<div class="bg-white p-2 text-[10px] text-outline ${i===15 ? 'ring-2 ring-primary ring-inset' : ''}">
+                                            <div class="flex justify-between">
+                                                <span>${(i%31)+1}</span>
+                                                ${i % 7 === 2 ? '<span class="w-1 h-1 bg-primary rounded-full"></span>' : ''}
+                                            </div>
+                                            ${i === 15 ? '<div class="mt-1 bg-primary/10 text-primary p-1 rounded-sm scale-90 origin-left">Laser Appt.</div>' : ''}
+                                        </div>`);
+                                    }
+                                </script>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Sticky Footer Summary -->
+<footer class="h-12 border-t border-outline-variant flex items-center justify-between px-8 bg-surface-container-highest text-secondary text-[11px] font-label-caps">
+<p>© 2024 EPILISSE - Luxury Beauty Care Munich | Admin Console v2.4.0</p>
+<div class="flex gap-4">
+<a class="hover:text-primary transition-colors" href="#">Support</a>
+<a class="hover:text-primary transition-colors" href="#">Impressum</a>
+</div>
+</footer>
+</main>
+<!-- Global Interactions Script -->
+<script>
+        // Simple micro-interaction for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => btn.classList.add('scale-95'));
+            btn.addEventListener('mouseup', () => btn.classList.remove('scale-95'));
+            btn.addEventListener('mouseleave', () => btn.classList.remove('scale-95'));
+        });
+
+        // Hover effect for side nav
+        const navLinks = document.querySelectorAll('aside nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                if(!link.classList.contains('active-tab')) {
+                    link.style.transform = 'translateX(4px)';
+                }
+            });
+            link.addEventListener('mouseleave', () => {
+                link.style.transform = 'translateX(0)';
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,86 @@
+{
+  "nav": {
+    "behandlungen": "Tedaviler",
+    "preise": "Fiyatlar",
+    "ueberUns": "Hakkımızda",
+    "kontakt": "İletişim",
+    "cta": "RANDEVU AL",
+    "lang": "TR"
+  },
+  "hero": {
+    "slide1Headline": "Zamansız Güzellik.",
+    "slide1Sub": "Münih'teki özel stüdyomuzda estetik mükemmelliğin sanatını keşfedin.",
+    "slide1Cta": "RANDEVU AL",
+    "slide2Headline": "Yumuşak Pürüzsüzlük.",
+    "slide2Sub": "Kalıcı bir ipeksi cilt hissi için hassas lazer epilasyon. Ağrısız ve etkili.",
+    "slide2Cta": "DAHA FAZLA BİLGİ",
+    "slide3Headline": "Yüz Estetiği.",
+    "slide3Sub": "Parlak cilt ve doğal gençleşme için bireysel tedaviler.",
+    "slide3Cta": "TEKLİFİ GÖR",
+    "slide4Headline": "Mükemmel Bakım.",
+    "slide4Sub": "Elleriniz ve ayaklarınız için en yüksek düzeyde manikür ve pedikür.",
+    "slide4Cta": "ŞİMDİ AL"
+  },
+  "services": {
+    "sectionLabel": "HİZMETLERİMİZ",
+    "sectionTitle": "Özel Tedaviler",
+    "laser": "Lazer Epilasyon",
+    "laserDesc": "En modern teknoloji ile kalıcı pürüzsüzlük.",
+    "laserSeo": "Münih'te Kalıcı Epilasyon",
+    "facial": "Yüz Estetiği",
+    "facialDesc": "Münih'te Hydrafacial ve premium cilt bakımı.",
+    "body": "Vücut Şekillendirme",
+    "bodyDesc": "En yüksek estetik seviyede vücut şekillendirme.",
+    "injectables": "Enjeksiyonlar",
+    "injectablesDesc": "Hassasiyetle doğal gençleşme.",
+    "mani": "Manikür & Pedikür",
+    "maniDesc": "Mükemmel görünüm için tırnak estetiği.",
+    "andere": "Wellness & Fazlası",
+    "discover": "KEŞFEDİN",
+    "details": "DETAYLAR"
+  },
+  "promo": {
+    "label": "ÖZEL TEKLİF",
+    "title": "Kış Parlaklığı\nKombi Paketi",
+    "desc": "Yüz nemlendirme ve manikür kombinasyonumuza özel %20 indirim kazanın. Sezon sonuna kadar geçerlidir.",
+    "ctaPrimary": "TEKLİFİ KAPAT",
+    "ctaSecondary": "DETAYLARI GÖR"
+  },
+  "about": {
+    "sectionLabel": "EPİLİSSE HAKKINDA",
+    "title": "Münih'in Premium Estetik Adresi",
+    "desc": "EPILISSE Stüdyosu'na hoş geldiniz – Münih'in kalbindeki özel güzellik stüdyonuz. En modern tedavi yöntemlerini bireysel güzelliğe derin anlayışla birleştiriyoruz.",
+    "value1Title": "Kalite",
+    "value1Desc": "Klinik düzeyde yalnızca sertifikalı teknolojiler ve tıbbi aktif bileşenler.",
+    "value2Title": "Gizlilik",
+    "value2Desc": "Kişisel güzellik yolculuğunuz için korunaklı bir alan – tamamen gizli.",
+    "value3Title": "Mükemmellik",
+    "value3Desc": "Her tedavi, cilt tipinize ve isteklerinize göre bireysel olarak uyarlanır."
+  },
+  "contact": {
+    "sectionLabel": "İLETİŞİM & KONUM",
+    "title": "Münih'te Bizi Ziyaret Edin",
+    "addressTitle": "Stüdyo Adresi",
+    "address": "ADRES PLACEHOLDER\nMünih, Almanya",
+    "hoursTitle": "Çalışma Saatleri",
+    "hours": "Pzt – Cmt: 09:00 – 20:00\nPaz: Kapalı",
+    "phoneTitle": "Telefon",
+    "phone": "+49 (0) 89 XXX XXX XX",
+    "ctaCalendar": "RANDEVU AL",
+    "ctaWhatsapp": "WhatsApp İletişim",
+    "ctaMaps": "Google Maps"
+  },
+  "footer": {
+    "tagline": "Münih'in kalbinde özel güzellik ve kalıcı epilasyon uzmanınız. Kalite, gizlilik ve mükemmellik.",
+    "behandlungenTitle": "Tedaviler",
+    "studioTitle": "Stüdyo",
+    "legalTitle": "Yasal",
+    "impressum": "Künye",
+    "datenschutz": "Gizlilik Politikası",
+    "agb": "Kullanım Şartları",
+    "karriere": "Kariyer",
+    "copyright": "© 2025 EPILISSE – Luxury Beauty Care Munich.",
+    "badge1": "MÜNIH'TEN",
+    "badge2": "GÜVENLİ ÖDEME"
+  }
+}

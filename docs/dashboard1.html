@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EPILISSE Admin | Category &amp; Service Controller</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "surface-tint": "#745b00",
+                    "on-secondary-fixed": "#1c1c18",
+                    "surface-container-high": "#eae7e7",
+                    "surface-variant": "#e5e2e1",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#e5e2dc",
+                    "on-tertiary-container": "#383a3b",
+                    "secondary-fixed-dim": "#c9c6c1",
+                    "on-surface": "#1c1b1b",
+                    "tertiary": "#5d5f5f",
+                    "on-surface-variant": "#4d4635",
+                    "on-error-container": "#93000a",
+                    "secondary": "#5f5e5a",
+                    "primary-container": "#c5a021",
+                    "tertiary-container": "#a3a4a4",
+                    "on-background": "#1c1b1b",
+                    "primary-fixed": "#ffe089",
+                    "surface-bright": "#fcf9f8",
+                    "on-secondary": "#ffffff",
+                    "outline": "#7f7663",
+                    "tertiary-fixed": "#e2e2e2",
+                    "primary-fixed-dim": "#eac243",
+                    "surface-container-highest": "#e5e2e1",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#474743",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "secondary-container": "#e5e2dc",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-primary-fixed": "#241a00",
+                    "inverse-primary": "#eac243",
+                    "inverse-on-surface": "#f3f0ef",
+                    "surface-dim": "#dcd9d9",
+                    "primary": "#745b00",
+                    "on-primary-container": "#483800",
+                    "on-secondary-container": "#656460",
+                    "on-primary-fixed-variant": "#574500",
+                    "surface-container-low": "#f6f3f2",
+                    "surface": "#fcf9f8",
+                    "inverse-surface": "#313030",
+                    "outline-variant": "#d0c5af",
+                    "surface-container-lowest": "#ffffff",
+                    "background": "#fcf9f8",
+                    "surface-container": "#f0eded"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px",
+                    "container-max-width": "1440px",
+                    "unit": "8px",
+                    "section-gap": "80px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Manrope"],
+                    "body-md": ["Manrope"],
+                    "headline-sm": ["Playfair Display"],
+                    "label-caps": ["Manrope"],
+                    "body-lg": ["Manrope"],
+                    "headline-md": ["Playfair Display"],
+                    "headline-lg": ["Playfair Display"],
+                    "headline-lg-mobile": ["Playfair Display"],
+                    "display-lg": ["Playfair Display"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "label-caps": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .active-nav-link {
+            background-color: rgba(229, 226, 220, 0.5); /* style_active_navigation from JSON mapping */
+            font-weight: 700;
+            color: #745b00;
+        }
+        .custom-shadow {
+            box-shadow: 0px 4px 20px rgba(0,0,0,0.04);
+        }
+        /* Custom scrollbar for cleaner look */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #fcf9f8; }
+        ::-webkit-scrollbar-thumb { background: #d0c5af; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-surface-container-low border-r border-outline-variant flex flex-col p-8 z-50">
+<!-- Brand Header -->
+<div class="mb-12">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 rounded-full bg-cover bg-center overflow-hidden border border-outline-variant" data-alt="A sophisticated professional portrait of a beauty salon administrator. The lighting is soft and high-end, reflecting a luxury spa environment. She is dressed in minimalist professional attire. The background shows a hint of a modern, clean treatment room with cream and gold accents. High-resolution editorial photography style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCGWuLGuQq_VFMjVT8a7sOD1ycMjpZvG7F347oSAmCNaYffYLo5eHrkfE63XchfxGfVfcKRNmFIWaNNMhb672MGZ7Rw14EN_-5ZI0i9UZ4u7_N_NkOqtBOJo45_lfLqKsoGeb5nOJroH7FRd5G6ZWPWxZMPySsAlynB5jzZNS659dyIfB5WVrUmjP-exr9j4tm-pvCnrSNpGhiAc3-StYLvFMfBGwdqTKBQbxga9hvO99JovJuafH_sYC0UZ74pFSOn-9uCn5GMnypm')"></div>
+<div>
+<h1 class="font-display-lg text-headline-sm text-primary tracking-tight">EPILISSE Admin</h1>
+<p class="font-body-sm text-on-surface-variant opacity-70">Munich Studio</p>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-3 px-4 font-label-caps text-label-caps flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Neuer Termin
+            </button>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/30 transition-all font-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/30 transition-all font-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span>Termine</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 active-nav-link transition-all font-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="content_cut">content_cut</span>
+<span>Behandlungen</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/30 transition-all font-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>Kunden</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-secondary-container/30 transition-all font-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Einstellungen</span>
+</a>
+</nav>
+<!-- Footer Actions -->
+<div class="mt-auto pt-8 border-t border-outline-variant/30 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary transition-colors font-body-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+                Support
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-error transition-colors font-body-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+                Abmelden
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-[280px] flex-1 p-margin-desktop overflow-y-auto">
+<!-- Header & Action Bar -->
+<header class="flex justify-between items-start mb-12">
+<div>
+<h2 class="font-headline-lg text-display-lg text-on-surface mb-2">Master Category Controller</h2>
+<p class="font-body-lg text-on-surface-variant max-w-2xl opacity-80">Zentrale Verwaltung der übergeordneten Behandlungs- und Service-Kategorien für das Epilisse Beauty-Ökosystem.</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex bg-surface-container-high p-1 rounded-sm">
+<button class="px-3 py-1 font-label-caps text-[10px] bg-white text-primary shadow-sm">DE</button>
+<button class="px-3 py-1 font-label-caps text-[10px] text-on-surface-variant opacity-50">EN</button>
+<button class="px-3 py-1 font-label-caps text-[10px] text-on-surface-variant opacity-50">TR</button>
+</div>
+<button class="bg-primary text-on-primary py-3 px-6 font-label-caps text-label-caps hover:brightness-110 transition-all">
+                    Änderungen veröffentlichen
+                </button>
+</div>
+</header>
+<!-- Main Categories Grid (Bento Style) -->
+<section class="bg-surface-container-lowest border border-outline-variant p-8 mb-section-gap custom-shadow">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary" data-icon="category">category</span>
+<h3 class="font-headline-md text-headline-sm text-on-surface">Hauptkategorien</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-gutter">
+<!-- Category Card 1: Active Selection -->
+<div class="group relative bg-surface-container-low border-2 border-primary p-6 transition-all cursor-pointer">
+<div class="flex justify-between mb-6">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-caps text-[10px] bg-primary/10 text-primary px-2 py-0.5">Sichtbar</span>
+</div>
+<h4 class="font-headline-sm text-on-surface mb-2 leading-tight">Laser-Haarentfernung</h4>
+<p class="font-body-sm text-on-surface-variant mb-6 opacity-70 line-clamp-2">Premium Diodenlaser-Technologie für seidig glatte Haut.</p>
+<div class="flex gap-2">
+<button class="flex-1 py-2 text-[10px] font-label-caps border border-primary text-primary hover:bg-primary hover:text-white transition-colors">Edit</button>
+<button class="py-2 px-2 border border-outline-variant text-on-surface-variant hover:bg-surface transition-colors">
+<span class="material-symbols-outlined text-[16px]">settings</span>
+</button>
+</div>
+</div>
+<!-- Category Card 2 -->
+<div class="group relative bg-surface p-6 border border-outline-variant hover:border-primary/50 transition-all cursor-pointer">
+<div class="flex justify-between mb-6">
+<span class="material-symbols-outlined text-secondary text-3xl" data-icon="face">face</span>
+<span class="font-label-caps text-[10px] bg-primary/10 text-primary px-2 py-0.5">Sichtbar</span>
+</div>
+<h4 class="font-headline-sm text-on-surface mb-2 leading-tight">Gesichtsästhetik</h4>
+<p class="font-body-sm text-on-surface-variant mb-6 opacity-70 line-clamp-2">Exklusive Behandlungen für strahlende Hautgesundheit.</p>
+<div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex-1 py-2 text-[10px] font-label-caps border border-outline-variant text-on-surface hover:border-primary transition-colors">Edit</button>
+</div>
+</div>
+<!-- Category Card 3 -->
+<div class="group relative bg-surface p-6 border border-outline-variant hover:border-primary/50 transition-all cursor-pointer">
+<div class="flex justify-between mb-6">
+<span class="material-symbols-outlined text-secondary text-3xl" data-icon="body_system">body_system</span>
+<span class="font-label-caps text-[10px] bg-error-container text-error px-2 py-0.5">Verborgen</span>
+</div>
+<h4 class="font-headline-sm text-on-surface mb-2 leading-tight">Body Contouring</h4>
+<p class="font-body-sm text-on-surface-variant mb-6 opacity-70 line-clamp-2">Nicht-invasive Formung Ihrer Silhouette.</p>
+<div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex-1 py-2 text-[10px] font-label-caps border border-outline-variant text-on-surface transition-colors">Edit</button>
+</div>
+</div>
+<!-- Category Card 4 -->
+<div class="group relative bg-surface p-6 border border-outline-variant hover:border-primary/50 transition-all cursor-pointer">
+<div class="flex justify-between mb-6">
+<span class="material-symbols-outlined text-secondary text-3xl" data-icon="vaccines">vaccines</span>
+<span class="font-label-caps text-[10px] bg-primary/10 text-primary px-2 py-0.5">Sichtbar</span>
+</div>
+<h4 class="font-headline-sm text-on-surface mb-2 leading-tight">Injectables</h4>
+<p class="font-body-sm text-on-surface-variant mb-6 opacity-70 line-clamp-2">Präzise Hyaluron- und Botox-Behandlungen.</p>
+<div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex-1 py-2 text-[10px] font-label-caps border border-outline-variant text-on-surface transition-colors">Edit</button>
+</div>
+</div>
+<!-- Category Card 5 -->
+<div class="group relative bg-surface p-6 border border-outline-variant hover:border-primary/50 transition-all cursor-pointer">
+<div class="flex justify-between mb-6">
+<span class="material-symbols-outlined text-secondary text-3xl" data-icon="spa">spa</span>
+<span class="font-label-caps text-[10px] bg-primary/10 text-primary px-2 py-0.5">Sichtbar</span>
+</div>
+<h4 class="font-headline-sm text-on-surface mb-2 leading-tight">Maniküre</h4>
+<p class="font-body-sm text-on-surface-variant mb-6 opacity-70 line-clamp-2">Luxuriöse Nagelpflege und Handmassage.</p>
+<div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex-1 py-2 text-[10px] font-label-caps border border-outline-variant text-on-surface transition-colors">Edit</button>
+</div>
+</div>
+<!-- Empty State: New Category -->
+<div class="group relative border-2 border-dashed border-outline-variant p-6 flex flex-col items-center justify-center text-center hover:bg-surface-container transition-all cursor-pointer">
+<div class="w-12 h-12 rounded-full border border-outline-variant flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-outline">add</span>
+</div>
+<h4 class="font-label-caps text-on-surface-variant text-[12px]">Neue Kategorie</h4>
+<p class="font-body-sm text-outline text-[11px] mt-1 italic">z.B. Wellness &amp; Massagen</p>
+</div>
+</div>
+</section>
+<!-- Detailed Service Management Area -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter items-start">
+<!-- Sub-Service Management List -->
+<section class="lg:col-span-2 bg-white border border-outline-variant p-8 custom-shadow">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="font-headline-md text-headline-sm text-on-surface">Sub-Service Management</h3>
+<p class="font-body-sm text-on-surface-variant">Konfiguration für Laser-Haarentfernung</p>
+</div>
+<button class="text-primary font-label-caps text-label-caps flex items-center gap-2 border-b border-primary pb-1 hover:opacity-70 transition-opacity">
+                        + Neuer Service
+                    </button>
+</div>
+<div class="space-y-4">
+<!-- Service Row Item -->
+<div class="grid grid-cols-12 gap-4 items-center py-4 border-b border-outline-variant/30 hover:bg-surface-container-lowest transition-colors px-2">
+<div class="col-span-1">
+<span class="material-symbols-outlined text-outline cursor-move">drag_indicator</span>
+</div>
+<div class="col-span-4">
+<input class="w-full bg-transparent border-none focus:ring-0 font-body-md text-on-surface p-0" type="text" value="Oberlippe"/>
+</div>
+<div class="col-span-2">
+<div class="flex items-center gap-1 border border-outline-variant px-2 py-1">
+<span class="text-primary text-[12px]">€</span>
+<input class="w-full border-none p-0 focus:ring-0 text-[14px] font-medium" type="text" value="29.00"/>
+</div>
+</div>
+<div class="col-span-2">
+<div class="flex items-center gap-1 border border-outline-variant px-2 py-1">
+<span class="material-symbols-outlined text-[16px] text-outline">schedule</span>
+<input class="w-full border-none p-0 focus:ring-0 text-[14px] font-medium" type="text" value="15 min"/>
+</div>
+</div>
+<div class="col-span-3 flex justify-end items-center gap-4">
+<div class="relative inline-block w-10 h-5 transition duration-200 ease-in bg-primary rounded-full cursor-pointer">
+<div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform transform translate-x-5"></div>
+</div>
+<button class="text-outline hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete_outline</span>
+</button>
+</div>
+</div>
+<!-- Service Row Item -->
+<div class="grid grid-cols-12 gap-4 items-center py-4 border-b border-outline-variant/30 hover:bg-surface-container-lowest transition-colors px-2">
+<div class="col-span-1">
+<span class="material-symbols-outlined text-outline cursor-move">drag_indicator</span>
+</div>
+<div class="col-span-4">
+<input class="w-full bg-transparent border-none focus:ring-0 font-body-md text-on-surface p-0" type="text" value="Ganzes Gesicht"/>
+</div>
+<div class="col-span-2">
+<div class="flex items-center gap-1 border border-outline-variant px-2 py-1">
+<span class="text-primary text-[12px]">€</span>
+<input class="w-full border-none p-0 focus:ring-0 text-[14px] font-medium" type="text" value="89.00"/>
+</div>
+</div>
+<div class="col-span-2">
+<div class="flex items-center gap-1 border border-outline-variant px-2 py-1">
+<span class="material-symbols-outlined text-[16px] text-outline">schedule</span>
+<input class="w-full border-none p-0 focus:ring-0 text-[14px] font-medium" type="text" value="45 min"/>
+</div>
+</div>
+<div class="col-span-3 flex justify-end items-center gap-4">
+<div class="relative inline-block w-10 h-5 transition duration-200 ease-in bg-primary rounded-full cursor-pointer">
+<div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform transform translate-x-5"></div>
+</div>
+<button class="text-outline hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete_outline</span>
+</button>
+</div>
+</div>
+<!-- Service Row Item -->
+<div class="grid grid-cols-12 gap-4 items-center py-4 border-b border-outline-variant/30 hover:bg-surface-container-lowest transition-colors px-2">
+<div class="col-span-1">
+<span class="material-symbols-outlined text-outline cursor-move">drag_indicator</span>
+</div>
+<div class="col-span-4">
+<input class="w-full bg-transparent border-none focus:ring-0 font-body-md text-on-surface p-0" type="text" value="Beine (Komplett)"/>
+</div>
+<div class="col-span-2">
+<div class="flex items-center gap-1 border border-outline-variant px-2 py-1">
+<span class="text-primary text-[12px]">€</span>
+<input class="w-full border-none p-0 focus:ring-0 text-[14px] font-medium" type="text" value="159.00"/>
+</div>
+</div>
+<div class="col-span-2">
+<div class="flex items-center gap-1 border border-outline-variant px-2 py-1">
+<span class="material-symbols-outlined text-[16px] text-outline">schedule</span>
+<input class="w-full border-none p-0 focus:ring-0 text-[14px] font-medium" type="text" value="90 min"/>
+</div>
+</div>
+<div class="col-span-3 flex justify-end items-center gap-4">
+<div class="relative inline-block w-10 h-5 transition duration-200 ease-in bg-primary rounded-full cursor-pointer">
+<div class="absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform transform translate-x-5"></div>
+</div>
+<button class="text-outline hover:text-error transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete_outline</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Campaign & Package Sidebar -->
+<section class="bg-surface-container-lowest border border-outline-variant p-8 custom-shadow h-full">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary" data-icon="auto_fix_high">auto_fix_high</span>
+<h3 class="font-headline-md text-headline-sm text-on-surface">Campaigns</h3>
+</div>
+<div class="space-y-6">
+<!-- Existing Campaign Card -->
+<div class="border border-outline-variant p-4 bg-white relative group overflow-hidden">
+<div class="absolute top-0 right-0 w-16 h-16 -mr-8 -mt-8 bg-primary/5 rounded-full"></div>
+<span class="font-label-caps text-[9px] text-primary block mb-2">AKTIVE AKTION</span>
+<h4 class="font-headline-sm text-body-lg text-on-surface mb-2">Winter Glow Kombi-Paket</h4>
+<p class="font-body-sm text-on-surface-variant mb-4 text-[13px]">Ganzes Gesicht + Dekolleté inkl. Maske für nur 120€ statt 149€.</p>
+<div class="flex items-center justify-between mt-4">
+<span class="text-primary font-bold text-headline-sm">120,00€</span>
+<button class="text-[11px] font-label-caps border border-outline-variant px-3 py-1.5 hover:bg-primary hover:text-white transition-all">Anpassen</button>
+</div>
+</div>
+<!-- Placeholder for New Campaign -->
+<button class="w-full border-2 border-dashed border-outline-variant p-8 flex flex-col items-center justify-center gap-2 hover:bg-surface-container-low transition-all group">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary">add</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface">Add Another Campaign</span>
+<p class="font-body-sm text-[11px] text-outline text-center">Erstellen Sie zeitlich begrenzte Angebote für Laser-Behandlungen.</p>
+</button>
+</div>
+<!-- Category Preview Image -->
+<div class="mt-12">
+<span class="font-label-caps text-[10px] text-outline mb-3 block">KATEGORIE-VORSCHAU (FRONTEND)</span>
+<div class="aspect-[4/3] w-full bg-cover bg-center grayscale brightness-95 border border-outline-variant" data-alt="A luxurious, high-contrast close-up of a premium laser hair removal treatment. The scene features a clean, minimalist aesthetic with soft, focused lighting on smooth skin and professional medical equipment. The color palette is composed of muted creams, soft gold highlights, and clean whites, reflecting the quiet luxury brand identity of Epilisse. Cinematic and polished beauty photography." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDMFA9N2gnwhKKRroL7E8c3i0AhOLAY86LRLECTmHMU4v3shAHXt2Kh0eAV79YngizhYmIfSZo20FN1F8mAx2lF7W-BY7GtF-jcaQRnV7rM8hWRcCIyPJYHZUt_qIklUrdXZzgbb-zvBqNXWHoMhGO4Anohb882TeKRhW10nhJ4SYQv0cY-fsxdvSeSVrh5ID8FOB-ycx2BkWZL6Su7_XUT3wHw0BiLZwD0mVnvsKDXYITCoHq6GiPitn0QSxss4ROEHb1Ytkf5tAuJ')"></div>
+<div class="mt-4 flex justify-between items-center">
+<p class="font-body-sm italic text-on-surface-variant opacity-70">Hauptbild: laser_hair_hero.jpg</p>
+<button class="text-primary font-label-caps text-[10px] underline">Tauschen</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer Script for Micro-interactions -->
+<script>
+        // Toggle Simulation Logic
+        document.querySelectorAll('.relative.inline-block.w-10.h-5').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const dot = this.querySelector('div');
+                const isActive = this.classList.contains('bg-primary');
+                
+                if(isActive) {
+                    this.classList.replace('bg-primary', 'bg-outline-variant');
+                    dot.classList.replace('translate-x-5', 'translate-x-0');
+                } else {
+                    this.classList.replace('bg-outline-variant', 'bg-primary');
+                    dot.classList.replace('translate-x-0', 'translate-x-5');
+                }
+            });
+        });
+
+        // Simple row hover highlighting effect
+        const serviceRows = document.querySelectorAll('.grid-cols-12');
+        serviceRows.forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.querySelector('.material-symbols-outlined').style.color = '#745b00';
+            });
+            row.addEventListener('mouseleave', () => {
+                row.querySelector('.material-symbols-outlined').style.color = '';
+            });
+        });
+    </script>
+</body></html>

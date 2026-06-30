@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Laser-Haarentfernung | EPILISSE Luxury Beauty Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "secondary": "#5f5e5a",
+                "primary-container": "#c5a021",
+                "on-primary-fixed-variant": "#574500",
+                "on-error-container": "#93000a",
+                "on-secondary-container": "#656460",
+                "tertiary-container": "#a3a4a4",
+                "secondary-container": "#e5e2dc",
+                "outline": "#7f7663",
+                "on-secondary": "#ffffff",
+                "outline-variant": "#d0c5af",
+                "primary-fixed-dim": "#eac243",
+                "surface-container-lowest": "#ffffff",
+                "on-primary-container": "#483800",
+                "surface": "#fcf9f8",
+                "error": "#ba1a1a",
+                "on-tertiary-container": "#383a3b",
+                "tertiary-fixed": "#e2e2e2",
+                "on-tertiary-fixed-variant": "#454747",
+                "on-tertiary-fixed": "#1a1c1c",
+                "on-surface-variant": "#4d4635",
+                "inverse-surface": "#313030",
+                "surface-dim": "#dcd9d9",
+                "tertiary-fixed-dim": "#c6c6c7",
+                "surface-container-high": "#eae7e7",
+                "surface-tint": "#745b00",
+                "inverse-on-surface": "#f3f0ef",
+                "error-container": "#ffdad6",
+                "on-primary-fixed": "#241a00",
+                "surface-variant": "#e5e2e1",
+                "on-background": "#1c1b1b",
+                "surface-container-highest": "#e5e2e1",
+                "primary-fixed": "#ffe089",
+                "surface-container": "#f0eded",
+                "secondary-fixed": "#e5e2dc",
+                "secondary-fixed-dim": "#c9c6c1",
+                "background": "#fcf9f8",
+                "surface-bright": "#fcf9f8",
+                "on-secondary-fixed-variant": "#474743",
+                "on-secondary-fixed": "#1c1c18",
+                "on-primary": "#ffffff",
+                "on-error": "#ffffff",
+                "primary": "#745b00",
+                "inverse-primary": "#eac243",
+                "surface-container-low": "#f6f3f2",
+                "tertiary": "#5d5f5f",
+                "on-surface": "#1c1b1b",
+                "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "spacing": {
+                "margin-mobile": "16px",
+                "unit": "8px",
+                "section-gap": "80px",
+                "container-max-width": "1440px",
+                "gutter": "24px",
+                "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                "display-lg": ["Playfair Display"],
+                "body-lg": ["Manrope"],
+                "headline-sm": ["Playfair Display"],
+                "body-sm": ["Manrope"],
+                "headline-lg": ["Playfair Display"],
+                "headline-md": ["Playfair Display"],
+                "body-md": ["Manrope"],
+                "label-caps": ["Manrope"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .luxury-shadow {
+            box-shadow: 0px 4px 20px rgba(0,0,0,0.04);
+        }
+        .text-stroke-gold {
+            -webkit-text-stroke: 1px #745b00;
+            color: transparent;
+        }
+        .glass-nav {
+            background: rgba(252, 249, 248, 0.8);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md overflow-x-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 glass-nav border-b border-outline-variant/30">
+<div class="flex items-center gap-8">
+<a class="font-display-lg text-headline-md tracking-widest text-primary" href="#">EPILISSE</a>
+<div class="hidden md:flex gap-8">
+<a class="font-label-caps text-label-caps text-primary border-b border-primary py-1" href="#">Behandlungen</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300" href="#">Preise</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300" href="#">Über Uns</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300" href="#">Kontakt</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="hidden lg:inline font-label-caps text-label-caps text-secondary cursor-pointer hover:text-primary">DE | EN | TR</span>
+<button class="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-100 active:scale-95">
+                Termin Buchen
+            </button>
+</div>
+</nav>
+<main class="mt-[80px]">
+<!-- Hero Section -->
+<section class="relative w-full h-[716px] min-h-[500px] overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="w-full h-full bg-cover bg-center transition-transform duration-[10s] hover:scale-110" data-alt="A macro cinematic shot of a luxury beauty treatment environment. Soft natural light illuminates a pristine treatment room with cream-toned minimalist decor and gold accents. In the foreground, a high-end medical laser device is shown with its sleek, professional design. The atmosphere is serene, high-end, and exceptionally clean, reflecting the quiet luxury brand identity of a Munich beauty studio." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDYjBxY_5jgd1zV3S6f54auMKfGGrnf_nUDyMDjmdGw6dVJQPTKNZXlcxViHrvhn3b9sU8vdRuY0Xo9vEk7B573gKj1u-y7pJ2RLNt8eovCEdgIfX73mrjoHjaA3SDuEEJ1n6fW9cjPUQRG1MBg6BmBXeVpB0vp9OV9zMxedArRK3iI3ABfEbRu1rAjMaDK3q03AYuDoduRWP6uzj-vI2lXCRNfACkm5S1slmgz-wR_-8LhNNfmFX8spaZGMk9NBX6GBPzQ7BmFrvnB')">
+</div>
+<div class="absolute inset-0 bg-black/20"></div>
+</div>
+<div class="relative z-10 h-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop flex flex-col justify-end pb-24">
+<div class="max-w-2xl text-white">
+<span class="font-label-caps text-label-caps tracking-[0.3em] uppercase mb-4 block">Signature Treatment</span>
+<h1 class="font-display-lg text-display-lg mb-6 leading-none">Laser-Haarentfernung</h1>
+<p class="font-body-lg text-body-lg text-white/90 leading-relaxed">
+                        Erleben Sie modernste Technologie für dauerhaft glatte Haut. Schmerzarm, hocheffektiv und perfekt auf Ihren Hauttyp abgestimmt.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Info & Health Benefits Section (Bento Style) -->
+<section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Main Description -->
+<div class="md:col-span-7 flex flex-col justify-center">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-8">Die Zukunft der Hautpflege</h2>
+<div class="space-y-6 font-body-md text-body-md text-secondary leading-loose">
+<p>
+                            Unsere Laser-Haarentfernung nutzt die innovative Diodenlaser-Technologie, um Haarwurzeln gezielt und nachhaltig zu deaktivieren. Im Gegensatz zu herkömmlichen Methoden ist unser Verfahren besonders hautschonend und auch für sensible Bereiche geeignet.
+                        </p>
+<p>
+                            Jede Behandlung beginnt mit einer ausführlichen Hautanalyse, um die Laser-Parameter exakt auf Ihren Melaningehalt und Ihre Haarstruktur zu kalibrieren. So garantieren wir maximale Sicherheit und exzellente Ergebnisse ab der ersten Sitzung.
+                        </p>
+</div>
+</div>
+<!-- Health Benefits Card -->
+<div class="md:col-span-5 bg-surface-container-low p-10 flex flex-col justify-center border-l-2 border-primary">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-6">Gesundheitliche Wirkung</h3>
+<ul class="space-y-4">
+<li class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary mt-1">check_circle</span>
+<span class="font-body-md text-on-surface-variant">Vermeidung von eingewachsenen Haaren (Rasurbrand-Prävention)</span>
+</li>
+<li class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary mt-1">check_circle</span>
+<span class="font-body-md text-on-surface-variant">Schonung der Hautbarriere durch Wegfall täglicher Rasurbelastung</span>
+</li>
+<li class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary mt-1">check_circle</span>
+<span class="font-body-md text-on-surface-variant">Hautbildverfeinerung und Reduktion von Pigmentflecken</span>
+</li>
+<li class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary mt-1">check_circle</span>
+<span class="font-body-md text-on-surface-variant">Langfristige Zeitersparnis und reduzierter Wasserverbrauch</span>
+</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Pricing Table Section -->
+<section class="bg-surface-container-lowest py-section-gap">
+<div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="text-center mb-16">
+<span class="font-label-caps text-label-caps text-primary tracking-widest uppercase">Preise &amp; Services</span>
+<h2 class="font-headline-lg text-headline-lg mt-2">Investition in Ihre Schönheit</h2>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-4">
+<!-- Pricing Item 1 -->
+<div class="flex items-center justify-between py-6 border-b border-outline-variant hover:bg-surface/50 transition-colors px-4 group">
+<div class="flex flex-col">
+<span class="font-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">Oberlippe oder Kinn</span>
+<span class="font-body-sm text-secondary">Behandlungsdauer: ca. 15 Min.</span>
+</div>
+<div class="flex items-center gap-6">
+<span class="font-display-lg text-headline-md text-primary">€ 39,00</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</div>
+<!-- Pricing Item 2 -->
+<div class="flex items-center justify-between py-6 border-b border-outline-variant hover:bg-surface/50 transition-colors px-4 group">
+<div class="flex flex-col">
+<span class="font-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">Achselhöhlen</span>
+<span class="font-body-sm text-secondary">Behandlungsdauer: ca. 20 Min.</span>
+</div>
+<div class="flex items-center gap-6">
+<span class="font-display-lg text-headline-md text-primary">€ 55,00</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</div>
+<!-- Pricing Item 3 -->
+<div class="flex items-center justify-between py-6 border-b border-outline-variant hover:bg-surface/50 transition-colors px-4 group">
+<div class="flex flex-col">
+<span class="font-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">Unterarme</span>
+<span class="font-body-sm text-secondary">Behandlungsdauer: ca. 30 Min.</span>
+</div>
+<div class="flex items-center gap-6">
+<span class="font-display-lg text-headline-md text-primary">€ 89,00</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</div>
+<!-- Pricing Item 4 -->
+<div class="flex items-center justify-between py-6 border-b border-outline-variant hover:bg-surface/50 transition-colors px-4 group">
+<div class="flex flex-col">
+<span class="font-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">Beine komplett</span>
+<span class="font-body-sm text-secondary">Behandlungsdauer: ca. 60 Min.</span>
+</div>
+<div class="flex items-center gap-6">
+<span class="font-display-lg text-headline-md text-primary">€ 189,00</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</div>
+<!-- Pricing Item 5 -->
+<div class="flex items-center justify-between py-6 border-b border-outline-variant hover:bg-surface/50 transition-colors px-4 group">
+<div class="flex flex-col">
+<span class="font-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">Rücken (komplett)</span>
+<span class="font-body-sm text-secondary">Behandlungsdauer: ca. 45 Min.</span>
+</div>
+<div class="flex items-center gap-6">
+<span class="font-display-lg text-headline-md text-primary">€ 149,00</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</div>
+<!-- Pricing Item 6 -->
+<div class="flex items-center justify-between py-6 border-b border-outline-variant hover:bg-surface/50 transition-colors px-4 group">
+<div class="flex flex-col">
+<span class="font-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">Ganzkörper Luxury Pack</span>
+<span class="font-body-sm text-secondary">Behandlungsdauer: ca. 120 Min.</span>
+</div>
+<div class="flex items-center gap-6">
+<span class="font-display-lg text-headline-md text-primary">€ 349,00</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Campaign Banner -->
+<section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop my-section-gap">
+<div class="relative overflow-hidden luxury-shadow border border-outline-variant/30">
+<div class="grid grid-cols-1 md:grid-cols-2">
+<div class="p-12 md:p-20 bg-primary-container text-on-primary-container flex flex-col justify-center relative overflow-hidden">
+<div class="absolute top-0 right-0 p-10 opacity-10">
+<span class="material-symbols-outlined text-[180px]">auto_awesome</span>
+</div>
+<span class="font-label-caps text-label-caps tracking-[0.4em] mb-4">Limited Edition Offer</span>
+<h2 class="font-headline-lg text-display-lg mb-6 text-on-primary-container">Kombi-Paket Kampagne</h2>
+<p class="font-body-lg text-body-lg mb-10 opacity-90">
+                            Buchen Sie ein Paket aus 3 Behandlungszonen und erhalten Sie die günstigste Zone komplett kostenfrei. Gültig für alle Laser-Treatments in diesem Monat.
+                        </p>
+<div>
+<button class="bg-on-primary-container text-primary-container px-10 py-4 font-label-caps text-label-caps tracking-widest hover:bg-on-primary-fixed hover:text-white transition-all">
+                                JETZT SICHERN
+                            </button>
+</div>
+</div>
+<div class="h-[400px] md:h-auto bg-cover bg-center" data-alt="A sophisticated close-up portrait of a woman with flawless, smooth skin, captured in a high-fashion photography style. The lighting is soft and golden, accentuating the natural texture of her skin. The background is a blurred, warm luxury interior of a beauty studio. The composition conveys purity, excellence, and the premium results of a high-end laser hair removal treatment." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDpZoen6Z8-BkUl8prQYXf0Xd1Phn1Xdcuk_VZ-IofB9pCsDecKCUdvXaAoDYxIvL3Pd7MzIsqk1Qsa1ZfN8QNOHMUhZWC4pSKfwKd1kxuc1UmJnIvzSkftdtB_72BxCD3RsoYfSP9DCDgl7Hu2Txw7HLS7n783Lh-uDnPYuVXqfLwu3QW9RvZwYy-yu30PukyuMKxMBOWOlrxhxQXQMiIRW8nVG7y5oMjkK0lvir7cCDbsFPR1OXu3dQoZxS2tCiISP8GlPzFjtSct')">
+</div>
+</div>
+</div><div class="relative overflow-hidden luxury-shadow border border-outline-variant/30 mt-8"><div class="grid grid-cols-1 md:grid-cols-2"><div class="h-[400px] md:h-auto bg-cover bg-center" data-alt="A serene, high-end beauty studio interior with soft lighting and minimalist decor." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDYjBxY_5jgd1zV3S6f54auMKfGGrnf_nUDyMDjmdGw6dVJQPTKNZXlcxViHrvhn3b9sU8vdRuY0Xo9vEk7B573gKj1u-y7pJ2RLNt8eovCEdgIfX73mrjoHjaA3SDuEEJ1n6fW9cjPUQRG1MBg6BmBXeVpB0vp9OV9zMxedArRK3iI3ABfEbRu1rAjMaDK3q03AYuDoduRWP6uzj-vI2lXCRNfACkm5S1slmgz-wR_-8LhNNfmFX8spaZGMk9NBX6GBPzQ7BmFrvnB')"></div><div class="p-12 md:p-20 bg-surface-container-low text-on-surface flex flex-col justify-center relative overflow-hidden"><div class="absolute top-0 right-0 p-10 opacity-10"><span class="material-symbols-outlined text-[180px]">loyalty</span></div><span class="font-label-caps text-label-caps tracking-[0.4em] mb-4 text-primary">Exklusives Treue-Special</span><h2 class="font-headline-lg text-display-lg mb-6">Freunde-Werben-Programm</h2><p class="font-body-lg text-body-lg mb-10 text-secondary">Empfehlen Sie uns weiter und erhalten Sie beide 20% Rabatt auf Ihre nächste Laser-Sitzung. Geteilte Schönheit ist doppelte Freude.</p><div><button class="bg-primary text-on-primary px-10 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all">MEHR ERFAHREN</button></div></div></div></div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest w-full px-margin-mobile md:px-margin-desktop py-section-gap grid grid-cols-1 md:grid-cols-4 gap-gutter border-t border-outline-variant">
+<div class="col-span-1 md:col-span-1">
+<a class="font-display-lg text-headline-md text-primary tracking-widest mb-6 block" href="#">EPILISSE</a>
+<p class="font-body-sm text-secondary leading-relaxed">
+                Ihre Experten für dauerhafte Haarentfernung und ästhetische Hautbehandlungen im Herzen von München.
+            </p>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-headline-sm text-headline-sm text-primary mb-2">Behandlungen</h4>
+<a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">Diodenlaser</a>
+<a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">HydraFacial</a>
+<a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">Microneedling</a>
+<a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">Peelings</a>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-headline-sm text-headline-sm text-primary mb-2">Rechtliches</h4>
+<a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">Impressum</a>
+<a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">Datenschutz</a>
+<a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">AGB</a>
+<a class="font-body-sm text-secondary hover:text-primary transition-colors" href="#">Widerruf</a>
+</div>
+<div class="flex flex-col gap-4">
+<h4 class="font-headline-sm text-headline-sm text-primary mb-2">Kontakt</h4>
+<span class="font-body-sm text-secondary">Maximilianstraße 12, 80539 München</span>
+<span class="font-body-sm text-secondary">+49 (0) 89 123 456 78</span>
+<span class="font-body-sm text-secondary">info@epilisse-munich.de</span>
+<div class="flex gap-4 mt-4">
+<span class="material-symbols-outlined text-primary cursor-pointer hover:scale-110 transition-transform">share</span>
+</div></div></footer></body></html>

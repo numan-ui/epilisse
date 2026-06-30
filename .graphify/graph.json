@@ -1,0 +1,505 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "community_labels": {}
+  },
+  "topology_signature": "n=24;e=23;eslint_config,eslint_config_compat,eslint_config_dirname,eslint_config_filename,i18n_navigation,i18n_navigation_link_redirect_usepathname_userouter,i18n_request,i18n_routing,i18n_routing_routing,locale_layout,locale_layout_localelayout,locale_layout_metadata,locale_page,locale_page_homepage,locale_page_img,locale_page_overlays,next_config,next_config_nextconfig,next_config_withnextintl,next_env_d,postcss_config,postcss_config_config,src_middleware,src_middleware_config|eslint_config\teslint_config_compat\tcontains;eslint_config\teslint_config_dirname\tcontains;eslint_config\teslint_config_filename\tcontains;i18n_navigation\ti18n_navigation_link_redirect_usepathname_userouter\tcontains;i18n_navigation\ti18n_routing\timports_from;i18n_navigation\ti18n_routing_routing\timports;i18n_navigation\tlocale_page\timports_from;i18n_request\ti18n_routing\timports_from;i18n_request\ti18n_routing_routing\timports;i18n_routing\ti18n_routing_routing\tcontains;i18n_routing\tlocale_layout\timports_from;i18n_routing\tsrc_middleware\timports_from;i18n_routing_routing\tlocale_layout\timports;i18n_routing_routing\tsrc_middleware\timports;locale_layout\tlocale_layout_localelayout\tcontains;locale_layout\tlocale_layout_metadata\tcontains;locale_page\tlocale_page_homepage\tcontains;locale_page\tlocale_page_img\tcontains;locale_page\tlocale_page_overlays\tcontains;next_config\tnext_config_nextconfig\tcontains;next_config\tnext_config_withnextintl\tcontains;postcss_config\tpostcss_config_config\tcontains;src_middleware\tsrc_middleware_config\tcontains",
+  "nodes": [
+    {
+      "id": "eslint_config",
+      "label": "eslint.config.mjs",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/eslint.config.mjs",
+      "source_location": "L1",
+      "community": 2,
+      "community_name": "Community 2"
+    },
+    {
+      "id": "eslint_config_filename",
+      "label": "__filename",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/eslint.config.mjs",
+      "source_location": "L5",
+      "community": 2,
+      "community_name": "Community 2"
+    },
+    {
+      "id": "eslint_config_dirname",
+      "label": "__dirname",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/eslint.config.mjs",
+      "source_location": "L6",
+      "community": 2,
+      "community_name": "Community 2"
+    },
+    {
+      "id": "eslint_config_compat",
+      "label": "compat",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/eslint.config.mjs",
+      "source_location": "L8",
+      "community": 2,
+      "community_name": "Community 2"
+    },
+    {
+      "id": "next_env_d",
+      "label": "next-env.d.ts",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/next-env.d.ts",
+      "source_location": "L1",
+      "community": 5,
+      "community_name": "Community 5"
+    },
+    {
+      "id": "next_config",
+      "label": "next.config.ts",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/next.config.ts",
+      "source_location": "L1",
+      "community": 3,
+      "community_name": "Community 3"
+    },
+    {
+      "id": "next_config_withnextintl",
+      "label": "withNextIntl",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/next.config.ts",
+      "source_location": "L4",
+      "community": 3,
+      "community_name": "Community 3"
+    },
+    {
+      "id": "next_config_nextconfig",
+      "label": "nextConfig",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/next.config.ts",
+      "source_location": "L6",
+      "community": 3,
+      "community_name": "Community 3"
+    },
+    {
+      "id": "postcss_config",
+      "label": "postcss.config.mjs",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/postcss.config.mjs",
+      "source_location": "L1",
+      "community": 4,
+      "community_name": "Community 4"
+    },
+    {
+      "id": "postcss_config_config",
+      "label": "config",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/postcss.config.mjs",
+      "source_location": "L1",
+      "community": 4,
+      "community_name": "Community 4"
+    },
+    {
+      "id": "locale_layout",
+      "label": "layout.tsx",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/layout.tsx",
+      "source_location": "L1",
+      "community": 0,
+      "community_name": "Community 0"
+    },
+    {
+      "id": "locale_layout_metadata",
+      "label": "metadata",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/layout.tsx",
+      "source_location": "L8",
+      "community": 0,
+      "community_name": "Community 0"
+    },
+    {
+      "id": "locale_layout_localelayout",
+      "label": "LocaleLayout()",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/layout.tsx",
+      "source_location": "L30",
+      "community": 0,
+      "community_name": "Community 0"
+    },
+    {
+      "id": "locale_page",
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/page.tsx",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Community 1"
+    },
+    {
+      "id": "locale_page_img",
+      "label": "IMG",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/page.tsx",
+      "source_location": "L9",
+      "community": 1,
+      "community_name": "Community 1"
+    },
+    {
+      "id": "locale_page_overlays",
+      "label": "OVERLAYS",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/page.tsx",
+      "source_location": "L31",
+      "community": 1,
+      "community_name": "Community 1"
+    },
+    {
+      "id": "locale_page_homepage",
+      "label": "HomePage()",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/page.tsx",
+      "source_location": "L43",
+      "community": 1,
+      "community_name": "Community 1"
+    },
+    {
+      "id": "i18n_navigation",
+      "label": "navigation.ts",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/i18n/navigation.ts",
+      "source_location": "L1",
+      "community": 1,
+      "community_name": "Community 1"
+    },
+    {
+      "id": "i18n_navigation_link_redirect_usepathname_userouter",
+      "label": "{ Link, redirect, usePathname, useRouter }",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/i18n/navigation.ts",
+      "source_location": "L4",
+      "community": 1,
+      "community_name": "Community 1"
+    },
+    {
+      "id": "i18n_request",
+      "label": "request.ts",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/i18n/request.ts",
+      "source_location": "L1",
+      "community": 0,
+      "community_name": "Community 0"
+    },
+    {
+      "id": "i18n_routing",
+      "label": "routing.ts",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/i18n/routing.ts",
+      "source_location": "L1",
+      "community": 0,
+      "community_name": "Community 0"
+    },
+    {
+      "id": "i18n_routing_routing",
+      "label": "routing",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/i18n/routing.ts",
+      "source_location": "L3",
+      "community": 0,
+      "community_name": "Community 0"
+    },
+    {
+      "id": "src_middleware",
+      "label": "middleware.ts",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/middleware.ts",
+      "source_location": "L1",
+      "community": 0,
+      "community_name": "Community 0"
+    },
+    {
+      "id": "src_middleware_config",
+      "label": "config",
+      "file_type": "code",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/middleware.ts",
+      "source_location": "L6",
+      "community": 0,
+      "community_name": "Community 0"
+    }
+  ],
+  "links": [
+    {
+      "source": "eslint_config",
+      "target": "eslint_config_compat",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/eslint.config.mjs",
+      "source_location": "L8",
+      "weight": 1,
+      "_src": "eslint_config",
+      "_tgt": "eslint_config_compat",
+      "confidence_score": 1
+    },
+    {
+      "source": "eslint_config",
+      "target": "eslint_config_dirname",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/eslint.config.mjs",
+      "source_location": "L6",
+      "weight": 1,
+      "_src": "eslint_config",
+      "_tgt": "eslint_config_dirname",
+      "confidence_score": 1
+    },
+    {
+      "source": "eslint_config",
+      "target": "eslint_config_filename",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/eslint.config.mjs",
+      "source_location": "L5",
+      "weight": 1,
+      "_src": "eslint_config",
+      "_tgt": "eslint_config_filename",
+      "confidence_score": 1
+    },
+    {
+      "source": "i18n_navigation",
+      "target": "i18n_navigation_link_redirect_usepathname_userouter",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/i18n/navigation.ts",
+      "source_location": "L4",
+      "weight": 1,
+      "_src": "i18n_navigation",
+      "_tgt": "i18n_navigation_link_redirect_usepathname_userouter",
+      "confidence_score": 1
+    },
+    {
+      "source": "i18n_navigation",
+      "target": "i18n_routing",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/i18n/navigation.ts",
+      "source_location": "L2",
+      "weight": 1,
+      "_src": "i18n_navigation",
+      "_tgt": "i18n_routing",
+      "confidence_score": 1
+    },
+    {
+      "source": "i18n_navigation",
+      "target": "i18n_routing_routing",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/i18n/navigation.ts",
+      "source_location": "L2",
+      "weight": 1,
+      "_src": "i18n_navigation",
+      "_tgt": "i18n_routing_routing",
+      "confidence_score": 1
+    },
+    {
+      "source": "i18n_request",
+      "target": "i18n_routing",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/i18n/request.ts",
+      "source_location": "L2",
+      "weight": 1,
+      "_src": "i18n_request",
+      "_tgt": "i18n_routing",
+      "confidence_score": 1
+    },
+    {
+      "source": "i18n_request",
+      "target": "i18n_routing_routing",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/i18n/request.ts",
+      "source_location": "L2",
+      "weight": 1,
+      "_src": "i18n_request",
+      "_tgt": "i18n_routing_routing",
+      "confidence_score": 1
+    },
+    {
+      "source": "i18n_routing",
+      "target": "i18n_routing_routing",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/i18n/routing.ts",
+      "source_location": "L3",
+      "weight": 1,
+      "_src": "i18n_routing",
+      "_tgt": "i18n_routing_routing",
+      "confidence_score": 1
+    },
+    {
+      "source": "locale_layout",
+      "target": "i18n_routing",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/layout.tsx",
+      "source_location": "L5",
+      "weight": 1,
+      "_src": "locale_layout",
+      "_tgt": "i18n_routing",
+      "confidence_score": 1
+    },
+    {
+      "source": "locale_layout",
+      "target": "i18n_routing_routing",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/layout.tsx",
+      "source_location": "L5",
+      "weight": 1,
+      "_src": "locale_layout",
+      "_tgt": "i18n_routing_routing",
+      "confidence_score": 1
+    },
+    {
+      "source": "locale_layout",
+      "target": "locale_layout_localelayout",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/layout.tsx",
+      "source_location": "L30",
+      "weight": 1,
+      "_src": "locale_layout",
+      "_tgt": "locale_layout_localelayout",
+      "confidence_score": 1
+    },
+    {
+      "source": "locale_layout",
+      "target": "locale_layout_metadata",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/layout.tsx",
+      "source_location": "L8",
+      "weight": 1,
+      "_src": "locale_layout",
+      "_tgt": "locale_layout_metadata",
+      "confidence_score": 1
+    },
+    {
+      "source": "locale_page",
+      "target": "i18n_navigation",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/page.tsx",
+      "source_location": "L6",
+      "weight": 1,
+      "_src": "locale_page",
+      "_tgt": "i18n_navigation",
+      "confidence_score": 1
+    },
+    {
+      "source": "locale_page",
+      "target": "locale_page_homepage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/page.tsx",
+      "source_location": "L43",
+      "weight": 1,
+      "_src": "locale_page",
+      "_tgt": "locale_page_homepage",
+      "confidence_score": 1
+    },
+    {
+      "source": "locale_page",
+      "target": "locale_page_img",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/page.tsx",
+      "source_location": "L9",
+      "weight": 1,
+      "_src": "locale_page",
+      "_tgt": "locale_page_img",
+      "confidence_score": 1
+    },
+    {
+      "source": "locale_page",
+      "target": "locale_page_overlays",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/app/[locale]/page.tsx",
+      "source_location": "L31",
+      "weight": 1,
+      "_src": "locale_page",
+      "_tgt": "locale_page_overlays",
+      "confidence_score": 1
+    },
+    {
+      "source": "next_config",
+      "target": "next_config_nextconfig",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/next.config.ts",
+      "source_location": "L6",
+      "weight": 1,
+      "_src": "next_config",
+      "_tgt": "next_config_nextconfig",
+      "confidence_score": 1
+    },
+    {
+      "source": "next_config",
+      "target": "next_config_withnextintl",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/next.config.ts",
+      "source_location": "L4",
+      "weight": 1,
+      "_src": "next_config",
+      "_tgt": "next_config_withnextintl",
+      "confidence_score": 1
+    },
+    {
+      "source": "postcss_config",
+      "target": "postcss_config_config",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/postcss.config.mjs",
+      "source_location": "L1",
+      "weight": 1,
+      "_src": "postcss_config",
+      "_tgt": "postcss_config_config",
+      "confidence_score": 1
+    },
+    {
+      "source": "src_middleware",
+      "target": "i18n_routing",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/middleware.ts",
+      "source_location": "L2",
+      "weight": 1,
+      "_src": "src_middleware",
+      "_tgt": "i18n_routing",
+      "confidence_score": 1
+    },
+    {
+      "source": "src_middleware",
+      "target": "i18n_routing_routing",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/middleware.ts",
+      "source_location": "L2",
+      "weight": 1,
+      "_src": "src_middleware",
+      "_tgt": "i18n_routing_routing",
+      "confidence_score": 1
+    },
+    {
+      "source": "src_middleware",
+      "target": "src_middleware_config",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "D:/CLAUDE PROJECTS/EPILISSE PROJECT/src/middleware.ts",
+      "source_location": "L6",
+      "weight": 1,
+      "_src": "src_middleware",
+      "_tgt": "src_middleware_config",
+      "confidence_score": 1
+    }
+  ],
+  "hyperedges": []
+}

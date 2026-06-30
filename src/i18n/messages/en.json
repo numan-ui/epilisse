@@ -1,0 +1,86 @@
+{
+  "nav": {
+    "behandlungen": "Treatments",
+    "preise": "Pricing",
+    "ueberUns": "About Us",
+    "kontakt": "Contact",
+    "cta": "BOOK APPOINTMENT",
+    "lang": "EN"
+  },
+  "hero": {
+    "slide1Headline": "Timeless Beauty.",
+    "slide1Sub": "Discover the art of aesthetic perfection at our exclusive studio in Munich.",
+    "slide1Cta": "BOOK APPOINTMENT",
+    "slide2Headline": "Silky Smoothness.",
+    "slide2Sub": "Precise laser hair removal for a silky skin feeling that lasts. Painless and effective.",
+    "slide2Cta": "LEARN MORE",
+    "slide3Headline": "Facial Aesthetics.",
+    "slide3Sub": "Individual treatments for radiant skin and natural rejuvenation.",
+    "slide3Cta": "VIEW OFFER",
+    "slide4Headline": "Perfect Care.",
+    "slide4Sub": "Manicure & Pedicure at the highest level for your hands and feet.",
+    "slide4Cta": "BOOK NOW"
+  },
+  "services": {
+    "sectionLabel": "OUR SERVICES",
+    "sectionTitle": "Exclusive Treatments",
+    "laser": "Laser Hair Removal",
+    "laserDesc": "Permanent smoothness through the most modern technology.",
+    "laserSeo": "Permanent Hair Removal Munich",
+    "facial": "Facial Aesthetics",
+    "facialDesc": "Hydrafacial & premium skincare in Munich.",
+    "body": "Body Contouring",
+    "bodyDesc": "Body shaping at the highest aesthetic level.",
+    "injectables": "Injectables",
+    "injectablesDesc": "Natural rejuvenation with precision.",
+    "mani": "Manicure & Pedicure",
+    "maniDesc": "Nail aesthetics for the perfect appearance.",
+    "andere": "Andere",
+    "discover": "DISCOVER",
+    "details": "DETAILS"
+  },
+  "promo": {
+    "label": "EXCLUSIVE OFFER",
+    "title": "Winter Glow\nCombi Package",
+    "desc": "Get 20% off our exclusive combination of facial hydration and manicure. Valid until end of season.",
+    "ctaPrimary": "SECURE OFFER",
+    "ctaSecondary": "VIEW DETAILS"
+  },
+  "about": {
+    "sectionLabel": "ABOUT EPILISSE",
+    "title": "Munich's Address for Premium Aesthetics",
+    "desc": "Welcome to EPILISSE Studio – your exclusive beauty studio in the heart of Munich. We combine the most modern treatment methods with a deep understanding of individual beauty.",
+    "value1Title": "Quality",
+    "value1Desc": "Exclusively certified technologies and medical active ingredients at clinical level.",
+    "value2Title": "Discretion",
+    "value2Desc": "A protected space for your personal beauty journey – completely confidential.",
+    "value3Title": "Perfection",
+    "value3Desc": "Every treatment is individually tailored to your skin type and wishes."
+  },
+  "contact": {
+    "sectionLabel": "CONTACT & LOCATION",
+    "title": "Visit Us in Munich",
+    "addressTitle": "Studio Address",
+    "address": "ADDRESS PLACEHOLDER\nMunich, Germany",
+    "hoursTitle": "Opening Hours",
+    "hours": "Mon – Sat: 09:00 – 20:00\nSun: Closed",
+    "phoneTitle": "Phone",
+    "phone": "+49 (0) 89 XXX XXX XX",
+    "ctaCalendar": "BOOK APPOINTMENT",
+    "ctaWhatsapp": "WhatsApp Contact",
+    "ctaMaps": "Google Maps"
+  },
+  "footer": {
+    "tagline": "Your expert for exclusive beauty and permanent hair removal in the heart of Munich. Quality, discretion and perfection.",
+    "behandlungenTitle": "Treatments",
+    "studioTitle": "Studio",
+    "legalTitle": "Legal",
+    "impressum": "Imprint",
+    "datenschutz": "Privacy Policy",
+    "agb": "Terms & Conditions",
+    "karriere": "Careers",
+    "copyright": "© 2025 EPILISSE – Luxury Beauty Care Munich.",
+    "badge1": "MADE IN MUNICH",
+    "badge2": "SECURE PAYMENT"
+  }
+}

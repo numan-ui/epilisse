@@ -1,0 +1,86 @@
+{
+  "nav": {
+    "behandlungen": "Behandlungen",
+    "preise": "Preise",
+    "ueberUns": "Über Uns",
+    "kontakt": "Kontakt",
+    "cta": "TERMIN BUCHEN",
+    "lang": "DE"
+  },
+  "hero": {
+    "slide1Headline": "Zeitlose Schönheit.",
+    "slide1Sub": "Entdecken Sie die Kunst der ästhetischen Perfektion in unserem Exklusiv-Studio in München.",
+    "slide1Cta": "TERMIN BUCHEN",
+    "slide2Headline": "Sanfte Glätte.",
+    "slide2Sub": "Präzise Laser-Haarentfernung für ein seidiges Hautgefühl, das bleibt. Schmerzfrei und effektiv.",
+    "slide2Cta": "ERFAHREN SIE MEHR",
+    "slide3Headline": "Gesichtsästhetik.",
+    "slide3Sub": "Individuelle Behandlungen für eine strahlende Haut und natürliche Verjüngung.",
+    "slide3Cta": "ZUM ANGEBOT",
+    "slide4Headline": "Perfekte Pflege.",
+    "slide4Sub": "Maniküre & Pediküre auf höchstem Niveau für Ihre Hände und Füße.",
+    "slide4Cta": "JETZT BUCHEN"
+  },
+  "services": {
+    "sectionLabel": "UNSER ANGEBOT",
+    "sectionTitle": "Exklusive Behandlungen",
+    "laser": "Laser-Haarentfernung",
+    "laserDesc": "Dauerhafte Glätte durch modernste Technologie.",
+    "laserSeo": "Dauerhafte Haarentfernung München",
+    "facial": "Gesichtsästhetik",
+    "facialDesc": "Hydrafacial & Premium-Hautpflege in München.",
+    "body": "Body Contouring",
+    "bodyDesc": "Körperformung auf höchstem ästhetischen Niveau.",
+    "injectables": "Injectables",
+    "injectablesDesc": "Natürliche Verjüngung mit Präzision.",
+    "mani": "Maniküre & Pediküre",
+    "maniDesc": "Nagelästhetik für den perfekten Auftritt.",
+    "andere": "Andere",
+    "discover": "ENTDECKEN",
+    "details": "DETAILS"
+  },
+  "promo": {
+    "label": "EXKLUSIVES ANGEBOT",
+    "title": "Winter Glow\nKombi-Paket",
+    "desc": "Erhalten Sie 20 % Rabatt auf unsere exklusive Kombination aus Gesichtshydrierung und Maniküre. Gültig bis Ende der Saison.",
+    "ctaPrimary": "ANGEBOT SICHERN",
+    "ctaSecondary": "DETAILS ANSEHEN"
+  },
+  "about": {
+    "sectionLabel": "ÜBER EPILISSE",
+    "title": "Münchens Adresse für Premium-Ästhetik",
+    "desc": "Willkommen im EPILISSE Studio – Ihrem exklusiven Kosmetikstudio im Herzen von München. Wir vereinen modernste Behandlungsmethoden mit einem tiefen Verständnis für individuelle Schönheit.",
+    "value1Title": "Qualität",
+    "value1Desc": "Ausschließlich zertifizierte Technologien und medizinische Wirkstoffe auf klinischem Niveau.",
+    "value2Title": "Diskretion",
+    "value2Desc": "Ein geschützter Raum für Ihre persönliche Schönheitsreise – absolut vertraulich.",
+    "value3Title": "Perfektion",
+    "value3Desc": "Jede Behandlung wird individuell auf Ihren Hauttyp und Ihre Wünsche abgestimmt."
+  },
+  "contact": {
+    "sectionLabel": "KONTAKT & STANDORT",
+    "title": "Besuchen Sie uns in München",
+    "addressTitle": "Studio Adresse",
+    "address": "ADRESSE PLACEHOLDER\nMünchen, Deutschland",
+    "hoursTitle": "Öffnungszeiten",
+    "hours": "Mo – Sa: 09:00 – 20:00 Uhr\nSo: Geschlossen",
+    "phoneTitle": "Telefon",
+    "phone": "+49 (0) 89 XXX XXX XX",
+    "ctaCalendar": "TERMIN BUCHEN",
+    "ctaWhatsapp": "WhatsApp Kontakt",
+    "ctaMaps": "Google Maps"
+  },
+  "footer": {
+    "tagline": "Ihr Experte für exklusive Schönheit und dauerhafte Haarentfernung im Herzen von München. Qualität, Diskretion und Perfektion.",
+    "behandlungenTitle": "Behandlungen",
+    "studioTitle": "Studio",
+    "legalTitle": "Rechtliches",
+    "impressum": "Impressum",
+    "datenschutz": "Datenschutz",
+    "agb": "AGB",
+    "karriere": "Karriere",
+    "copyright": "© 2025 EPILISSE – Luxury Beauty Care Munich.",
+    "badge1": "MADE IN MUNICH",
+    "badge2": "SECURE PAYMENT"
+  }
+}
