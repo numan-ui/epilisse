@@ -7,8 +7,6 @@ const KPI_CARDS = [
 ];
 
 
-const STORY_SLIDES = ['Laser Treatment', 'Luxury Skin'];
-
 const CALENDAR_DAYS = Array.from({ length: 30 }, (_, i) => i + 1);
 
 export default function AdminDashboardPage() {
@@ -58,86 +56,6 @@ export default function AdminDashboardPage() {
               </div>
             </div>
           ))}
-        </section>
-
-        {/* Landing Page Management */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between border-b border-outline-variant pb-2">
-            <h3 className="font-headline-sm text-headline-sm">Landing Page Management</h3>
-            <span className="font-label-caps text-[10px] text-outline">Live-Vorschau verfügbar</span>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Hero Editor */}
-            <div className="bg-surface-container-lowest border border-outline-variant/50 p-8 rounded-xl space-y-6">
-              <div className="flex items-center gap-2 text-primary">
-                <span className="material-symbols-outlined">edit_note</span>
-                <span className="font-label-caps uppercase tracking-widest">Hero Sektion</span>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="font-label-caps text-[10px] text-outline uppercase block mb-2">Headline</label>
-                  <input
-                    className="w-full border-b border-outline-variant bg-transparent py-2 font-headline-sm focus:border-primary focus:outline-none transition-all"
-                    type="text"
-                    defaultValue="Sanfte Epilation & Luxus-Pflege"
-                  />
-                </div>
-                <div>
-                  <label className="font-label-caps text-[10px] text-outline uppercase block mb-2">Subtext</label>
-                  <textarea
-                    className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md focus:border-primary focus:outline-none resize-none transition-all"
-                    rows={2}
-                    defaultValue="Erleben Sie die nächste Stufe der Haarentfernung im Herzen von München."
-                  />
-                </div>
-                <div>
-                  <label className="font-label-caps text-[10px] text-outline uppercase block mb-2">Hero Hintergrundbild</label>
-                  <div className="relative h-40 w-full rounded-lg overflow-hidden border border-dashed border-outline-variant bg-surface-container flex items-center justify-center cursor-pointer hover:border-primary/50 transition-colors group">
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">cloud_upload</span>
-                      <span className="font-body-sm text-secondary">Klicken zum Aktualisieren</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Story Slides */}
-            <div className="bg-surface-container-lowest border border-outline-variant/50 p-8 rounded-xl space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-primary">
-                  <span className="material-symbols-outlined">auto_stories</span>
-                  <span className="font-label-caps uppercase tracking-widest">Story Slides</span>
-                </div>
-                <button className="text-primary font-label-caps text-[12px] hover:underline">+ Slide hinzufügen</button>
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                {STORY_SLIDES.map((label) => (
-                  <div
-                    key={label}
-                    className="relative aspect-[9/16] rounded-lg overflow-hidden group border border-outline-variant bg-secondary-container/30"
-                  >
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-outline text-3xl">image</span>
-                    </div>
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                      <button className="bg-white/20 p-2 rounded-full hover:bg-white/40">
-                        <span className="material-symbols-outlined text-white text-[18px]">edit</span>
-                      </button>
-                      <button className="bg-white/20 p-2 rounded-full hover:bg-error/40">
-                        <span className="material-symbols-outlined text-white text-[18px]">delete</span>
-                      </button>
-                    </div>
-                    <div className="absolute bottom-2 left-2 right-2 text-white font-label-caps text-[8px]">{label}</div>
-                  </div>
-                ))}
-                <div className="aspect-[9/16] rounded-lg border-2 border-dashed border-outline-variant bg-surface-container flex flex-col items-center justify-center text-outline-variant hover:text-primary hover:border-primary transition-all cursor-pointer">
-                  <span className="material-symbols-outlined">add_circle</span>
-                  <span className="font-label-caps text-[10px] mt-2">Neu</span>
-                </div>
-              </div>
-            </div>
-          </div>
         </section>
 
         {/* Google Calendar */}

@@ -37,6 +37,7 @@ export default function CategoryDetailPage() {
   const [contentOpen, setContentOpen] = useState(false);
   const [contentTab, setContentTab]   = useState<'hero' | 'info' | 'banners'>('hero');
   const svcNameRef = useRef<HTMLInputElement>(null);
+  const catImgRef  = useRef<HTMLInputElement>(null);
 
   /* ── Service helpers ─────────────────────────────── */
   const updateService = (id: string, field: keyof Service, value: string | boolean) =>
@@ -452,27 +453,53 @@ export default function CategoryDetailPage() {
               </div>
             </section>
 
-            {/* Category image preview */}
+            {/* Category image (used for the tile on the landing page) */}
             <section className="bg-surface-container-lowest border border-outline-variant p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
               <span className="font-label-caps text-[10px] text-outline mb-3 block">KATEGORIE-BILD (FRONTEND)</span>
-              <div
-                className="aspect-[4/3] w-full border border-outline-variant flex flex-col items-center justify-center gap-3 relative overflow-hidden group cursor-pointer"
-                style={{ background: PREVIEW_GRADIENT[catId] ?? 'linear-gradient(135deg,#f6f3f2,#e5e2dc)' }}
-              >
-                <span className="material-symbols-outlined text-5xl opacity-25" style={{ color: '#745b00' }}>
-                  {category.icon}
-                </span>
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <div className="bg-white/90 px-4 py-2 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-[18px]">cloud_upload</span>
-                    <span className="font-label-caps text-[11px] text-primary">Bild hochladen</span>
+              {category.image ? (
+                <div className="relative group cursor-pointer" onClick={() => catImgRef.current?.click()}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={category.image} alt="" className="aspect-[4/3] w-full object-cover border border-outline-variant/30" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                    <span className="bg-white/90 px-2 py-1 font-label-caps text-[10px] text-primary">Ändern</span>
+                    <span
+                      className="bg-white/90 px-2 py-1 font-label-caps text-[10px] text-error cursor-pointer"
+                      onClick={e => { e.stopPropagation(); updateCategory(catId, 'image', ''); }}
+                    >Entfernen</span>
                   </div>
                 </div>
-              </div>
-              <div className="mt-3 flex justify-between items-center">
-                <p className="font-body-sm text-[12px] italic text-outline">{catId}_hero.jpg</p>
-                <button className="text-primary font-label-caps text-[10px] underline">Tauschen</button>
-              </div>
+              ) : (
+                <div
+                  onClick={() => catImgRef.current?.click()}
+                  className="aspect-[4/3] w-full border border-outline-variant flex flex-col items-center justify-center gap-3 relative overflow-hidden group cursor-pointer"
+                  style={{ background: PREVIEW_GRADIENT[catId] ?? 'linear-gradient(135deg,#f6f3f2,#e5e2dc)' }}
+                >
+                  <span className="material-symbols-outlined text-5xl opacity-25" style={{ color: '#745b00' }}>
+                    {category.icon}
+                  </span>
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/15 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <div className="bg-white/90 px-4 py-2 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-[18px]">cloud_upload</span>
+                      <span className="font-label-caps text-[11px] text-primary">Bild hochladen</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <input
+                ref={catImgRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={e => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = () => updateCategory(catId, 'image', reader.result as string);
+                  reader.readAsDataURL(file);
+                  e.target.value = '';
+                }}
+              />
+              <p className="font-body-sm text-[12px] italic text-outline mt-3">Ohne eigenes Bild wird das Standardfoto verwendet.</p>
             </section>
           </div>
         </div>

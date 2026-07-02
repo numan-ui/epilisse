@@ -11,7 +11,7 @@ const ICON_OPTIONS = [
   'emoji_nature', 'flare', 'water_drop', 'volunteer_activism', 'colorize',
 ];
 
-const EMPTY_CAT: Omit<Category, 'id'> = { icon: 'auto_awesome', name: '', desc: '', visible: true };
+const EMPTY_CAT: Omit<Category, 'id'> = { icon: 'auto_awesome', name: '', desc: '', visible: true, image: '' };
 
 export default function BehandlungenPage() {
   const params = useParams();

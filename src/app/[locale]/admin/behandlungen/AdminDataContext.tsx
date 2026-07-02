@@ -1,9 +1,10 @@
 'use client';
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import {
-  INIT_SERVICES, INIT_CAMPAIGNS, INIT_PAGE_CONTENT, CATEGORIES, INIT_SETTINGS,
+  INIT_SERVICES, INIT_CAMPAIGNS, INIT_PAGE_CONTENT, CATEGORIES, INIT_SETTINGS, INIT_LANDING_CONTENT,
+  INIT_HERO_SLIDES, HERO_SLIDE_LIMIT, INIT_PROMO_BANNERS, PROMO_BANNER_LIMIT, INIT_ABOUT_VALUES, ABOUT_VALUE_LIMIT,
   type Service, type Campaign, type Category, type PageContent, type PageContentMap,
-  type PageBanner, type SiteSettings,
+  type PageBanner, type SiteSettings, type LandingContent, type HeroSlide, type PromoBanner, type AboutValue,
 } from './data';
 
 type ServicesMap  = Record<string, Service[]>;
@@ -14,6 +15,10 @@ const LS_CMP = 'epilisse_admin_campaigns';
 const LS_PC  = 'epilisse_admin_page_content';
 const LS_CAT = 'epilisse_admin_categories';
 const LS_SET = 'epilisse_admin_settings';
+const LS_LC  = 'epilisse_admin_landing_content';
+const LS_HERO  = 'epilisse_admin_hero_slides';
+const LS_PROMO = 'epilisse_admin_promo_banners';
+const LS_ABOUT = 'epilisse_admin_about_values';
 
 const ls = {
   read: <T,>(key: string): T | null => {
@@ -39,6 +44,10 @@ interface AdminDataCtx {
   pageContent: PageContentMap;
   categories: Category[];
   settings: SiteSettings;
+  landingContent: LandingContent;
+  heroSlides: HeroSlide[];
+  promoBanners: PromoBanner[];
+  aboutValues: AboutValue[];
   updateService:        (catId: string, id: string, field: keyof Service,  value: string | boolean) => void;
   deleteService:        (catId: string, id: string) => void;
   addService:           (catId: string, svc: Omit<Service, 'id'>) => void;
@@ -56,6 +65,16 @@ interface AdminDataCtx {
   deleteCategory: (id: string) => void;
   updateSetting:  <K extends keyof SiteSettings>(key: K, value: SiteSettings[K]) => void;
   updateSettingHours: (index: number, field: 'open' | 'close' | 'closed', value: string | boolean) => void;
+  updateLandingField: <K extends keyof LandingContent>(key: K, value: LandingContent[K]) => void;
+  updateHeroSlide: (id: string, field: keyof HeroSlide, value: string | number) => void;
+  addHeroSlide: () => void;
+  removeHeroSlide: (id: string) => void;
+  updatePromoBanner: (id: string, field: keyof PromoBanner, value: string) => void;
+  addPromoBanner: () => void;
+  removePromoBanner: (id: string) => void;
+  updateAboutValue: (id: string, field: keyof AboutValue, value: string) => void;
+  addAboutValue: () => void;
+  removeAboutValue: (id: string) => void;
 }
 
 const Ctx = createContext<AdminDataCtx | null>(null);
@@ -65,7 +84,11 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [campaigns,   setCampaigns]   = useState<CampaignsMap>(defaultCampaigns);
   const [pageContent, setPageContent] = useState<PageContentMap>(defaultPageContent);
   const [categories,  setCategories]  = useState<Category[]>(CATEGORIES.map(c => ({ ...c })));
-  const [settings,    setSettings]    = useState<SiteSettings>({ ...INIT_SETTINGS, heroImages: [...INIT_SETTINGS.heroImages] as [string,string,string,string], hours: INIT_SETTINGS.hours.map(h => ({ ...h })) });
+  const [settings,    setSettings]    = useState<SiteSettings>({ ...INIT_SETTINGS, hours: INIT_SETTINGS.hours.map(h => ({ ...h })) });
+  const [landingContent, setLandingContent] = useState<LandingContent>({ ...INIT_LANDING_CONTENT });
+  const [heroSlides, setHeroSlides]   = useState<HeroSlide[]>(INIT_HERO_SLIDES.map(s => ({ ...s })));
+  const [promoBanners, setPromoBanners] = useState<PromoBanner[]>(INIT_PROMO_BANNERS.map(p => ({ ...p })));
+  const [aboutValues, setAboutValues] = useState<AboutValue[]>(INIT_ABOUT_VALUES.map(v => ({ ...v })));
 
   useEffect(() => {
     const svcs = ls.read<ServicesMap>(LS_SVC);
@@ -73,11 +96,19 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     const pc   = ls.read<PageContentMap>(LS_PC);
     const cats = ls.read<Category[]>(LS_CAT);
     const set  = ls.read<SiteSettings>(LS_SET);
+    const lc   = ls.read<LandingContent>(LS_LC);
+    const hero = ls.read<HeroSlide[]>(LS_HERO);
+    const promo = ls.read<PromoBanner[]>(LS_PROMO);
+    const about = ls.read<AboutValue[]>(LS_ABOUT);
     if (svcs) setServices(svcs);
     if (cmps) setCampaigns(cmps);
     if (pc)   setPageContent(pc);
     if (cats && cats.length > 0) setCategories(cats);
-    if (set)  setSettings(prev => ({ ...prev, ...set, heroImages: (set.heroImages ?? prev.heroImages) as [string,string,string,string], hours: set.hours ?? prev.hours }));
+    if (set)  setSettings(prev => ({ ...prev, ...set, hours: set.hours ?? prev.hours }));
+    if (lc)   setLandingContent(prev => ({ ...prev, ...lc }));
+    if (hero && hero.length > 0) setHeroSlides(hero);
+    if (promo && promo.length > 0) setPromoBanners(promo);
+    if (about && about.length > 0) setAboutValues(about);
   }, []);
 
   /* ── Services ────────────────────────────────────── */
@@ -187,14 +218,87 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       ls.write(LS_SET, next); return next;
     }), []);
 
+  /* ── Landing page content ────────────────────────── */
+  const updateLandingField = useCallback(<K extends keyof LandingContent>(key: K, value: LandingContent[K]) =>
+    setLandingContent(prev => {
+      const next = { ...prev, [key]: value };
+      ls.write(LS_LC, next); return next;
+    }), []);
+
+  /* ── Hero slides ─────────────────────────────────── */
+  const updateHeroSlide = useCallback((id: string, field: keyof HeroSlide, value: string | number) =>
+    setHeroSlides(prev => {
+      const next = prev.map(s => s.id === id ? { ...s, [field]: value } : s);
+      ls.write(LS_HERO, next); return next;
+    }), []);
+
+  const addHeroSlide = useCallback(() =>
+    setHeroSlides(prev => {
+      if (prev.length >= HERO_SLIDE_LIMIT) return prev;
+      const next = [...prev, { id: `hero-${Date.now()}`, headline: '', sub: '', cta: 'TERMIN BUCHEN', image: '', duration: 8 }];
+      ls.write(LS_HERO, next); return next;
+    }), []);
+
+  const removeHeroSlide = useCallback((id: string) =>
+    setHeroSlides(prev => {
+      if (prev.length <= 1) return prev;
+      const next = prev.filter(s => s.id !== id);
+      ls.write(LS_HERO, next); return next;
+    }), []);
+
+  /* ── Promo banners (Kombi-Angebot) ────────────────── */
+  const updatePromoBanner = useCallback((id: string, field: keyof PromoBanner, value: string) =>
+    setPromoBanners(prev => {
+      const next = prev.map(p => p.id === id ? { ...p, [field]: value } : p);
+      ls.write(LS_PROMO, next); return next;
+    }), []);
+
+  const addPromoBanner = useCallback(() =>
+    setPromoBanners(prev => {
+      if (prev.length >= PROMO_BANNER_LIMIT) return prev;
+      const next = [...prev, { id: `promo-${Date.now()}`, label: '', title: '', desc: '', ctaPrimary: 'JETZT BUCHEN', ctaSecondary: '', image: '' }];
+      ls.write(LS_PROMO, next); return next;
+    }), []);
+
+  const removePromoBanner = useCallback((id: string) =>
+    setPromoBanners(prev => {
+      if (prev.length <= 1) return prev;
+      const next = prev.filter(p => p.id !== id);
+      ls.write(LS_PROMO, next); return next;
+    }), []);
+
+  /* ── Über Uns "Werte" ─────────────────────────────── */
+  const updateAboutValue = useCallback((id: string, field: keyof AboutValue, value: string) =>
+    setAboutValues(prev => {
+      const next = prev.map(v => v.id === id ? { ...v, [field]: value } : v);
+      ls.write(LS_ABOUT, next); return next;
+    }), []);
+
+  const addAboutValue = useCallback(() =>
+    setAboutValues(prev => {
+      if (prev.length >= ABOUT_VALUE_LIMIT) return prev;
+      const next = [...prev, { id: `av-${Date.now()}`, icon: 'star', title: '', desc: '' }];
+      ls.write(LS_ABOUT, next); return next;
+    }), []);
+
+  const removeAboutValue = useCallback((id: string) =>
+    setAboutValues(prev => {
+      if (prev.length <= 1) return prev;
+      const next = prev.filter(v => v.id !== id);
+      ls.write(LS_ABOUT, next); return next;
+    }), []);
+
   return (
     <Ctx.Provider value={{
-      services, campaigns, pageContent, categories, settings,
+      services, campaigns, pageContent, categories, settings, landingContent, heroSlides, promoBanners, aboutValues,
       updateService, deleteService, addService,
       updateCampaign, deleteCampaign, addCampaign,
       updatePageField, updatePageParagraph, updatePageBenefit, addPageBenefit, removePageBenefit, updatePageBanner,
       addCategory, updateCategory, deleteCategory,
-      updateSetting, updateSettingHours,
+      updateSetting, updateSettingHours, updateLandingField,
+      updateHeroSlide, addHeroSlide, removeHeroSlide,
+      updatePromoBanner, addPromoBanner, removePromoBanner,
+      updateAboutValue, addAboutValue, removeAboutValue,
     }}>
       {children}
     </Ctx.Provider>

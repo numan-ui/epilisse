@@ -7,15 +7,13 @@ import { Link } from "@/i18n/navigation";
 import { FRONTEND_SLUG } from "@/app/[locale]/admin/behandlungen/data";
 import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { useAdminCategories } from "@/hooks/useAdminCategories";
+import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
+import { useAdminHeroSlides } from "@/hooks/useAdminHeroSlides";
+import { useAdminPromoBanners } from "@/hooks/useAdminPromoBanners";
+import { useAdminAboutValues } from "@/hooks/useAdminAboutValues";
 
 /* ── Image constants (Stitch AI – replace with real salon photos) ── */
 const IMG = {
-  hero: [
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuD_YasW9q229vcdUMyOWhsXE0U56gXDW6IhxHCHslvhyudCbfAceKlPVs2XmGP2zRTNgbrCpnW7wLqysQlSs-XP9sR0JO7XReZFC7rVxns2gpe1h7jVgIztmgeZnC8P0gK6eqoAbqsiq_aXBWC0sFVsNmsdZg8ysh_1BdL-yWU858EORE7eXi0v1mssia4G2iXsFBhPOxJd618fsVSgIMKlsRJaBTUn8FqwRk8M5F9VQFNNmVgaWeU-KnCcASqRauKgP4vjhali-pMt",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuB19c_exWt7H0n9vAsZz2kxGDGG-6ta5oPx7QUek7amnLk9lSKwX1U_2_UteAPk9YQWV_scOgE7XPR5xRwTS7UypBg55Iu2kTWSkUW7OqfwIwzNXIySxYdJxoUlzxitWwOn7KgNTrchQ3eQQbo5DN4XztJEAbo0D3vbPu97mCC59GSXoe7oe1x7mq3RC3iapMSvwggpNh8aqy0oMDqRZSfEq4tlt61cSnUlFuSXgKZjLrmBnJxSZ6geu2ibj9T1rqUv8BoIVmoSYDke",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuCDCTVBkANRMCY5r7E2JLvTph0kXEA4T7GxktWv_bKMsgdG-AzO4MqdgFWvxeMIo4R4mlT3yzjHXFTmz2RMdSYBujyVKX-cIPUOMYrFBB2ecuVjcgYnes1xN_ami77RkyJfoZ850mfG5EwXU8-B_9qIIv66-_hQmWFSIruc6mQD8FuAZoQ9poHrEZJ1OhiQ92g2-Wr5bKJd6ZeyHf3zmq1k6SioVRtxAlftGRh3_AXEo5W9nWYw4m18vMFt9BX55pIVBkjVLW8zw2To",
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuAb0Xk8wJSTpOUGnUD4StyAC2X_a5HESgSsYNy02I50YB_F081P4wFEpLLa3HWYmPBVpi2nDPPOAy0_8C2Qdpfl2a9dZ-vx5kuLRWfWCnLSNk3pf7GP-8KlvRZUjHoayjhKxkAEfyVMfcA6MG2jqqpmCCqbmIqrxvAVImnfhZxf_0DcCu_hTAoRnkq3Dan1OvZbY3PTrpL-he-a5fk5zE2Pkg4ranUUJlJT3SVH73E1zMstR68y86JSpWTYQXQxapywC4Mypwk7ZMux",
-  ],
   laser:
     "https://lh3.googleusercontent.com/aida-public/AB6AXuA3IvtG-coL1R-rxRRkCnvRhXTeCycUg1nJq-MJ9OwNUG_hyq5EKihhgBnZ6-I8FAXVro5Kaa5XCJjLSIsa6Xb7xroT8mf9NdJM89YISQMXd0yIQ_HlT9Ex29xuoiRwoTc0hr0Yn3r8_n9K0e5RlFX-CeRmNZdVeFcpCDBQ0OB8n0Y6aBnvXrJX1wH1cWYO97zGEQPOmnnZE13-I2ZEY81xSze4Uv-GEDoHwfTQnB2_t-NNQGEPkoA5XgHE4w9KWM4CAJG-EdG8Cy_z",
   facial:
@@ -24,8 +22,6 @@ const IMG = {
   injectables:
     "https://lh3.googleusercontent.com/aida-public/AB6AXuB2R1r5IBHzprIEBLdeHT1f02OFMOX85Ol0fXFMTE8Mn9Nlc1lMes1BoOgj1lwKVSGR-dIFS-r-gyxMLZZESLXUcH_zS9UBq5T3z81zaxMXyfkXaTN50ZQOxmiM9kMWb4FbuKoODmgwAvE3ta_i60Ekgbw0pVcC1SjtZtC__ZxTNJSwkcNaB_h8XguwNKKEQmQHrBovNuCFUoWvqMpN2bzbrTH7ZN2a66uUpCi_65MRDuC8j05691WrlUa-ULD7rQ27qkKsnnnR_7Q7",
   mani: "https://lh3.googleusercontent.com/aida-public/AB6AXuAtJndxncsaGViuLmDZDBacgojv8siWTA93LPFPxNKQpEt2zcmQOehCknTGGJyu6i6UnkaiofOhED7An8f2QpALTSIozuiak5h3D6E_eJGWt9ZvHmvNcykq9-o53KhIoV6PlcBlXDxkJoMv-p60rCfkvezFpByYXAE-Nf2Yqu6Ce3WZ-puxUEYanR11hTB_J-X_htoKYgGVsUvScVZLae2VUaXdaKyQuFNuH1TxcUFPuaVWjKQRAg8BbvmnFqGiwILaxXwCVD4uJQFs",
-  promo:
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuAvUxRPJ0wH6TMH-8xt3LJfxAs7ZqckEkTBSQxEydnrBF-ozc-9ikTW9uoBWM_C_K5WX_0k1rqq9kBEVNK_0dNLR0DGTcWE4OuICmxXNLb7d0_GnlQ8GqcpgL1gNYzFWdN6sTQdMoTyq0W1o_Vkbc9q8WnJXkJVzAJrfPK-YIjJn8yVSz63e9L5FD0O4kRLLuuFjq2mjkr7CRGmhg4-HoJIGuvJq9jGjAFVZJjx4Ht7jx5oC8lMbVwkQ",
   about:
     "https://lh3.googleusercontent.com/aida-public/AB6AXuCDCTVBkANRMCY5r7E2JLvTph0kXEA4T7GxktWv_bKMsgdG-AzO4MqdgFWvxeMIo4R4mlT3yzjHXFTmz2RMdSYBujyVKX-cIPUOMYrFBB2ecuVjcgYnes1xN_ami77RkyJfoZ850mfG5EwXU8-B_9qIIv66-_hQmWFSIruc6mQD8FuAZoQ9poHrEZJ1OhiQ92g2-Wr5bKJd6ZeyHf3zmq1k6SioVRtxAlftGRh3_AXEo5W9nWYw4m18vMFt9BX55pIVBkjVLW8zw2To",
 };
@@ -48,6 +44,10 @@ export default function HomePage() {
 
   const settings   = useAdminSettings();
   const categories = useAdminCategories();
+  const lc         = useAdminLandingContent();
+  const heroSlides = useAdminHeroSlides();
+  const promoBanners = useAdminPromoBanners();
+  const aboutValues = useAdminAboutValues();
 
   /* ── Dynamic booking URLs from admin settings ─── */
   const GCAL_URL = settings.calendarUrl || 'https://calendar.google.com';
@@ -59,15 +59,17 @@ export default function HomePage() {
     ? `https://maps.google.com/?q=${encodeURIComponent(settings.address)}`
     : 'https://maps.google.com/?q=München';
 
+  /* ── Contact display values: admin settings override i18n placeholders ─── */
+  const displayAddress = settings.address || t("contact.address");
+  const displayHours   = settings.hours
+    .map(d => `${d.day}: ${d.closed ? 'Geschlossen' : `${d.open} – ${d.close} Uhr`}`)
+    .join('\n');
+  const displayPhone   = settings.phone || t("contact.phone");
+  const phoneHref      = displayPhone.replace(/\s/g, '');
+
   /* ── Images: admin override or fallback to originals ─── */
-  const heroImgs = [
-    settings.heroImages[0] || IMG.hero[0],
-    settings.heroImages[1] || IMG.hero[1],
-    settings.heroImages[2] || IMG.hero[2],
-    settings.heroImages[3] || IMG.hero[3],
-  ];
-  const promoImg = settings.promoImage || IMG.promo;
   const aboutImg = settings.aboutImage || IMG.about;
+  const getCatImage = (id: string) => categories.find(c => c.id === id)?.image || '';
 
   /* ── Bento grid: visible original cats + custom cats ─── */
   const visibleCats  = categories.filter(c => c.visible);
@@ -80,26 +82,20 @@ export default function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % 4);
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     setSlideKey((prev) => prev + 1);
-  }, []);
+  }, [heroSlides.length]);
 
   useEffect(() => {
-    const timer = setInterval(nextSlide, 10000);
-    return () => clearInterval(timer);
-  }, [nextSlide]);
+    const durationMs = (heroSlides[currentSlide]?.duration || 10) * 1000;
+    const timer = setTimeout(nextSlide, durationMs);
+    return () => clearTimeout(timer);
+  }, [currentSlide, heroSlides, nextSlide]);
 
   const goToSlide = (idx: number) => {
     setCurrentSlide(idx);
     setSlideKey((prev) => prev + 1);
   };
-
-  const slides = [
-    { headline: t("hero.slide1Headline"), sub: t("hero.slide1Sub"), cta: t("hero.slide1Cta") },
-    { headline: t("hero.slide2Headline"), sub: t("hero.slide2Sub"), cta: t("hero.slide2Cta") },
-    { headline: t("hero.slide3Headline"), sub: t("hero.slide3Sub"), cta: t("hero.slide3Cta") },
-    { headline: t("hero.slide4Headline"), sub: t("hero.slide4Sub"), cta: t("hero.slide4Cta") },
-  ];
 
   const locales = [
     { code: "de", label: "DE" },
@@ -121,16 +117,16 @@ export default function HomePage() {
         {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-10">
           <a href="#behandlungen" className="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300">
-            {t("nav.behandlungen")}
+            {lc.navBehandlungen || t("nav.behandlungen")}
           </a>
           <a href="#preise" className="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300">
-            {t("nav.preise")}
+            {lc.navPreise || t("nav.preise")}
           </a>
           <a href="#uber-uns" className="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300">
-            {t("nav.ueberUns")}
+            {lc.navUeberUns || t("nav.ueberUns")}
           </a>
           <a href="#kontakt" className="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300">
-            {t("nav.kontakt")}
+            {lc.navKontakt || t("nav.kontakt")}
           </a>
         </div>
 
@@ -161,7 +157,7 @@ export default function HomePage() {
             rel="noopener noreferrer"
             className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-95 hover:scale-100 duration-200"
           >
-            {t("nav.cta")}
+            {lc.navCta || t("nav.cta")}
           </a>
 
           {/* Mobile hamburger */}
@@ -179,10 +175,10 @@ export default function HomePage() {
       {menuOpen && (
         <div className="fixed inset-0 z-40 bg-surface flex flex-col items-center justify-center gap-8">
           {[
-            { href: "#behandlungen", label: t("nav.behandlungen") },
-            { href: "#preise", label: t("nav.preise") },
-            { href: "#uber-uns", label: t("nav.ueberUns") },
-            { href: "#kontakt", label: t("nav.kontakt") },
+            { href: "#behandlungen", label: lc.navBehandlungen || t("nav.behandlungen") },
+            { href: "#preise", label: lc.navPreise || t("nav.preise") },
+            { href: "#uber-uns", label: lc.navUeberUns || t("nav.ueberUns") },
+            { href: "#kontakt", label: lc.navKontakt || t("nav.kontakt") },
           ].map((item) => (
             <a
               key={item.href}
@@ -217,15 +213,16 @@ export default function HomePage() {
       <section className="relative h-[921px] md:h-screen w-full overflow-hidden">
         {/* Progress bars */}
         <div className="absolute top-24 left-0 w-full px-margin-mobile md:px-margin-desktop z-30 flex gap-2">
-          {slides.map((_, i) => (
+          {heroSlides.map((slide, i) => (
             <button
-              key={i}
+              key={slide.id}
               onClick={() => goToSlide(i)}
               className="h-1 bg-white/20 flex-1 overflow-hidden cursor-pointer"
               aria-label={`Slide ${i + 1}`}
             >
               <div
                 key={i === currentSlide ? `active-${slideKey}` : `idle-${i}`}
+                style={i === currentSlide ? { animationDuration: `${slide.duration || 10}s` } : undefined}
                 className={`h-full bg-white ${i === currentSlide ? "progress-animate" : ""} ${i < currentSlide ? "w-full" : i === currentSlide ? "w-0" : "w-0"}`}
               />
             </button>
@@ -233,23 +230,27 @@ export default function HomePage() {
         </div>
 
         {/* Slides */}
-        {slides.map((slide, i) => (
+        {heroSlides.map((slide, i) => (
           <div
-            key={i}
+            key={slide.id}
             className={`absolute inset-0 transition-opacity duration-1000 ${
               i === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
           >
             {/* Dark overlay */}
-            <div className={`absolute inset-0 ${OVERLAYS[i]} z-10`} />
+            <div className={`absolute inset-0 ${OVERLAYS[i % OVERLAYS.length]} z-10`} />
 
             {/* Background image */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={heroImgs[i]}
-              alt={slide.headline}
-              className="w-full h-full object-cover"
-            />
+            {slide.image ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={slide.image}
+                alt={slide.headline}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full" style={{ background: 'linear-gradient(135deg,#3a3226 0%,#1a1712 100%)' }} />
+            )}
 
             {/* Content */}
             <div className="absolute inset-0 z-20 flex flex-col justify-center items-start px-margin-mobile md:px-margin-desktop">
@@ -273,9 +274,9 @@ export default function HomePage() {
 
         {/* Manual slide nav dots (mobile) */}
         <div className="absolute bottom-8 left-0 w-full flex justify-center gap-2 z-30 md:hidden">
-          {slides.map((_, i) => (
+          {heroSlides.map((slide, i) => (
             <button
-              key={i}
+              key={slide.id}
               onClick={() => goToSlide(i)}
               className={`w-2 h-2 rounded-full transition-all ${
                 i === currentSlide ? "bg-white w-6" : "bg-white/50"
@@ -296,10 +297,10 @@ export default function HomePage() {
         {/* Section header */}
         <div className="text-center mb-16">
           <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-3">
-            {t("services.sectionLabel")}
+            {lc.servicesSectionLabel || t("services.sectionLabel")}
           </span>
           <h2 className="font-display-lg text-display-lg font-bold text-primary mb-4">
-            {t("services.sectionTitle")}
+            {lc.servicesSectionTitle || t("services.sectionTitle")}
           </h2>
           <div className="w-20 h-[2px] bg-primary-fixed-dim mx-auto" />
         </div>
@@ -311,11 +312,11 @@ export default function HomePage() {
           {isVisible('laser') && (
             <Link href="/laser-haarentfernung" className="md:col-span-3 md:row-span-2 group relative overflow-hidden bg-surface-container-lowest border border-outline-variant/30 cursor-pointer min-h-[400px] md:min-h-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={IMG.laser} alt={getCatName('laser')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              <img src={getCatImage('laser') || IMG.laser} alt={getCatName('laser')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8">
                 <span className="font-label-caps text-label-caps text-primary-fixed-dim/70 mb-2 tracking-widest">{t("services.laserSeo")}</span>
                 <h3 className="font-headline-lg text-headline-lg font-semibold text-white mb-2">{getCatName('laser')}</h3>
-                <p className="text-white/80 font-body-sm text-body-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 mb-4">{t("services.laserDesc")}</p>
+                <p className="text-white/80 font-body-sm text-body-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 mb-4">{lc.servicesLaserDesc || t("services.laserDesc")}</p>
                 <span className="text-primary-fixed-dim font-label-caps text-label-caps flex items-center gap-2">{t("services.discover")}<span className="material-symbols-outlined text-sm">arrow_forward</span></span>
               </div>
             </Link>
@@ -325,10 +326,10 @@ export default function HomePage() {
           {isVisible('gesicht') && (
             <Link href="/gesichtsaesthetik" className="md:col-span-2 md:row-span-1 group relative overflow-hidden bg-surface-container-lowest border border-outline-variant/30 cursor-pointer min-h-[280px] md:min-h-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={IMG.facial} alt={getCatName('gesicht')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              <img src={getCatImage('gesicht') || IMG.facial} alt={getCatName('gesicht')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8">
                 <h3 className="font-headline-md text-headline-md font-medium text-white mb-1">{getCatName('gesicht')}</h3>
-                <p className="text-white/70 font-body-sm text-body-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 mb-2">{t("services.facialDesc")}</p>
+                <p className="text-white/70 font-body-sm text-body-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 mb-2">{lc.servicesFacialDesc || t("services.facialDesc")}</p>
                 <span className="text-primary-fixed-dim font-label-caps text-label-caps flex items-center gap-2">{t("services.details")}<span className="material-symbols-outlined text-sm">arrow_forward</span></span>
               </div>
             </Link>
@@ -337,12 +338,18 @@ export default function HomePage() {
           {/* Andere (1×1) */}
           {isVisible('andere') && (
             <Link href="/andere" className="md:col-span-1 md:row-span-1 group relative overflow-hidden border border-outline-variant/30 cursor-pointer min-h-[200px] md:min-h-0" style={{ background: 'linear-gradient(135deg,#ecfdf5 0%,#6ee7b7 100%)' }}>
+              {getCatImage('andere') && (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={getCatImage('andere')} alt={getCatName('andere')} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex flex-col justify-end p-4">
                 <h3 className="font-headline-sm font-medium text-white text-[16px]">{getCatName('andere')}</h3>
               </div>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20 group-hover:opacity-30 transition-opacity">
-                <span className="material-symbols-outlined text-on-surface" style={{ fontSize: '64px' }}>spa</span>
-              </div>
+              {!getCatImage('andere') && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20 group-hover:opacity-30 transition-opacity">
+                  <span className="material-symbols-outlined text-on-surface" style={{ fontSize: '64px' }}>spa</span>
+                </div>
+              )}
             </Link>
           )}
 
@@ -350,7 +357,7 @@ export default function HomePage() {
           {isVisible('body') && (
             <Link href="/body-contouring" className="md:col-span-1 md:row-span-1 group relative overflow-hidden bg-surface-container-lowest border border-outline-variant/30 cursor-pointer min-h-[200px] md:min-h-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={IMG.body} alt={getCatName('body')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              <img src={getCatImage('body') || IMG.body} alt={getCatName('body')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4">
                 <h3 className="font-headline-sm font-medium text-white text-[16px]">{getCatName('body')}</h3>
               </div>
@@ -361,7 +368,7 @@ export default function HomePage() {
           {isVisible('inject') && (
             <Link href="/injectables" className="md:col-span-1 md:row-span-1 group relative overflow-hidden bg-surface-container-lowest border border-outline-variant/30 cursor-pointer min-h-[200px] md:min-h-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={IMG.injectables} alt={getCatName('inject')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              <img src={getCatImage('inject') || IMG.injectables} alt={getCatName('inject')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4">
                 <h3 className="font-headline-sm font-medium text-white text-[16px]">{getCatName('inject')}</h3>
               </div>
@@ -372,7 +379,7 @@ export default function HomePage() {
           {isVisible('mani') && (
             <Link href="/manikure-pedikure" className="md:col-span-1 md:row-span-1 group relative overflow-hidden bg-surface-container-lowest border border-outline-variant/30 cursor-pointer min-h-[200px] md:min-h-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={IMG.mani} alt={getCatName('mani')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              <img src={getCatImage('mani') || IMG.mani} alt={getCatName('mani')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4">
                 <h3 className="font-headline-sm font-medium text-white text-[16px]">{getCatName('mani')}</h3>
               </div>
@@ -393,7 +400,12 @@ export default function HomePage() {
                   className="group relative overflow-hidden bg-surface-container-lowest border border-outline-variant/30 cursor-pointer min-h-[200px] flex flex-col items-center justify-center"
                   style={{ background: 'linear-gradient(135deg,#fff8e7 0%,#f5e5a0 100%)' }}
                 >
-                  <span className="material-symbols-outlined text-[48px] text-primary/30 group-hover:text-primary/50 transition-colors">{cat.icon}</span>
+                  {cat.image ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={cat.image} alt={cat.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  ) : (
+                    <span className="material-symbols-outlined text-[48px] text-primary/30 group-hover:text-primary/50 transition-colors">{cat.icon}</span>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex flex-col justify-end p-4">
                     <h3 className="font-headline-sm font-medium text-white text-[16px]">{cat.name}</h3>
                   </div>
@@ -409,51 +421,59 @@ export default function HomePage() {
       ══════════════════════════════════════════════════════ */}
       <section
         id="preise"
-        className="mb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
+        className="mb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto space-y-8"
       >
-        <div className="relative w-full min-h-[400px] overflow-hidden group border border-outline-variant/30">
-          <div className="absolute inset-0 bg-secondary-container/30 z-10" />
-          <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between z-20 px-8 md:px-24">
-            {/* Text */}
-            <div className="text-center md:text-left max-w-xl py-12 md:py-16">
-              <span className="font-label-caps text-label-caps text-primary tracking-[0.3em] mb-4 block">
-                {t("promo.label")}
-              </span>
-              <h2 className="font-display-lg text-display-lg font-bold text-on-surface mb-6 leading-tight whitespace-pre-line">
-                {t("promo.title")}
-              </h2>
-              <p className="font-body-md text-body-md text-secondary mb-8 max-w-md">
-                {t("promo.desc")}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <a
-                  href={GCAL_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-primary text-on-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all text-center"
-                >
-                  {t("promo.ctaPrimary")}
-                </a>
-                <a
-                  href="#behandlungen"
-                  className="border border-primary text-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary/5 transition-all text-center"
-                >
-                  {t("promo.ctaSecondary")}
-                </a>
+        {promoBanners.map((banner) => (
+          <div key={banner.id} className="relative w-full min-h-[400px] overflow-hidden group border border-outline-variant/30">
+            <div className="absolute inset-0 bg-secondary-container/30 z-10" />
+            <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between z-20 px-8 md:px-24">
+              {/* Text */}
+              <div className="text-center md:text-left max-w-xl py-12 md:py-16">
+                <span className="font-label-caps text-label-caps text-primary tracking-[0.3em] mb-4 block">
+                  {banner.label}
+                </span>
+                <h2 className="font-display-lg text-display-lg font-bold text-on-surface mb-6 leading-tight whitespace-pre-line">
+                  {banner.title}
+                </h2>
+                <p className="font-body-md text-body-md text-secondary mb-8 max-w-md">
+                  {banner.desc}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <a
+                    href={GCAL_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-primary text-on-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all text-center"
+                  >
+                    {banner.ctaPrimary}
+                  </a>
+                  {banner.ctaSecondary && (
+                    <a
+                      href="#behandlungen"
+                      className="border border-primary text-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary/5 transition-all text-center"
+                    >
+                      {banner.ctaSecondary}
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Image */}
+              <div className="hidden md:block w-[380px] h-[400px] relative overflow-hidden flex-shrink-0">
+                <div className="absolute inset-0 shadow-2xl" style={{ background: 'linear-gradient(135deg,#f6f3f2,#e5e2dc)' }} />
+                {banner.image && (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={banner.image}
+                    alt={banner.title}
+                    onError={e => { e.currentTarget.style.display = 'none'; }}
+                    className="absolute inset-0 w-full h-full object-cover shadow-2xl scale-110 group-hover:scale-100 transition-transform duration-1000"
+                  />
+                )}
               </div>
             </div>
-
-            {/* Image */}
-            <div className="hidden md:block w-[380px] h-[400px] relative overflow-hidden flex-shrink-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={promoImg}
-                alt="Winter Glow Kombi-Paket"
-                className="w-full h-full object-cover shadow-2xl scale-110 group-hover:scale-100 transition-transform duration-1000"
-              />
-            </div>
           </div>
-        </div>
+        ))}
       </section>
 
       {/* ══════════════════════════════════════════════════════
@@ -467,23 +487,19 @@ export default function HomePage() {
           {/* Left: text */}
           <div>
             <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-3">
-              {t("about.sectionLabel")}
+              {lc.aboutSectionLabel || t("about.sectionLabel")}
             </span>
             <h2 className="font-display-lg text-headline-lg font-semibold text-on-surface mb-6 leading-tight">
-              {t("about.title")}
+              {lc.aboutTitle || t("about.title")}
             </h2>
             <p className="font-body-lg text-body-lg text-secondary mb-10">
-              {t("about.desc")}
+              {lc.aboutDesc || t("about.desc")}
             </p>
 
             {/* Values */}
             <div className="flex flex-col gap-8">
-              {[
-                { title: t("about.value1Title"), desc: t("about.value1Desc"), icon: "verified" },
-                { title: t("about.value2Title"), desc: t("about.value2Desc"), icon: "lock" },
-                { title: t("about.value3Title"), desc: t("about.value3Desc"), icon: "star" },
-              ].map((v) => (
-                <div key={v.title} className="flex gap-4 items-start">
+              {aboutValues.map((v) => (
+                <div key={v.id} className="flex gap-4 items-start">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <span className="material-symbols-outlined text-primary text-xl">{v.icon}</span>
                   </div>
@@ -525,10 +541,10 @@ export default function HomePage() {
       >
         <div className="text-center mb-16">
           <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-3">
-            {t("contact.sectionLabel")}
+            {lc.contactSectionLabel || t("contact.sectionLabel")}
           </span>
           <h2 className="font-display-lg text-headline-lg font-semibold text-on-surface mb-4">
-            {t("contact.title")}
+            {lc.contactTitle || t("contact.title")}
           </h2>
           <div className="w-20 h-[2px] bg-primary-fixed-dim mx-auto" />
         </div>
@@ -541,10 +557,10 @@ export default function HomePage() {
               <span className="material-symbols-outlined text-primary">location_on</span>
             </div>
             <h3 className="font-headline-sm text-headline-sm font-medium text-on-surface">
-              {t("contact.addressTitle")}
+              {lc.contactAddressTitle || t("contact.addressTitle")}
             </h3>
             <address className="font-body-sm text-body-sm text-secondary not-italic whitespace-pre-line">
-              {t("contact.address")}
+              {displayAddress}
             </address>
           </div>
 
@@ -554,10 +570,10 @@ export default function HomePage() {
               <span className="material-symbols-outlined text-primary">schedule</span>
             </div>
             <h3 className="font-headline-sm text-headline-sm font-medium text-on-surface">
-              {t("contact.hoursTitle")}
+              {lc.contactHoursTitle || t("contact.hoursTitle")}
             </h3>
             <p className="font-body-sm text-body-sm text-secondary whitespace-pre-line">
-              {t("contact.hours")}
+              {displayHours}
             </p>
           </div>
 
@@ -567,13 +583,13 @@ export default function HomePage() {
               <span className="material-symbols-outlined text-primary">phone</span>
             </div>
             <h3 className="font-headline-sm text-headline-sm font-medium text-on-surface">
-              {t("contact.phoneTitle")}
+              {lc.contactPhoneTitle || t("contact.phoneTitle")}
             </h3>
             <a
-              href={`tel:${t("contact.phone").replace(/\s/g, "")}`}
+              href={`tel:${phoneHref}`}
               className="font-body-sm text-body-sm text-secondary hover:text-primary transition-colors"
             >
-              {t("contact.phone")}
+              {displayPhone}
             </a>
           </div>
         </div>
@@ -621,7 +637,7 @@ export default function HomePage() {
               EPILISSE
             </div>
             <p className="font-body-sm text-body-sm text-secondary max-w-xs">
-              {t("footer.tagline")}
+              {lc.footerTagline || t("footer.tagline")}
             </p>
             <div className="flex gap-4">
               <a href="#" className="text-primary hover:scale-110 transition-transform" aria-label="Facebook">
@@ -639,7 +655,7 @@ export default function HomePage() {
           {/* Behandlungen */}
           <div>
             <h4 className="font-headline-sm text-headline-sm font-medium text-primary mb-6">
-              {t("footer.behandlungenTitle")}
+              {lc.footerBehandlungenTitle || t("footer.behandlungenTitle")}
             </h4>
             <ul className="flex flex-col gap-4 font-body-sm text-body-sm text-secondary">
               {[
@@ -660,14 +676,14 @@ export default function HomePage() {
           {/* Studio */}
           <div>
             <h4 className="font-headline-sm text-headline-sm font-medium text-primary mb-6">
-              {t("footer.studioTitle")}
+              {lc.footerStudioTitle || t("footer.studioTitle")}
             </h4>
             <ul className="flex flex-col gap-4 font-body-sm text-body-sm text-secondary">
-              <li className="whitespace-pre-line">{t("contact.address")}</li>
-              <li className="whitespace-pre-line">{t("contact.hours")}</li>
+              <li className="whitespace-pre-line">{displayAddress}</li>
+              <li className="whitespace-pre-line">{displayHours}</li>
               <li>
-                <a href={`tel:${t("contact.phone").replace(/\s/g, "")}`} className="hover:text-primary transition-colors">
-                  {t("contact.phone")}
+                <a href={`tel:${phoneHref}`} className="hover:text-primary transition-colors">
+                  {displayPhone}
                 </a>
               </li>
             </ul>
@@ -676,7 +692,7 @@ export default function HomePage() {
           {/* Legal */}
           <div>
             <h4 className="font-headline-sm text-headline-sm font-medium text-primary mb-6">
-              {t("footer.legalTitle")}
+              {lc.footerLegalTitle || t("footer.legalTitle")}
             </h4>
             <ul className="flex flex-col gap-4 font-body-sm text-body-sm text-secondary">
               {[
@@ -699,14 +715,14 @@ export default function HomePage() {
         {/* Bottom bar */}
         <div className="max-w-[1440px] mx-auto border-t border-outline-variant/30 pt-8 mt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <span className="font-body-sm text-body-sm text-secondary">
-            {t("footer.copyright")}
+            {lc.footerCopyright || t("footer.copyright")}
           </span>
           <div className="flex gap-8 items-center">
             <span className="font-label-caps text-[10px] text-secondary/60 tracking-widest">
-              {t("footer.badge1")}
+              {lc.footerBadge1 || t("footer.badge1")}
             </span>
             <span className="font-label-caps text-[10px] text-secondary/60 tracking-widest">
-              {t("footer.badge2")}
+              {lc.footerBadge2 || t("footer.badge2")}
             </span>
             <a
               href={`/${locale}/admin`}

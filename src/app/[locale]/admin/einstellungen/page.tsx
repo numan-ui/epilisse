@@ -235,42 +235,10 @@ export default function EinstellungenPage() {
             <section className="max-w-3xl space-y-8">
               <div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface mb-1">Startseite Bilder</h3>
-                <p className="font-body-sm text-on-surface-variant opacity-70">Bilder für Hero-Slider, Promo-Banner und Über-Uns-Bereich. Leer lassen = Standard-Bild wird verwendet.</p>
-              </div>
-
-              {/* Hero Slider Images */}
-              <div className="bg-surface-container-lowest border border-outline-variant p-6 space-y-5">
-                <h4 className="font-headline-sm text-[15px] text-on-surface flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-[18px]">auto_stories</span>
-                  Hero-Slider Bilder (4 Slides)
-                </h4>
-                <div className="grid grid-cols-2 gap-4">
-                  {([0, 1, 2, 3] as const).map((i) => (
-                    <div key={i} className="space-y-2">
-                      <label className="font-label-caps text-[10px] text-outline uppercase block">Slide {i + 1}</label>
-                      <ImageUpload
-                        value={settings.heroImages[i]}
-                        onChange={v => {
-                          const next = [...settings.heroImages] as [string,string,string,string];
-                          next[i] = v;
-                          updateSetting('heroImages', next);
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Promo Image */}
-              <div className="bg-surface-container-lowest border border-outline-variant p-6 space-y-5">
-                <h4 className="font-headline-sm text-[15px] text-on-surface flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-[18px]">campaign</span>
-                  Promo-Banner Bild
-                </h4>
-                <ImageUpload
-                  value={settings.promoImage}
-                  onChange={v => updateSetting('promoImage', v)}
-                />
+                <p className="font-body-sm text-on-surface-variant opacity-70">
+                  Über-Uns-Bereich. Hero-Slider- und Kombi-Angebot-Bilder werden jetzt pro Eintrag unter{' '}
+                  <a href="../startseite" className="text-primary underline">Startseite</a> gepflegt.
+                </p>
               </div>
 
               {/* About Image */}

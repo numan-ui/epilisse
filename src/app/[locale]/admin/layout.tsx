@@ -5,6 +5,7 @@ import { AdminDataProvider } from './behandlungen/AdminDataContext';
 
 const NAV_ITEMS = [
   { href: '/admin', icon: 'dashboard', label: 'Dashboard' },
+  { href: '/admin/startseite', icon: 'home', label: 'Startseite' },
   { href: '/admin/termine', icon: 'calendar_month', label: 'Termine' },
   { href: '/admin/behandlungen', icon: 'content_cut', label: 'Behandlungen' },
   { href: '/admin/kunden', icon: 'group', label: 'Kunden' },

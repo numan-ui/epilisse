@@ -1,14 +1,14 @@
 export type Service  = { id: string; name: string; price: string; duration: string; active: boolean };
 export type Campaign = { id: string; label: string; title: string; desc: string; price: string; oldPrice?: string; cta: string; icon: string; image: string; active: boolean };
-export type Category = { id: string; icon: string; name: string; desc: string; visible: boolean };
+export type Category = { id: string; icon: string; name: string; desc: string; visible: boolean; image: string };
 
 export const CATEGORIES: Category[] = [
-  { id: 'laser',   icon: 'auto_awesome',    name: 'Laser-Haarentfernung', desc: 'Premium Diodenlaser-Technologie für seidig glatte Haut.',        visible: true  },
-  { id: 'gesicht', icon: 'face',             name: 'Gesichtsästhetik',     desc: 'Exklusive Behandlungen für strahlende Hautgesundheit.',          visible: true  },
-  { id: 'body',    icon: 'self_improvement', name: 'Body Contouring',      desc: 'Nicht-invasive Formung Ihrer Silhouette.',                      visible: false },
-  { id: 'inject',  icon: 'vaccines',         name: 'Injectables',          desc: 'Präzise Hyaluron- und Botox-Behandlungen.',                     visible: true  },
-  { id: 'mani',    icon: 'spa',              name: 'Maniküre',             desc: 'Luxuriöse Nagelpflege und Handmassage.',                        visible: true  },
-  { id: 'andere',  icon: 'favorite',         name: 'Andere',               desc: 'Weitere Wellness- und Beauty-Services für Ihr Wohlbefinden.',   visible: true  },
+  { id: 'laser',   icon: 'auto_awesome',    name: 'Laser-Haarentfernung', desc: 'Premium Diodenlaser-Technologie für seidig glatte Haut.',        visible: true,  image: '' },
+  { id: 'gesicht', icon: 'face',             name: 'Gesichtsästhetik',     desc: 'Exklusive Behandlungen für strahlende Hautgesundheit.',          visible: true,  image: '' },
+  { id: 'body',    icon: 'self_improvement', name: 'Body Contouring',      desc: 'Nicht-invasive Formung Ihrer Silhouette.',                      visible: false, image: '' },
+  { id: 'inject',  icon: 'vaccines',         name: 'Injectables',          desc: 'Präzise Hyaluron- und Botox-Behandlungen.',                     visible: true,  image: '' },
+  { id: 'mani',    icon: 'spa',              name: 'Maniküre',             desc: 'Luxuriöse Nagelpflege und Handmassage.',                        visible: true,  image: '' },
+  { id: 'andere',  icon: 'favorite',         name: 'Andere',               desc: 'Weitere Wellness- und Beauty-Services für Ihr Wohlbefinden.',   visible: true,  image: '' },
 ];
 
 const s = (id: string, name: string, price: string, duration: string, active = true): Service =>
@@ -98,8 +98,7 @@ export type SiteSettings = {
   name: string; tagline: string; address: string; phone: string; email: string; whatsapp: string;
   calendarUrl: string; whatsappMsg: string; bookingActive: boolean; whatsappActive: boolean;
   instagram: string; facebook: string; tiktok: string; google: string;
-  heroImages: [string, string, string, string];
-  promoImage: string; aboutImage: string;
+  aboutImage: string;
   hours: OpeningDay[];
 };
 
@@ -118,8 +117,6 @@ export const INIT_SETTINGS: SiteSettings = {
   facebook: 'epilisse.munich',
   tiktok: '@epilisse',
   google: '',
-  heroImages: ['', '', '', ''],
-  promoImage: '',
   aboutImage: '',
   hours: [
     { day: 'Montag',     open: '09:00', close: '19:00', closed: false },
@@ -131,6 +128,91 @@ export const INIT_SETTINGS: SiteSettings = {
     { day: 'Sonntag',    open: '10:00', close: '16:00', closed: true  },
   ],
 };
+
+export type LandingContent = {
+  navBehandlungen: string; navPreise: string; navUeberUns: string; navKontakt: string; navCta: string;
+  servicesSectionLabel: string; servicesSectionTitle: string;
+  servicesLaserDesc: string; servicesFacialDesc: string;
+  aboutSectionLabel: string; aboutTitle: string; aboutDesc: string;
+  contactSectionLabel: string; contactTitle: string;
+  contactAddressTitle: string; contactHoursTitle: string; contactPhoneTitle: string;
+  footerTagline: string; footerBehandlungenTitle: string; footerStudioTitle: string; footerLegalTitle: string;
+  footerCopyright: string; footerBadge1: string; footerBadge2: string;
+};
+
+export const INIT_LANDING_CONTENT: LandingContent = {
+  navBehandlungen: 'Behandlungen', navPreise: 'Preise', navUeberUns: 'Über Uns', navKontakt: 'Kontakt', navCta: 'TERMIN BUCHEN',
+  servicesSectionLabel: 'UNSER ANGEBOT', servicesSectionTitle: 'Exklusive Behandlungen',
+  servicesLaserDesc: 'Dauerhafte Glätte durch modernste Technologie.',
+  servicesFacialDesc: 'Hydrafacial & Premium-Hautpflege in München.',
+  aboutSectionLabel: 'ÜBER EPILISSE', aboutTitle: 'Münchens Adresse für Premium-Ästhetik',
+  aboutDesc: 'Willkommen im EPILISSE Studio – Ihrem exklusiven Kosmetikstudio im Herzen von München. Wir vereinen modernste Behandlungsmethoden mit einem tiefen Verständnis für individuelle Schönheit.',
+  contactSectionLabel: 'KONTAKT & STANDORT', contactTitle: 'Besuchen Sie uns in München',
+  contactAddressTitle: 'Studio Adresse', contactHoursTitle: 'Öffnungszeiten', contactPhoneTitle: 'Telefon',
+  footerTagline: 'Ihr Experte für exklusive Schönheit und dauerhafte Haarentfernung im Herzen von München. Qualität, Diskretion und Perfektion.',
+  footerBehandlungenTitle: 'Behandlungen', footerStudioTitle: 'Studio', footerLegalTitle: 'Rechtliches',
+  footerCopyright: '© 2026 EPILISSE – Luxury Beauty Care Munich.',
+  footerBadge1: 'MADE IN MUNICH', footerBadge2: 'SECURE PAYMENT',
+};
+
+export type HeroSlide = { id: string; headline: string; sub: string; cta: string; image: string; duration: number };
+
+export const HERO_SLIDE_LIMIT = 10;
+
+export const INIT_HERO_SLIDES: HeroSlide[] = [
+  {
+    id: 'hero1', duration: 10,
+    headline: 'Zeitlose Schönheit.',
+    sub: 'Entdecken Sie die Kunst der ästhetischen Perfektion in unserem Exklusiv-Studio in München.',
+    cta: 'TERMIN BUCHEN',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD_YasW9q229vcdUMyOWhsXE0U56gXDW6IhxHCHslvhyudCbfAceKlPVs2XmGP2zRTNgbrCpnW7wLqysQlSs-XP9sR0JO7XReZFC7rVxns2gpe1h7jVgIztmgeZnC8P0gK6eqoAbqsiq_aXBWC0sFVsNmsdZg8ysh_1BdL-yWU858EORE7eXi0v1mssia4G2iXsFBhPOxJd618fsVSgIMKlsRJaBTUn8FqwRk8M5F9VQFNNmVgaWeU-KnCcASqRauKgP4vjhali-pMt',
+  },
+  {
+    id: 'hero2', duration: 10,
+    headline: 'Sanfte Glätte.',
+    sub: 'Präzise Laser-Haarentfernung für ein seidiges Hautgefühl, das bleibt. Schmerzfrei und effektiv.',
+    cta: 'ERFAHREN SIE MEHR',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB19c_exWt7H0n9vAsZz2kxGDGG-6ta5oPx7QUek7amnLk9lSKwX1U_2_UteAPk9YQWV_scOgE7XPR5xRwTS7UypBg55Iu2kTWSkUW7OqfwIwzNXIySxYdJxoUlzxitWwOn7KgNTrchQ3eQQbo5DN4XztJEAbo0D3vbPu97mCC59GSXoe7oe1x7mq3RC3iapMSvwggpNh8aqy0oMDqRZSfEq4tlt61cSnUlFuSXgKZjLrmBnJxSZ6geu2ibj9T1rqUv8BoIVmoSYDke',
+  },
+  {
+    id: 'hero3', duration: 10,
+    headline: 'Gesichtsästhetik.',
+    sub: 'Individuelle Behandlungen für eine strahlende Haut und natürliche Verjüngung.',
+    cta: 'ZUM ANGEBOT',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCDCTVBkANRMCY5r7E2JLvTph0kXEA4T7GxktWv_bKMsgdG-AzO4MqdgFWvxeMIo4R4mlT3yzjHXFTmz2RMdSYBujyVKX-cIPUOMYrFBB2ecuVjcgYnes1xN_ami77RkyJfoZ850mfG5EwXU8-B_9qIIv66-_hQmWFSIruc6mQD8FuAZoQ9poHrEZJ1OhiQ92g2-Wr5bKJd6ZeyHf3zmq1k6SioVRtxAlftGRh3_AXEo5W9nWYw4m18vMFt9BX55pIVBkjVLW8zw2To',
+  },
+  {
+    id: 'hero4', duration: 10,
+    headline: 'Perfekte Pflege.',
+    sub: 'Maniküre & Pediküre auf höchstem Niveau für Ihre Hände und Füße.',
+    cta: 'JETZT BUCHEN',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAb0Xk8wJSTpOUGnUD4StyAC2X_a5HESgSsYNy02I50YB_F081P4wFEpLLa3HWYmPBVpi2nDPPOAy0_8C2Qdpfl2a9dZ-vx5kuLRWfWCnLSNk3pf7GP-8KlvRZUjHoayjhKxkAEfyVMfcA6MG2jqqpmCCqbmIqrxvAVImnfhZxf_0DcCu_hTAoRnkq3Dan1OvZbY3PTrpL-he-a5fk5zE2Pkg4ranUUJlJT3SVH73E1zMstR68y86JSpWTYQXQxapywC4Mypwk7ZMux',
+  },
+];
+
+export type PromoBanner = { id: string; label: string; title: string; desc: string; ctaPrimary: string; ctaSecondary: string; image: string };
+
+export const PROMO_BANNER_LIMIT = 4;
+
+export const INIT_PROMO_BANNERS: PromoBanner[] = [
+  {
+    id: 'promo1',
+    label: 'EXKLUSIVES ANGEBOT', title: 'Winter Glow\nKombi-Paket',
+    desc: 'Erhalten Sie 20 % Rabatt auf unsere exklusive Kombination aus Gesichtshydrierung und Maniküre. Gültig bis Ende der Saison.',
+    ctaPrimary: 'ANGEBOT SICHERN', ctaSecondary: 'DETAILS ANSEHEN',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD9Jgcgz1lnxvUeFEc6mJMhe2fEQ_S7p7HqKt66Xz-k9ENiAAqtl5TMcgoL8KLRf78R0-wppwEv-4FLWZqaQ-5eJphTdHeXT8VwSjV2KqVi_XldRkOSaQSereWSQNPe2HOnDACmji6f22QeEcZUQSqoZHT7oiyLRNYYPsb69N6HuRaI0SUP0BrdNcAW08nJmomDxLZadSl9ZKoER-eetlH2O2cNrFikoJfTnvg0pKM_AvPxwDxBPA6NpLhfP0TI-YyWHtuvNutTlkHk',
+  },
+];
+
+export type AboutValue = { id: string; icon: string; title: string; desc: string };
+
+export const ABOUT_VALUE_LIMIT = 10;
+
+export const INIT_ABOUT_VALUES: AboutValue[] = [
+  { id: 'av1', icon: 'verified', title: 'Qualität', desc: 'Ausschließlich zertifizierte Technologien und medizinische Wirkstoffe auf klinischem Niveau.' },
+  { id: 'av2', icon: 'lock', title: 'Diskretion', desc: 'Ein geschützter Raum für Ihre persönliche Schönheitsreise – absolut vertraulich.' },
+  { id: 'av3', icon: 'star', title: 'Perfektion', desc: 'Jede Behandlung wird individuell auf Ihren Hauttyp und Ihre Wünsche abgestimmt.' },
+];
 
 export const FRONTEND_SLUG: Record<string, string> = {
   laser:   'laser-haarentfernung',

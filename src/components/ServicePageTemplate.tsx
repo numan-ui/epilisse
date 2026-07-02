@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
+import { useAdminSettings } from "@/hooks/useAdminSettings";
+import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 export interface PricingItem {
@@ -39,23 +41,26 @@ interface Props extends ServicePageData {
   locale: string;
 }
 
-const GCAL_URL = "https://calendar.google.com";
-
 const LOCALES = [
   { code: "de", label: "DE" },
   { code: "en", label: "EN" },
 ] as const;
 
-const NAV_LINKS = [
-  { href: "/#behandlungen", label: "Behandlungen" },
-  { href: "/#preise", label: "Preise" },
-  { href: "/#uber-uns", label: "Über Uns" },
-  { href: "/#kontakt", label: "Kontakt" },
-];
-
 // ── Component ─────────────────────────────────────────────────────────────
 export default function ServicePageTemplate({ locale, ...data }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const settings = useAdminSettings();
+  const lc = useAdminLandingContent();
+
+  const GCAL_URL = settings.calendarUrl || "https://calendar.google.com";
+  const bookingCta = lc.navCta || "Termin Buchen";
+
+  const NAV_LINKS = [
+    { href: "/#behandlungen", label: lc.navBehandlungen || "Behandlungen" },
+    { href: "/#preise", label: lc.navPreise || "Preise" },
+    { href: "/#uber-uns", label: lc.navUeberUns || "Über Uns" },
+    { href: "/#kontakt", label: lc.navKontakt || "Kontakt" },
+  ];
 
   return (
     <div className="min-h-screen bg-surface text-on-surface font-body-md overflow-x-hidden">
@@ -102,7 +107,7 @@ export default function ServicePageTemplate({ locale, ...data }: Props) {
             rel="noopener noreferrer"
             className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all"
           >
-            Termin Buchen
+            {bookingCta}
           </a>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -225,7 +230,7 @@ export default function ServicePageTemplate({ locale, ...data }: Props) {
                 rel="noopener noreferrer"
                 className="inline-block bg-primary text-on-primary px-10 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all"
               >
-                Termin Buchen
+                {bookingCta}
               </a>
             </div>
           </div>
@@ -305,7 +310,7 @@ export default function ServicePageTemplate({ locale, ...data }: Props) {
             EPILISSE
           </Link>
           <p className="font-body-sm text-secondary leading-relaxed">
-            Ihre Experten für dauerhafte Haarentfernung und ästhetische Hautbehandlungen im Herzen von München.
+            {lc.footerTagline}
           </p>
         </div>
         <div className="flex flex-col gap-3">
@@ -336,9 +341,9 @@ export default function ServicePageTemplate({ locale, ...data }: Props) {
         </div>
         <div className="flex flex-col gap-3">
           <h4 className="font-headline-sm text-headline-sm text-primary mb-2">Kontakt</h4>
-          <span className="font-body-sm text-secondary">Adresse Placeholder, München</span>
-          <span className="font-body-sm text-secondary">+49 (0) 89 XXX XXX XX</span>
-          <span className="font-body-sm text-secondary">info@epilisse-munich.de</span>
+          <span className="font-body-sm text-secondary">{settings.address}</span>
+          <span className="font-body-sm text-secondary">{settings.phone}</span>
+          <span className="font-body-sm text-secondary">{settings.email}</span>
         </div>
       </footer>
     </div>
