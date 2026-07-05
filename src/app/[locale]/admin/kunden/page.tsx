@@ -1,52 +1,60 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 
 type Customer = {
   id: string;
   name: string;
-  phone: string;
-  email: string;
+  phone: string | null;
+  email: string | null;
   since: string; // ISO date string
   totalVisits: number;
-  totalSpent: string;
-  lastService: string;
-  lastVisit: string;
+  totalSpent: number;
+  lastService: string | null;
+  lastVisit: string | null; // ISO timestamp
   tags: string[];
   notes: string;
 };
 
-const CUSTOMERS: Customer[] = [
-  { id: 'k1',  name: 'Aylin Kaya',       phone: '+49 176 111 222', email: 'aylin@mail.de',      since: '2024-03-12', totalVisits: 14, totalSpent: '1.240,00€', lastService: 'HydraFacial Basic',    lastVisit: '2026-06-29', tags: ['Stammkundin', 'VIP'],        notes: 'Bevorzugt morgens.' },
-  { id: 'k2',  name: 'Sophie Müller',    phone: '+49 176 333 444', email: 'sophie@mail.de',     since: '2024-07-05', totalVisits: 8,  totalSpent: '960,00€',   lastService: 'Botox Stirn',          lastVisit: '2026-06-29', tags: ['Stammkundin'],               notes: '' },
-  { id: 'k3',  name: 'Zeynep Arslan',    phone: '+49 176 555 666', email: 'zeynep@mail.de',     since: '2025-01-20', totalVisits: 6,  totalSpent: '540,00€',   lastService: 'Oberlippe – Laser',    lastVisit: '2026-06-29', tags: ['Neukundin'],                 notes: 'Empfindliche Haut.' },
-  { id: 'k4',  name: 'Lisa Wagner',      phone: '+49 176 777 888', email: 'lisa@mail.de',       since: '2023-11-01', totalVisits: 22, totalSpent: '2.100,00€', lastService: 'Gel-Maniküre',         lastVisit: '2026-06-29', tags: ['Stammkundin', 'VIP'],        notes: 'Kommt monatlich.' },
-  { id: 'k5',  name: 'Fatma Demir',      phone: '+49 176 999 000', email: 'fatma@mail.de',      since: '2024-09-14', totalVisits: 10, totalSpent: '1.580,00€', lastService: 'Beine (Komplett)',     lastVisit: '2026-06-29', tags: ['Stammkundin'],               notes: '' },
-  { id: 'k6',  name: 'Anna Schneider',   phone: '+49 176 100 200', email: 'anna.s@mail.de',     since: '2025-04-10', totalVisits: 3,  totalSpent: '247,00€',   lastService: 'Hyaluron Lippen',     lastVisit: '2026-06-20', tags: ['Neukundin'],                 notes: 'Interessiert an Laser.' },
-  { id: 'k7',  name: 'Müge Yıldız',      phone: '+49 176 300 400', email: 'muge@mail.de',       since: '2024-02-28', totalVisits: 18, totalSpent: '2.340,00€', lastService: 'Microneedling',        lastVisit: '2026-06-05', tags: ['Stammkundin', 'VIP'],        notes: 'Profhilo-Interesse.' },
-  { id: 'k8',  name: 'Lena Braun',       phone: '+49 176 500 600', email: 'lena.b@mail.de',     since: '2025-06-01', totalVisits: 2,  totalSpent: '110,00€',   lastService: 'Klassische Maniküre', lastVisit: '2026-06-15', tags: ['Neukundin'],                 notes: '' },
-  { id: 'k9',  name: 'Nadia Özkan',      phone: '+49 176 700 800', email: 'nadia@mail.de',      since: '2023-08-17', totalVisits: 30, totalSpent: '3.780,00€', lastService: 'Profhilo Gesicht',     lastVisit: '2026-05-30', tags: ['Stammkundin', 'VIP'],        notes: 'Loyalste Kundin.' },
-  { id: 'k10', name: 'Carina Held',      phone: '+49 176 900 010', email: 'carina@mail.de',     since: '2025-02-14', totalVisits: 4,  totalSpent: '380,00€',   lastService: 'Spa-Pediküre',         lastVisit: '2026-06-10', tags: ['Neukundin'],                 notes: '' },
-  { id: 'k11', name: 'Sandra Koch',      phone: '+49 176 011 022', email: 'sandra.k@mail.de',   since: '2024-05-22', totalVisits: 11, totalSpent: '990,00€',   lastService: 'Chemical Peeling',     lastVisit: '2026-05-28', tags: ['Stammkundin'],               notes: '' },
-  { id: 'k12', name: 'Hülya Şahin',     phone: '+49 176 033 044', email: 'hulya@mail.de',      since: '2024-10-30', totalVisits: 7,  totalSpent: '840,00€',   lastService: 'Baby Botox',           lastVisit: '2026-06-18', tags: ['Stammkundin'],               notes: 'Nächster Termin: Laser.' },
-];
-
 const ALL_TAGS = ['Alle', 'VIP', 'Stammkundin', 'Neukundin'];
 
+const formatMoney = (n: number) =>
+  n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '€';
+
+const formatDate = (iso: string | null) => (iso ? iso.slice(0, 10) : '—');
+
 export default function KundenPage() {
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading]     = useState(true);
   const [search, setSearch]       = useState('');
   const [tagFilter, setTagFilter] = useState('Alle');
-  const [selected, setSelected]   = useState<Customer | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showAdd, setShowAdd]     = useState(false);
   const [sortBy, setSortBy]       = useState<'name' | 'visits' | 'spent'>('name');
+  const [notesDraft, setNotesDraft] = useState('');
+  const [newCustomer, setNewCustomer] = useState({ name: '', phone: '', email: '', tag: 'Neukundin', notes: '' });
+
+  const loadCustomers = useCallback(() => {
+    setLoading(true);
+    fetch('/api/customers')
+      .then((r) => r.json())
+      .then((data) => setCustomers(data))
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => { loadCustomers(); }, [loadCustomers]);
+
+  const selected = customers.find((c) => c.id === selectedId) ?? null;
+
+  useEffect(() => { setNotesDraft(selected?.notes ?? ''); }, [selected?.id]);
 
   const filtered = useMemo(() => {
-    let list = CUSTOMERS;
+    let list = customers;
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(c =>
         c.name.toLowerCase().includes(q) ||
-        c.phone.includes(q) ||
-        c.email.toLowerCase().includes(q)
+        (c.phone ?? '').includes(q) ||
+        (c.email ?? '').toLowerCase().includes(q)
       );
     }
     if (tagFilter !== 'Alle') {
@@ -55,19 +63,56 @@ export default function KundenPage() {
     return [...list].sort((a, b) => {
       if (sortBy === 'name')   return a.name.localeCompare(b.name);
       if (sortBy === 'visits') return b.totalVisits - a.totalVisits;
-      return 0;
+      return b.totalSpent - a.totalSpent;
     });
-  }, [search, tagFilter, sortBy]);
+  }, [customers, search, tagFilter, sortBy]);
 
-  const vipCount    = CUSTOMERS.filter(c => c.tags.includes('VIP')).length;
-  const newCount    = CUSTOMERS.filter(c => c.tags.includes('Neukundin')).length;
-  const returnCount = CUSTOMERS.filter(c => c.tags.includes('Stammkundin')).length;
+  const vipCount    = customers.filter(c => c.tags.includes('VIP')).length;
+  const newCount    = customers.filter(c => c.tags.includes('Neukundin')).length;
+  const returnCount = customers.filter(c => c.tags.includes('Stammkundin')).length;
 
   const tagBadge = (tag: string) => {
     if (tag === 'VIP')         return 'bg-primary/10 text-primary';
     if (tag === 'Stammkundin') return 'bg-secondary-container/60 text-on-surface-variant';
     if (tag === 'Neukundin')   return 'bg-surface-container-high text-outline';
     return 'bg-surface-container text-outline';
+  };
+
+  const saveNotes = async () => {
+    if (!selected) return;
+    await fetch(`/api/customers/${selected.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes: notesDraft }),
+    });
+    setCustomers(prev => prev.map(c => c.id === selected.id ? { ...c, notes: notesDraft } : c));
+  };
+
+  const deleteCustomer = async () => {
+    if (!selected) return;
+    if (!window.confirm(`${selected.name} wirklich löschen?`)) return;
+    await fetch(`/api/customers/${selected.id}`, { method: 'DELETE' });
+    setCustomers(prev => prev.filter(c => c.id !== selected.id));
+    setSelectedId(null);
+  };
+
+  const createCustomer = async () => {
+    if (!newCustomer.name.trim()) return;
+    const res = await fetch('/api/customers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: newCustomer.name,
+        phone: newCustomer.phone || null,
+        email: newCustomer.email || null,
+        tags: [newCustomer.tag],
+        notes: newCustomer.notes,
+      }),
+    });
+    const created = await res.json();
+    setCustomers(prev => [...prev, { ...created, totalVisits: 0, totalSpent: 0, lastService: null, lastVisit: null }]);
+    setNewCustomer({ name: '', phone: '', email: '', tag: 'Neukundin', notes: '' });
+    setShowAdd(false);
   };
 
   return (
@@ -77,7 +122,7 @@ export default function KundenPage() {
         <div className="flex items-center gap-4">
           <h2 className="font-headline-md text-headline-md text-on-surface">Kunden</h2>
           <span className="text-outline-variant">|</span>
-          <p className="font-body-sm text-secondary">{CUSTOMERS.length} Kundinnen gesamt</p>
+          <p className="font-body-sm text-secondary">{customers.length} Kundinnen gesamt</p>
         </div>
         <button
           onClick={() => setShowAdd(true)}
@@ -149,18 +194,24 @@ export default function KundenPage() {
 
           {/* Customer list */}
           <div className="flex-1 overflow-y-auto">
-            {filtered.length === 0 && (
+            {loading && (
+              <div className="flex flex-col items-center justify-center h-full text-on-surface-variant opacity-50 gap-3">
+                <span className="material-symbols-outlined text-4xl animate-spin">progress_activity</span>
+                <p className="font-body-sm">Lädt…</p>
+              </div>
+            )}
+            {!loading && filtered.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-on-surface-variant opacity-50 gap-3">
                 <span className="material-symbols-outlined text-5xl">search_off</span>
                 <p className="font-body-sm">Keine Ergebnisse gefunden.</p>
               </div>
             )}
-            {filtered.map((cust) => {
-              const isActive = selected?.id === cust.id;
+            {!loading && filtered.map((cust) => {
+              const isActive = selectedId === cust.id;
               return (
                 <div
                   key={cust.id}
-                  onClick={() => setSelected(isActive ? null : cust)}
+                  onClick={() => setSelectedId(isActive ? null : cust.id)}
                   className={`flex items-center gap-4 px-6 py-4 border-b border-outline-variant/20 cursor-pointer transition-all hover:bg-surface-container-low ${
                     isActive ? 'bg-primary/5 border-l-2 border-primary' : ''
                   }`}
@@ -178,12 +229,12 @@ export default function KundenPage() {
                         <span key={t} className={`font-label-caps text-[9px] px-1.5 py-0.5 ${tagBadge(t)}`}>{t}</span>
                       ))}
                     </div>
-                    <p className="font-body-sm text-[12px] text-outline truncate mt-0.5">{cust.lastService} · {cust.lastVisit}</p>
+                    <p className="font-body-sm text-[12px] text-outline truncate mt-0.5">{cust.lastService ?? 'Noch kein Besuch'} · {formatDate(cust.lastVisit)}</p>
                   </div>
 
                   {/* Stats */}
                   <div className="text-right shrink-0 hidden md:block">
-                    <p className="font-body-sm text-[13px] text-on-surface font-semibold">{cust.totalSpent}</p>
+                    <p className="font-body-sm text-[13px] text-on-surface font-semibold">{formatMoney(cust.totalSpent)}</p>
                     <p className="font-label-caps text-[10px] text-outline">{cust.totalVisits} Besuche</p>
                   </div>
 
@@ -203,7 +254,7 @@ export default function KundenPage() {
             <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 bg-surface/80 backdrop-blur-sm shrink-0">
               <span className="font-label-caps text-[11px] text-primary uppercase tracking-wider">Kundenprofil</span>
               <button
-                onClick={() => setSelected(null)}
+                onClick={() => setSelectedId(null)}
                 className="text-outline hover:text-error transition-colors"
               >
                 <span className="material-symbols-outlined text-[20px]">close</span>
@@ -218,7 +269,7 @@ export default function KundenPage() {
                 </div>
                 <div>
                   <h3 className="font-headline-sm text-headline-sm text-on-surface">{selected.name}</h3>
-                  <p className="font-body-sm text-outline">Kundin seit {selected.since}</p>
+                  <p className="font-body-sm text-outline">Kundin seit {formatDate(selected.since)}</p>
                   <div className="flex gap-1 mt-1 flex-wrap">
                     {selected.tags.map(t => (
                       <span key={t} className={`font-label-caps text-[9px] px-1.5 py-0.5 ${tagBadge(t)}`}>{t}</span>
@@ -234,11 +285,11 @@ export default function KundenPage() {
                   <p className="font-label-caps text-[9px] text-outline uppercase">Besuche</p>
                 </div>
                 <div className="bg-surface-container p-4 text-center">
-                  <p className="font-headline-sm text-[16px] text-on-surface">{selected.totalSpent}</p>
+                  <p className="font-headline-sm text-[16px] text-on-surface">{formatMoney(selected.totalSpent)}</p>
                   <p className="font-label-caps text-[9px] text-outline uppercase">Gesamt</p>
                 </div>
                 <div className="bg-surface-container p-4 text-center">
-                  <p className="font-body-sm text-[13px] text-on-surface">{selected.lastVisit}</p>
+                  <p className="font-body-sm text-[13px] text-on-surface">{formatDate(selected.lastVisit)}</p>
                   <p className="font-label-caps text-[9px] text-outline uppercase">Letzter Besuch</p>
                 </div>
               </div>
@@ -247,8 +298,8 @@ export default function KundenPage() {
               <div className="bg-surface-container-lowest border border-outline-variant p-5 space-y-4">
                 <h4 className="font-label-caps text-[10px] text-outline uppercase">Kontakt</h4>
                 {[
-                  { icon: 'phone', label: 'Telefon', value: selected.phone },
-                  { icon: 'mail',  label: 'E-Mail',  value: selected.email },
+                  { icon: 'phone', label: 'Telefon', value: selected.phone || '—' },
+                  { icon: 'mail',  label: 'E-Mail',  value: selected.email || '—' },
                 ].map(({ icon, label, value }) => (
                   <div key={label} className="flex items-center gap-3">
                     <span className="material-symbols-outlined text-[18px] text-outline">{icon}</span>
@@ -265,7 +316,7 @@ export default function KundenPage() {
                 <h4 className="font-label-caps text-[10px] text-outline uppercase">Letzter Service</h4>
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary text-[18px]">content_cut</span>
-                  <span className="font-body-md text-on-surface">{selected.lastService}</span>
+                  <span className="font-body-md text-on-surface">{selected.lastService ?? 'Noch kein Besuch'}</span>
                 </div>
               </div>
 
@@ -275,7 +326,9 @@ export default function KundenPage() {
                 <textarea
                   rows={3}
                   className="w-full border border-outline-variant bg-transparent p-3 font-body-sm text-on-surface focus:border-primary focus:outline-none resize-none transition-all"
-                  defaultValue={selected.notes}
+                  value={notesDraft}
+                  onChange={(e) => setNotesDraft(e.target.value)}
+                  onBlur={saveNotes}
                   placeholder="Interne Notizen zur Kundin…"
                 />
               </div>
@@ -286,10 +339,10 @@ export default function KundenPage() {
                   <span className="material-symbols-outlined text-[16px]">calendar_add_on</span>
                   Termin buchen
                 </button>
-                <button className="px-4 border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all">
-                  <span className="material-symbols-outlined text-[18px]">edit</span>
-                </button>
-                <button className="px-4 border border-outline-variant text-on-surface-variant hover:border-error hover:text-error transition-all">
+                <button
+                  onClick={deleteCustomer}
+                  className="px-4 border border-outline-variant text-on-surface-variant hover:border-error hover:text-error transition-all"
+                >
                   <span className="material-symbols-outlined text-[18px]">delete_outline</span>
                 </button>
               </div>
@@ -316,24 +369,44 @@ export default function KundenPage() {
             </div>
 
             <div className="space-y-4">
-              {[
-                { label: 'Vorname & Nachname', placeholder: 'Aylin Kaya',         type: 'text'  },
-                { label: 'Telefon',             placeholder: '+49 176 ...',        type: 'tel'   },
-                { label: 'E-Mail',              placeholder: 'info@example.de',   type: 'email' },
-              ].map(({ label, placeholder, type }) => (
-                <div key={label}>
-                  <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">{label}</label>
-                  <input
-                    type={type}
-                    placeholder={placeholder}
-                    className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
-                  />
-                </div>
-              ))}
+              <div>
+                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Vorname & Nachname</label>
+                <input
+                  type="text"
+                  placeholder="Aylin Kaya"
+                  value={newCustomer.name}
+                  onChange={(e) => setNewCustomer(p => ({ ...p, name: e.target.value }))}
+                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Telefon</label>
+                <input
+                  type="tel"
+                  placeholder="+49 176 ..."
+                  value={newCustomer.phone}
+                  onChange={(e) => setNewCustomer(p => ({ ...p, phone: e.target.value }))}
+                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">E-Mail</label>
+                <input
+                  type="email"
+                  placeholder="info@example.de"
+                  value={newCustomer.email}
+                  onChange={(e) => setNewCustomer(p => ({ ...p, email: e.target.value }))}
+                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                />
+              </div>
 
               <div>
                 <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Tag</label>
-                <select className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all">
+                <select
+                  value={newCustomer.tag}
+                  onChange={(e) => setNewCustomer(p => ({ ...p, tag: e.target.value }))}
+                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                >
                   <option>Neukundin</option>
                   <option>Stammkundin</option>
                   <option>VIP</option>
@@ -345,6 +418,8 @@ export default function KundenPage() {
                 <textarea
                   rows={2}
                   placeholder="Besondere Hinweise..."
+                  value={newCustomer.notes}
+                  onChange={(e) => setNewCustomer(p => ({ ...p, notes: e.target.value }))}
                   className="w-full border-b border-outline-variant bg-transparent py-2 font-body-sm text-on-surface focus:border-primary focus:outline-none resize-none transition-all"
                 />
               </div>
@@ -353,7 +428,7 @@ export default function KundenPage() {
             <div className="flex gap-3 pt-2">
               <button
                 className="flex-1 bg-primary text-on-primary py-3 font-label-caps text-label-caps hover:brightness-110 transition-all"
-                onClick={() => setShowAdd(false)}
+                onClick={createCustomer}
               >
                 Kundin speichern
               </button>

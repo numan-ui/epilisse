@@ -23,6 +23,7 @@ export default function InjectablesPage() {
   return (
     <ServicePageTemplate
       locale={locale}
+      categoryId="inject"
       {...pageContent}
       {...(adminCamps.campaign1 ? { campaign1: adminCamps.campaign1 } : {})}
       {...(adminCamps.campaign2 ? { campaign2: adminCamps.campaign2 } : {})}

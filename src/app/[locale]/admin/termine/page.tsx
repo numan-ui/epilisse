@@ -1,18 +1,25 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { CustomerPicker, type PickableCustomer } from '@/components/admin/CustomerPicker';
 
 type Appointment = {
   id: string;
-  time: string;
-  duration: number; // minutes
-  client: string;
-  service: string;
-  category: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string;
+  categoryId: string;
+  categoryName: string;
+  serviceName: string;
+  price: number | null;
+  startsAt: string; // ISO
+  durationMin: number;
   status: 'confirmed' | 'pending' | 'cancelled';
-  phone: string;
+  notes: string;
 };
 
-const TODAY = new Date(2026, 5, 29); // June 29, 2026
+type Category = { id: string; name: string };
+
+const TODAY = new Date();
 
 function getWeekDays(base: Date): Date[] {
   const monday = new Date(base);
@@ -29,16 +36,6 @@ function getWeekDays(base: Date): Date[] {
 const DE_DAYS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 const DE_MONTHS = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 
-const APPOINTMENTS: Appointment[] = [
-  { id: 'a1', time: '09:00', duration: 45, client: 'Aylin Kaya',       service: 'HydraFacial Basic',   category: 'Gesichtsästhetik',    status: 'confirmed', phone: '+49 176 111 222' },
-  { id: 'a2', time: '10:00', duration: 30, client: 'Sophie Müller',    service: 'Botox Stirn',          category: 'Injectables',         status: 'confirmed', phone: '+49 176 333 444' },
-  { id: 'a3', time: '11:00', duration: 15, client: 'Zeynep Arslan',    service: 'Oberlippe',            category: 'Laser-Haarentfernung',status: 'pending',   phone: '+49 176 555 666' },
-  { id: 'a4', time: '12:30', duration: 60, client: 'Lisa Wagner',      service: 'Gel-Maniküre',         category: 'Maniküre',            status: 'confirmed', phone: '+49 176 777 888' },
-  { id: 'a5', time: '14:00', duration: 90, client: 'Fatma Demir',      service: 'Beine (Komplett)',     category: 'Laser-Haarentfernung',status: 'confirmed', phone: '+49 176 999 000' },
-  { id: 'a6', time: '16:00', duration: 45, client: 'Anna Schneider',   service: 'Hyaluron Lippen',      category: 'Injectables',         status: 'pending',   phone: '+49 176 100 200' },
-  { id: 'a7', time: '17:00', duration: 75, client: 'Müge Yıldız',      service: 'Microneedling',        category: 'Gesichtsästhetik',    status: 'cancelled', phone: '+49 176 300 400' },
-];
-
 const STATUS_STYLES: Record<Appointment['status'], { bg: string; text: string; label: string }> = {
   confirmed: { bg: 'bg-primary/10',       text: 'text-primary',  label: 'Bestätigt'   },
   pending:   { bg: 'bg-amber-50',          text: 'text-amber-700',label: 'Ausstehend'  },
@@ -47,17 +44,47 @@ const STATUS_STYLES: Record<Appointment['status'], { bg: string; text: string; l
 
 const HOURS = Array.from({ length: 12 }, (_, i) => i + 8); // 08:00–19:00
 
+function timeOf(iso: string) {
+  return new Date(iso).toTimeString().slice(0, 5);
+}
 function timeToMinutes(t: string) {
   const [h, m] = t.split(':').map(Number);
   return h * 60 + m;
 }
+function isSameDay(iso: string, d: Date) {
+  return new Date(iso).toDateString() === d.toDateString();
+}
+
+const EMPTY_NEW_APPT = { customerId: '', categoryId: '', serviceName: '', date: TODAY.toISOString().slice(0, 10), time: '09:00', durationMin: 30, notes: '' };
 
 export default function TerminePage() {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [customers, setCustomers]       = useState<PickableCustomer[]>([]);
+  const [categories, setCategories]     = useState<Category[]>([]);
+  const [loading, setLoading]           = useState(true);
+
   const [view, setView]           = useState<'list' | 'week'>('list');
   const [currentWeek, setWeek]    = useState(() => getWeekDays(TODAY));
   const [selectedDate, setDate]   = useState(TODAY);
-  const [selected, setSelected]   = useState<Appointment | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showAdd, setShowAdd]     = useState(false);
+  const [newAppt, setNewAppt]     = useState(EMPTY_NEW_APPT);
+
+  const loadAppointments = useCallback(() => {
+    setLoading(true);
+    fetch('/api/appointments')
+      .then(r => r.json())
+      .then(setAppointments)
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    loadAppointments();
+    fetch('/api/customers').then(r => r.json()).then(setCustomers);
+    fetch('/api/categories').then(r => r.json()).then(setCategories);
+  }, [loadAppointments]);
+
+  const dayAppointments = appointments.filter(a => isSameDay(a.startsAt, selectedDate));
 
   const weekLabel = (() => {
     const from = currentWeek[0];
@@ -71,9 +98,47 @@ export default function TerminePage() {
   const nextWeek = () => setWeek(w => getWeekDays(new Date(w[0].getTime() + 7 * 86400000)));
   const goToday  = () => { setWeek(getWeekDays(TODAY)); setDate(TODAY); };
 
-  const confirmed = APPOINTMENTS.filter(a => a.status === 'confirmed').length;
-  const pending   = APPOINTMENTS.filter(a => a.status === 'pending').length;
-  const totalMin  = APPOINTMENTS.filter(a => a.status !== 'cancelled').reduce((s, a) => s + a.duration, 0);
+  const confirmed = dayAppointments.filter(a => a.status === 'confirmed').length;
+  const pending   = dayAppointments.filter(a => a.status === 'pending').length;
+  const totalMin  = dayAppointments.filter(a => a.status !== 'cancelled').reduce((s, a) => s + a.durationMin, 0);
+
+  const updateStatus = async (id: string, status: Appointment['status']) => {
+    await fetch(`/api/appointments/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+  };
+
+  const deleteAppointment = async (id: string) => {
+    if (!window.confirm('Termin wirklich löschen?')) return;
+    await fetch(`/api/appointments/${id}`, { method: 'DELETE' });
+    setAppointments(prev => prev.filter(a => a.id !== id));
+    if (selectedId === id) setSelectedId(null);
+  };
+
+  const createAppointment = async () => {
+    if (!newAppt.customerId || !newAppt.categoryId || !newAppt.serviceName.trim()) return;
+    const startsAt = new Date(`${newAppt.date}T${newAppt.time}:00`).toISOString();
+    const res = await fetch('/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customerId: newAppt.customerId,
+        categoryId: newAppt.categoryId,
+        serviceName: newAppt.serviceName,
+        startsAt,
+        durationMin: newAppt.durationMin,
+        notes: newAppt.notes,
+      }),
+    });
+    if (res.ok) {
+      loadAppointments();
+      setNewAppt(EMPTY_NEW_APPT);
+      setShowAdd(false);
+    }
+  };
 
   return (
     <>
@@ -121,8 +186,8 @@ export default function TerminePage() {
           <div className="flex items-center gap-3">
             <span className="material-symbols-outlined text-primary text-[20px]">event</span>
             <div>
-              <p className="font-label-caps text-[9px] text-outline uppercase tracking-widest">Heute</p>
-              <p className="font-headline-sm text-[16px] text-on-surface">{APPOINTMENTS.length} Termine</p>
+              <p className="font-label-caps text-[9px] text-outline uppercase tracking-widest">Ausgewählter Tag</p>
+              <p className="font-headline-sm text-[16px] text-on-surface">{dayAppointments.length} Termine</p>
             </div>
           </div>
           <div className="w-px h-8 bg-outline-variant" />
@@ -154,13 +219,17 @@ export default function TerminePage() {
         {/* ── LIST VIEW ───────────────────────────────────────── */}
         {view === 'list' && (
           <div className="flex-1 overflow-y-auto p-8 space-y-3">
-            {APPOINTMENTS.map((apt) => {
+            {loading && <p className="text-center font-body-sm text-outline">Lädt…</p>}
+            {!loading && dayAppointments.length === 0 && (
+              <p className="text-center font-body-sm text-outline py-16">Keine Termine an diesem Tag.</p>
+            )}
+            {dayAppointments.map((apt) => {
               const st = STATUS_STYLES[apt.status];
-              const isSelected = selected?.id === apt.id;
+              const isSelected = selectedId === apt.id;
               return (
                 <div
                   key={apt.id}
-                  onClick={() => setSelected(isSelected ? null : apt)}
+                  onClick={() => setSelectedId(isSelected ? null : apt.id)}
                   className={`group bg-surface-container-lowest border rounded-xl p-5 cursor-pointer transition-all ${
                     isSelected ? 'border-primary shadow-md' : 'border-outline-variant/60 hover:border-primary/40 hover:shadow-sm'
                   } ${apt.status === 'cancelled' ? 'opacity-60' : ''}`}
@@ -168,8 +237,8 @@ export default function TerminePage() {
                   <div className="flex items-center gap-5">
                     {/* Time block */}
                     <div className="shrink-0 w-16 text-center">
-                      <p className="font-headline-sm text-[18px] text-primary">{apt.time}</p>
-                      <p className="font-label-caps text-[10px] text-outline">{apt.duration} min</p>
+                      <p className="font-headline-sm text-[18px] text-primary">{timeOf(apt.startsAt)}</p>
+                      <p className="font-label-caps text-[10px] text-outline">{apt.durationMin} min</p>
                     </div>
 
                     {/* Divider */}
@@ -181,13 +250,13 @@ export default function TerminePage() {
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 flex-wrap">
-                        <h4 className="font-headline-sm text-[15px] text-on-surface">{apt.client}</h4>
+                        <h4 className="font-headline-sm text-[15px] text-on-surface">{apt.customerName}</h4>
                         <span className={`font-label-caps text-[10px] px-2 py-0.5 ${st.bg} ${st.text}`}>
                           {st.label}
                         </span>
                       </div>
                       <p className="font-body-sm text-outline mt-0.5">
-                        {apt.service} · <span className="text-on-surface-variant">{apt.category}</span>
+                        {apt.serviceName} · <span className="text-on-surface-variant">{apt.categoryName}</span>
                       </p>
                     </div>
 
@@ -195,18 +264,11 @@ export default function TerminePage() {
                     <div className="shrink-0 flex items-center gap-4">
                       <div className="hidden md:flex items-center gap-1.5 text-on-surface-variant">
                         <span className="material-symbols-outlined text-[16px]">phone</span>
-                        <span className="font-body-sm text-[13px]">{apt.phone}</span>
+                        <span className="font-body-sm text-[13px]">{apt.customerPhone}</span>
                       </div>
                       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={(e) => e.stopPropagation()}
-                          className="p-1.5 border border-outline-variant rounded hover:border-primary hover:text-primary transition-colors"
-                          title="Bearbeiten"
-                        >
-                          <span className="material-symbols-outlined text-[16px]">edit</span>
-                        </button>
-                        <button
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => { e.stopPropagation(); deleteAppointment(apt.id); }}
                           className="p-1.5 border border-outline-variant rounded hover:border-error hover:text-error transition-colors"
                           title="Löschen"
                         >
@@ -224,22 +286,23 @@ export default function TerminePage() {
                     <div className="mt-4 pt-4 border-t border-outline-variant/30 grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
                         <p className="font-label-caps text-[10px] text-outline uppercase mb-1">Telefon</p>
-                        <p className="font-body-sm text-on-surface">{apt.phone}</p>
+                        <p className="font-body-sm text-on-surface">{apt.customerPhone}</p>
                       </div>
                       <div>
                         <p className="font-label-caps text-[10px] text-outline uppercase mb-1">Kategorie</p>
-                        <p className="font-body-sm text-on-surface">{apt.category}</p>
+                        <p className="font-body-sm text-on-surface">{apt.categoryName}</p>
                       </div>
                       <div>
                         <p className="font-label-caps text-[10px] text-outline uppercase mb-1">Dauer</p>
-                        <p className="font-body-sm text-on-surface">{apt.duration} Minuten</p>
+                        <p className="font-body-sm text-on-surface">{apt.durationMin} Minuten</p>
                       </div>
                       <div>
                         <p className="font-label-caps text-[10px] text-outline uppercase mb-1">Status</p>
                         <select
                           className="font-body-sm text-on-surface bg-transparent border border-outline-variant px-2 py-1 focus:outline-none focus:border-primary"
-                          defaultValue={apt.status}
+                          value={apt.status}
                           onClick={(e) => e.stopPropagation()}
+                          onChange={(e) => updateStatus(apt.id, e.target.value as Appointment['status'])}
                         >
                           <option value="confirmed">Bestätigt</option>
                           <option value="pending">Ausstehend</option>
@@ -307,13 +370,12 @@ export default function TerminePage() {
                         <span className="font-label-caps text-[10px] text-outline">{String(hour).padStart(2,'0')}:00</span>
                       </div>
                       {currentWeek.map((d, di) => {
+                        const dayApts = appointments.filter((a) => {
+                          if (!isSameDay(a.startsAt, d)) return false;
+                          const h = timeToMinutes(timeOf(a.startsAt));
+                          return h >= hour * 60 && h < (hour + 1) * 60;
+                        });
                         const isToday = d.toDateString() === TODAY.toDateString();
-                        const dayApts = isToday
-                          ? APPOINTMENTS.filter((a) => {
-                              const h = timeToMinutes(a.time);
-                              return h >= hour * 60 && h < (hour + 1) * 60;
-                            })
-                          : [];
                         return (
                           <div
                             key={di}
@@ -325,11 +387,11 @@ export default function TerminePage() {
                                 <div
                                   key={apt.id}
                                   className={`${st.bg} border-l-2 border-primary px-1.5 py-1 mb-1 cursor-pointer hover:brightness-95 transition-all`}
-                                  onClick={() => { setView('list'); setSelected(apt); }}
+                                  onClick={() => { setView('list'); setDate(d); setSelectedId(apt.id); }}
                                 >
-                                  <p className={`font-label-caps text-[9px] ${st.text} leading-tight`}>{apt.time}</p>
-                                  <p className="font-body-sm text-[10px] text-on-surface leading-tight truncate">{apt.client}</p>
-                                  <p className="font-label-caps text-[9px] text-outline truncate">{apt.service}</p>
+                                  <p className={`font-label-caps text-[9px] ${st.text} leading-tight`}>{timeOf(apt.startsAt)}</p>
+                                  <p className="font-body-sm text-[10px] text-on-surface leading-tight truncate">{apt.customerName}</p>
+                                  <p className="font-label-caps text-[9px] text-outline truncate">{apt.serviceName}</p>
                                 </div>
                               );
                             })}
@@ -363,29 +425,36 @@ export default function TerminePage() {
             </div>
 
             <div className="space-y-4">
-              {[
-                { label: 'Kundenname', placeholder: 'Vorname Nachname', type: 'text' },
-                { label: 'Telefon',    placeholder: '+49 176 ...', type: 'tel' },
-              ].map(({ label, placeholder, type }) => (
-                <div key={label}>
-                  <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">{label}</label>
-                  <input
-                    type={type}
-                    placeholder={placeholder}
-                    className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
-                  />
-                </div>
-              ))}
+              <div>
+                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Kundin</label>
+                <CustomerPicker
+                  customers={customers}
+                  value={newAppt.customerId ? [newAppt.customerId] : []}
+                  onChange={(ids) => setNewAppt(p => ({ ...p, customerId: ids[0] ?? '' }))}
+                />
+              </div>
+
+              <div>
+                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Kategorie</label>
+                <select
+                  value={newAppt.categoryId}
+                  onChange={(e) => setNewAppt(p => ({ ...p, categoryId: e.target.value }))}
+                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                >
+                  <option value="">Wählen…</option>
+                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
 
               <div>
                 <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Service</label>
-                <select className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all">
-                  <option>Oberlippe – Laser</option>
-                  <option>Ganzes Gesicht – Laser</option>
-                  <option>HydraFacial Basic</option>
-                  <option>Botox Stirn</option>
-                  <option>Gel-Maniküre</option>
-                </select>
+                <input
+                  type="text"
+                  placeholder="z.B. Oberlippe – Laser"
+                  value={newAppt.serviceName}
+                  onChange={(e) => setNewAppt(p => ({ ...p, serviceName: e.target.value }))}
+                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -393,18 +462,32 @@ export default function TerminePage() {
                   <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Datum</label>
                   <input
                     type="date"
+                    value={newAppt.date}
+                    onChange={(e) => setNewAppt(p => ({ ...p, date: e.target.value }))}
                     className="w-full border-b border-outline-variant bg-transparent py-2 font-body-sm text-on-surface focus:border-primary focus:outline-none transition-all"
-                    defaultValue="2026-06-29"
                   />
                 </div>
                 <div>
                   <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Uhrzeit</label>
                   <input
                     type="time"
+                    value={newAppt.time}
+                    onChange={(e) => setNewAppt(p => ({ ...p, time: e.target.value }))}
                     className="w-full border-b border-outline-variant bg-transparent py-2 font-body-sm text-on-surface focus:border-primary focus:outline-none transition-all"
-                    defaultValue="09:00"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Dauer (Minuten)</label>
+                <input
+                  type="number"
+                  min={5}
+                  step={5}
+                  value={newAppt.durationMin}
+                  onChange={(e) => setNewAppt(p => ({ ...p, durationMin: Number(e.target.value) || 30 }))}
+                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-sm text-on-surface focus:border-primary focus:outline-none transition-all"
+                />
               </div>
 
               <div>
@@ -412,6 +495,8 @@ export default function TerminePage() {
                 <textarea
                   rows={2}
                   placeholder="Besondere Hinweise..."
+                  value={newAppt.notes}
+                  onChange={(e) => setNewAppt(p => ({ ...p, notes: e.target.value }))}
                   className="w-full border-b border-outline-variant bg-transparent py-2 font-body-sm text-on-surface focus:border-primary focus:outline-none resize-none transition-all"
                 />
               </div>
@@ -420,7 +505,7 @@ export default function TerminePage() {
             <div className="flex gap-3 pt-2">
               <button
                 className="flex-1 bg-primary text-on-primary py-3 font-label-caps text-label-caps hover:brightness-110 transition-all"
-                onClick={() => setShowAdd(false)}
+                onClick={createAppointment}
               >
                 Termin speichern
               </button>

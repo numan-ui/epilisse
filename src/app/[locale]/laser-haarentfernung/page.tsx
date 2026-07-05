@@ -23,6 +23,7 @@ export default function LaserPage() {
   return (
     <ServicePageTemplate
       locale={locale}
+      categoryId="laser"
       {...pageContent}
       {...(adminCamps.campaign1 ? { campaign1: adminCamps.campaign1 } : {})}
       {...(adminCamps.campaign2 ? { campaign2: adminCamps.campaign2 } : {})}

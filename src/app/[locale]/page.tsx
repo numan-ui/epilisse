@@ -11,6 +11,7 @@ import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useAdminHeroSlides } from "@/hooks/useAdminHeroSlides";
 import { useAdminPromoBanners } from "@/hooks/useAdminPromoBanners";
 import { useAdminAboutValues } from "@/hooks/useAdminAboutValues";
+import { useBookingModal } from "@/context/BookingModalContext";
 
 /* ── Image constants (Stitch AI – replace with real salon photos) ── */
 const IMG = {
@@ -48,9 +49,9 @@ export default function HomePage() {
   const heroSlides = useAdminHeroSlides();
   const promoBanners = useAdminPromoBanners();
   const aboutValues = useAdminAboutValues();
+  const booking = useBookingModal();
 
   /* ── Dynamic booking URLs from admin settings ─── */
-  const GCAL_URL = settings.calendarUrl || 'https://calendar.google.com';
   const waRaw    = settings.whatsapp.replace(/[\s+\-()]/g, '');
   const WA_URL   = waRaw
     ? `https://wa.me/${waRaw}?text=${encodeURIComponent(settings.whatsappMsg)}`
@@ -151,14 +152,13 @@ export default function HomePage() {
           </div>
 
           {/* CTA */}
-          <a
-            href={GCAL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={() => booking.open()}
             className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-95 hover:scale-100 duration-200"
           >
             {lc.navCta || t("nav.cta")}
-          </a>
+          </button>
 
           {/* Mobile hamburger */}
           <button
@@ -260,14 +260,13 @@ export default function HomePage() {
               <p className="font-body-lg text-body-lg text-white/90 max-w-lg mb-10">
                 {slide.sub}
               </p>
-              <a
-                href={GCAL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => booking.open()}
                 className="bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-all"
               >
                 {slide.cta}
-              </a>
+              </button>
             </div>
           </div>
         ))}
@@ -439,14 +438,13 @@ export default function HomePage() {
                   {banner.desc}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <a
-                    href={GCAL_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => booking.open()}
                     className="bg-primary text-on-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all text-center"
                   >
                     {banner.ctaPrimary}
-                  </a>
+                  </button>
                   {banner.ctaSecondary && (
                     <a
                       href="#behandlungen"
@@ -596,14 +594,13 @@ export default function HomePage() {
 
         {/* CTA buttons row */}
         <div className="flex flex-col sm:flex-row justify-center gap-4 mt-12">
-          <a
-            href={GCAL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={() => booking.open()}
             className="bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all text-center lux-shadow"
           >
             {t("contact.ctaCalendar")}
-          </a>
+          </button>
           <a
             href={WA_URL}
             target="_blank"

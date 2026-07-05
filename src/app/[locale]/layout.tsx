@@ -3,6 +3,8 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { BookingModalProvider } from "@/context/BookingModalContext";
+import BookingModal from "@/components/BookingModal";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -62,7 +64,10 @@ export default async function LocaleLayout({
       </head>
       <body className="bg-surface text-on-surface font-body-md overflow-x-hidden">
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <BookingModalProvider>
+            {children}
+            <BookingModal />
+          </BookingModalProvider>
         </NextIntlClientProvider>
       </body>
     </html>

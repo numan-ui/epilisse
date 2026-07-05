@@ -23,6 +23,7 @@ export default function GesichtsaesthetikPage() {
   return (
     <ServicePageTemplate
       locale={locale}
+      categoryId="gesicht"
       {...pageContent}
       {...(adminCamps.campaign1 ? { campaign1: adminCamps.campaign1 } : {})}
       {...(adminCamps.campaign2 ? { campaign2: adminCamps.campaign2 } : {})}

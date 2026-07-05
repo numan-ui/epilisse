@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { href: '/admin/termine', icon: 'calendar_month', label: 'Termine' },
   { href: '/admin/behandlungen', icon: 'content_cut', label: 'Behandlungen' },
   { href: '/admin/kunden', icon: 'group', label: 'Kunden' },
+  { href: '/admin/kampanyalar', icon: 'campaign', label: 'Kampanyalar' },
   { href: '/admin/einstellungen', icon: 'settings', label: 'Einstellungen' },
 ];
 

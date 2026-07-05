@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
+import { useBookingModal } from "@/context/BookingModalContext";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 export interface PricingItem {
@@ -39,6 +40,7 @@ export interface ServicePageData {
 
 interface Props extends ServicePageData {
   locale: string;
+  categoryId: string;
 }
 
 const LOCALES = [
@@ -47,12 +49,12 @@ const LOCALES = [
 ] as const;
 
 // ── Component ─────────────────────────────────────────────────────────────
-export default function ServicePageTemplate({ locale, ...data }: Props) {
+export default function ServicePageTemplate({ locale, categoryId, ...data }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const settings = useAdminSettings();
   const lc = useAdminLandingContent();
+  const booking = useBookingModal();
 
-  const GCAL_URL = settings.calendarUrl || "https://calendar.google.com";
   const bookingCta = lc.navCta || "Termin Buchen";
 
   const NAV_LINKS = [
@@ -101,14 +103,13 @@ export default function ServicePageTemplate({ locale, ...data }: Props) {
               </span>
             ))}
           </div>
-          <a
-            href={GCAL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={() => booking.open(categoryId)}
             className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all"
           >
             {bookingCta}
-          </a>
+          </button>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden text-primary"
@@ -224,14 +225,13 @@ export default function ServicePageTemplate({ locale, ...data }: Props) {
             </div>
 
             <div className="mt-12 text-center">
-              <a
-                href={GCAL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => booking.open(categoryId)}
                 className="inline-block bg-primary text-on-primary px-10 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all"
               >
                 {bookingCta}
-              </a>
+              </button>
             </div>
           </div>
         </section>
@@ -254,14 +254,13 @@ export default function ServicePageTemplate({ locale, ...data }: Props) {
                 </h2>
                 <p className="font-body-lg text-body-lg mb-10 opacity-90">{data.campaign1.body}</p>
                 <div>
-                  <a
-                    href={GCAL_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => booking.open(categoryId)}
                     className="inline-block bg-on-primary-container text-primary-container px-10 py-4 font-label-caps text-label-caps tracking-widest hover:opacity-90 transition-all"
                   >
                     {data.campaign1.cta}
-                  </a>
+                  </button>
                 </div>
               </div>
               <div
@@ -288,14 +287,13 @@ export default function ServicePageTemplate({ locale, ...data }: Props) {
                 <h2 className="font-headline-lg text-display-lg mb-6 leading-tight">{data.campaign2.title}</h2>
                 <p className="font-body-lg text-body-lg mb-10 text-secondary">{data.campaign2.body}</p>
                 <div>
-                  <a
-                    href={GCAL_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => booking.open(categoryId)}
                     className="inline-block bg-primary text-on-primary px-10 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all"
                   >
                     {data.campaign2.cta}
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>

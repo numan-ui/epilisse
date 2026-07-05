@@ -5,7 +5,7 @@ export type Category = { id: string; icon: string; name: string; desc: string; v
 export const CATEGORIES: Category[] = [
   { id: 'laser',   icon: 'auto_awesome',    name: 'Laser-Haarentfernung', desc: 'Premium Diodenlaser-Technologie für seidig glatte Haut.',        visible: true,  image: '' },
   { id: 'gesicht', icon: 'face',             name: 'Gesichtsästhetik',     desc: 'Exklusive Behandlungen für strahlende Hautgesundheit.',          visible: true,  image: '' },
-  { id: 'body',    icon: 'self_improvement', name: 'Body Contouring',      desc: 'Nicht-invasive Formung Ihrer Silhouette.',                      visible: false, image: '' },
+  { id: 'body',    icon: 'self_improvement', name: 'Body Contouring',      desc: 'Nicht-invasive Formung Ihrer Silhouette.',                      visible: true,  image: '' },
   { id: 'inject',  icon: 'vaccines',         name: 'Injectables',          desc: 'Präzise Hyaluron- und Botox-Behandlungen.',                     visible: true,  image: '' },
   { id: 'mani',    icon: 'spa',              name: 'Maniküre',             desc: 'Luxuriöse Nagelpflege und Handmassage.',                        visible: true,  image: '' },
   { id: 'andere',  icon: 'favorite',         name: 'Andere',               desc: 'Weitere Wellness- und Beauty-Services für Ihr Wohlbefinden.',   visible: true,  image: '' },

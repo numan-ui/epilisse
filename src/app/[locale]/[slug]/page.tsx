@@ -63,6 +63,7 @@ export default function DynamicCategoryPage() {
   return (
     <ServicePageTemplate
       locale={locale}
+      categoryId={slug}
       {...pc}
       {...(adminCamps.campaign1 ? { campaign1: adminCamps.campaign1 } : {})}
       {...(adminCamps.campaign2 ? { campaign2: adminCamps.campaign2 } : {})}

@@ -2,15 +2,46 @@
 import { useRef } from 'react';
 import { useAdminData } from '../behandlungen/AdminDataContext';
 
-const SECTIONS = ['Studio-Informationen', 'Öffnungszeiten', 'Online-Buchung', 'Social Media', 'Startseite Bilder', 'Darstellung'] as const;
+const SECTIONS = ['Studio-Informationen', 'Öffnungszeiten', 'Online-Buchung', 'Social Media', 'Startseite Bilder', 'Follow-Up Erinnerungen', 'Darstellung'] as const;
 type Section = typeof SECTIONS[number];
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+
+type FollowUpSetting = {
+  categoryId: string;
+  categoryName: string;
+  enabled: boolean;
+  renewalIntervalWeeks: number;
+  reminderLeadDays: number;
+};
 
 export default function EinstellungenPage() {
   const { settings, updateSetting, updateSettingHours } = useAdminData();
   const [active, setActive] = useState<Section>('Studio-Informationen');
   const [saved, setSaved] = useState(false);
+  const [followUp, setFollowUp] = useState<FollowUpSetting[]>([]);
+
+  const loadFollowUp = useCallback(() => {
+    fetch('/api/follow-up-settings').then(r => r.json()).then(setFollowUp);
+  }, []);
+
+  useEffect(() => { loadFollowUp(); }, [loadFollowUp]);
+
+  const patchFollowUp = async (categoryId: string, patch: Partial<FollowUpSetting>) => {
+    const next = followUp.map(f => f.categoryId === categoryId ? { ...f, ...patch } : f);
+    setFollowUp(next);
+    const row = next.find(f => f.categoryId === categoryId)!;
+    await fetch('/api/follow-up-settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        categoryId: row.categoryId,
+        enabled: row.enabled,
+        renewalIntervalWeeks: row.renewalIntervalWeeks,
+        reminderLeadDays: row.reminderLeadDays,
+      }),
+    });
+  };
 
   const handleSave = () => {
     setSaved(true);
@@ -251,6 +282,61 @@ export default function EinstellungenPage() {
                   value={settings.aboutImage}
                   onChange={v => updateSetting('aboutImage', v)}
                 />
+              </div>
+            </section>
+          )}
+
+          {/* ── Follow-Up Erinnerungen ────────────────────── */}
+          {active === 'Follow-Up Erinnerungen' && (
+            <section className="max-w-3xl space-y-8">
+              <div>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface mb-1">Follow-Up Erinnerungen</h3>
+                <p className="font-body-sm text-on-surface-variant opacity-70">
+                  Legen Sie pro Kategorie fest, nach wie vielen Wochen eine Kundin automatisch per E-Mail an eine Auffrischung erinnert wird.
+                  Ein nächtlicher Job prüft täglich den letzten Termin jeder Kundin je Kategorie.
+                </p>
+              </div>
+              <div className="bg-surface-container-lowest border border-outline-variant divide-y divide-outline-variant/30">
+                {followUp.map((f) => (
+                  <div key={f.categoryId} className="flex items-center gap-6 px-6 py-4">
+                    <div className="w-40 shrink-0">
+                      <p className="font-body-md text-on-surface">{f.categoryName}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="font-label-caps text-[10px] text-outline uppercase">Alle</label>
+                      <input
+                        type="number"
+                        min={1}
+                        className="w-16 border border-outline-variant px-2 py-1 font-body-sm text-on-surface bg-transparent focus:border-primary focus:outline-none"
+                        value={f.renewalIntervalWeeks}
+                        onChange={(e) => setFollowUp(prev => prev.map(x => x.categoryId === f.categoryId ? { ...x, renewalIntervalWeeks: Number(e.target.value) || 1 } : x))}
+                        onBlur={(e) => patchFollowUp(f.categoryId, { renewalIntervalWeeks: Number(e.target.value) || 1 })}
+                      />
+                      <span className="font-body-sm text-outline">Wochen</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="font-label-caps text-[10px] text-outline uppercase">Erinnerung</label>
+                      <input
+                        type="number"
+                        min={0}
+                        className="w-16 border border-outline-variant px-2 py-1 font-body-sm text-on-surface bg-transparent focus:border-primary focus:outline-none"
+                        value={f.reminderLeadDays}
+                        onChange={(e) => setFollowUp(prev => prev.map(x => x.categoryId === f.categoryId ? { ...x, reminderLeadDays: Number(e.target.value) || 0 } : x))}
+                        onBlur={(e) => patchFollowUp(f.categoryId, { reminderLeadDays: Number(e.target.value) || 0 })}
+                      />
+                      <span className="font-body-sm text-outline">Tage vorher</span>
+                    </div>
+                    <div className="ml-auto flex items-center gap-2">
+                      <span className="font-body-sm text-outline text-[12px]">{f.enabled ? 'Aktiv' : 'Inaktiv'}</span>
+                      <button
+                        onClick={() => patchFollowUp(f.categoryId, { enabled: !f.enabled })}
+                        className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors shrink-0 ${f.enabled ? 'bg-primary' : 'bg-outline-variant'}`}
+                      >
+                        <div className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-transform ${f.enabled ? 'translate-x-5' : 'translate-x-0'}`} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
           )}
