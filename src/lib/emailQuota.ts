@@ -19,6 +19,10 @@ export async function getRemainingEmailQuota(supabase: SupabaseClient<Database>)
   return Math.max(0, DAILY_EMAIL_LIMIT - (count ?? 0));
 }
 
-export async function logEmailSent(supabase: SupabaseClient<Database>, kind: EmailKind): Promise<void> {
-  await supabase.from('email_sends').insert({ kind });
+export async function logEmailSent(
+  supabase: SupabaseClient<Database>,
+  kind: EmailKind,
+  recipient?: { customerId?: string; email?: string }
+): Promise<void> {
+  await supabase.from('email_sends').insert({ kind, customer_id: recipient?.customerId ?? null, recipient: recipient?.email ?? null });
 }

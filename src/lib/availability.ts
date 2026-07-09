@@ -83,6 +83,27 @@ function overlaps(aStartMin: number, aEndMin: number, bStartMin: number, bEndMin
   return aStartMin < bEndMin && bStartMin < aEndMin;
 }
 
+// Appointment times are stored as naive Europe/Berlin wall-clock values (see
+// booking convention note on starts_at) — comparing them against raw UTC
+// "now" drifts by 1-2h depending on DST, which let already-passed slots keep
+// showing as available. Read "now" back out in the same Berlin wall-clock frame.
+function berlinNow(): { date: string; minutes: number } {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Berlin',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(new Date());
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '00';
+  return {
+    date: `${get('year')}-${get('month')}-${get('day')}`,
+    minutes: Number(get('hour')) * 60 + Number(get('minute')),
+  };
+}
+
 export function hasOverlap(
   appointments: BookedInterval[],
   startsAt: Date,
@@ -107,9 +128,9 @@ export function computeSlots(
 
   const openMin = toMinutes(hours.open);
   const closeMin = toMinutes(hours.close);
-  const now = new Date();
-  const isToday = date === now.toISOString().slice(0, 10);
-  const nowMin = isToday ? now.getUTCHours() * 60 + now.getUTCMinutes() : -1;
+  const { date: todayBerlin, minutes: nowMinBerlin } = berlinNow();
+  const isToday = date === todayBerlin;
+  const nowMin = isToday ? nowMinBerlin : -1;
 
   const busy = appointments.map((appt) => {
     const apptDate = new Date(appt.startsAt);

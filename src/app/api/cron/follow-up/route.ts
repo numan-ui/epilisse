@@ -68,7 +68,7 @@ export async function GET(request: Request) {
           category_id: setting.category_id,
           appointment_id: candidate.appointment_id,
         });
-        await logEmailSent(supabase, 'follow_up');
+        await logEmailSent(supabase, 'follow_up', { customerId: candidate.customer_id, email: customer.email });
         quotaRemaining--;
         sent++;
       } catch {

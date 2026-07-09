@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { maybeSendConsentRequest } from '@/lib/consentRequest';
 
 export async function GET(request: Request) {
   const supabase = supabaseServer();
@@ -56,5 +57,21 @@ export async function POST(request: Request) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Admin can create a customer with just a name (no email/phone required), then
+  // add an email later and book them — that first appointment is when we need to
+  // catch them up on the DSGVO consent they never got asked for. If this
+  // appointment is Laser and Behandlungseinwilligung is still missing, that
+  // request goes out immediately regardless of the customer's on-file category.
+  const { data: customer } = await supabase
+    .from('customers')
+    .select('id, name, email, consent_datenschutz_at, consent_behandlung_at, consent_request_last_sent_at, consent_request_behandlung_sent_at')
+    .eq('id', body.customerId)
+    .maybeSingle();
+
+  if (customer) {
+    await maybeSendConsentRequest(supabase, customer, body.categoryId === 'laser');
+  }
+
   return NextResponse.json(data, { status: 201 });
 }

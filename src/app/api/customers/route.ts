@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
-import { consentRequestEmail, sendEmail, getSiteUrl } from '@/lib/email/resend';
-import { signConsentToken } from '@/lib/consentToken';
-import { getRemainingEmailQuota, logEmailSent } from '@/lib/emailQuota';
+import { maybeSendConsentRequest } from '@/lib/consentRequest';
 
 export async function GET() {
   const supabase = supabaseServer();
@@ -47,6 +45,24 @@ export async function POST(request: Request) {
   const supabase = supabaseServer();
   const body = await request.json();
 
+  // Same email + same phone already on file → this is the same person, not a
+  // new customer. (Same email with a different phone is left alone — could
+  // legitimately be a different person sharing an inbox.)
+  if (body.email && body.phone) {
+    const { data: dup } = await supabase
+      .from('customers')
+      .select('id')
+      .ilike('email', body.email)
+      .eq('phone', body.phone)
+      .maybeSingle();
+    if (dup) {
+      return NextResponse.json(
+        { error: 'Eine Kundin mit dieser E-Mail und Telefonnummer existiert bereits.' },
+        { status: 409 }
+      );
+    }
+  }
+
   const { data, error } = await supabase
     .from('customers')
     .insert({
@@ -55,6 +71,9 @@ export async function POST(request: Request) {
       email: body.email ?? null,
       tags: body.tags ?? [],
       notes: body.notes ?? '',
+      gender: body.gender ?? 'keine_angabe',
+      class: body.class ?? null,
+      category: body.category ?? null,
     })
     .select()
     .single();
@@ -62,20 +81,10 @@ export async function POST(request: Request) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // Customers added directly by admin skip the public booking form's consent
-  // checkboxes — send them a consent-request email so Datenschutz/Behandlung
-  // (mandatory) get confirmed before/alongside their first real appointment.
-  if (data.email && !data.consent_datenschutz_at && !data.consent_behandlung_at) {
-    try {
-      if ((await getRemainingEmailQuota(supabase)) > 0) {
-        const token = signConsentToken(data.id);
-        const consentUrl = `${getSiteUrl()}/de/einwilligung?c=${data.id}&t=${token}`;
-        await sendEmail(data.email, consentRequestEmail({ customerName: data.name, consentUrl }));
-        await logEmailSent(supabase, 'consent_request');
-      }
-    } catch {
-      // Don't fail customer creation just because the consent email couldn't send.
-    }
-  }
+  // checkboxes — send them a consent-request email so Datenschutz (mandatory)
+  // and, if their category is Laser, Behandlungseinwilligung get confirmed
+  // before/alongside their first real appointment.
+  await maybeSendConsentRequest(supabase, data, data.category === 'laser');
 
   return NextResponse.json(data, { status: 201 });
 }

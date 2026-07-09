@@ -111,7 +111,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════════════ */}
       <nav className="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 glass-nav bg-surface/95 border-b border-outline-variant/30 lux-shadow">
         {/* Logo */}
-        <a href="#" className="font-display-lg text-headline-md tracking-widest epilisse-logo">
+        <a href="#" className="font-display-lg text-[26px] tracking-wide epilisse-logo">
           EPILISSE
         </a>
 

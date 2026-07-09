@@ -152,7 +152,19 @@
   100%    { background-position: 0%   center; }
 }
 
+/* ── Booking modal & Behandlungen page: category icons glow in sequence ── */
+@keyframes category-icon-glow {
+  0%, 100% { text-shadow: 0 0 0 rgba(197, 160, 33, 0); transform: scale(1); }
+  50%      { text-shadow: 0 0 14px rgba(197, 160, 33, 0.75), 0 0 5px rgba(197, 160, 33, 0.5); transform: scale(1.14); }
+}
+
+.category-icon-glow {
+  animation: category-icon-glow 1.8s ease-in-out 1;
+  animation-fill-mode: backwards;
+}
+
 .epilisse-logo {
+  font-weight: 700;
   background: linear-gradient(
     90deg,
     #000000 0%,

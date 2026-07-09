@@ -27,7 +27,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const body = await request.json();
 
   const patch: CustomerUpdate = { updated_at: new Date().toISOString() };
-  for (const key of ['name', 'phone', 'email', 'tags', 'notes'] as const) {
+  for (const key of ['name', 'phone', 'email', 'tags', 'notes', 'gender', 'is_active', 'class'] as const) {
     if (key in body) patch[key] = body[key];
   }
 

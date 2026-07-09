@@ -70,7 +70,7 @@ export default function ServicePageTemplate({ locale, categoryId, ...data }: Pro
       {/* ── NAVBAR ───────────────────────────────────────────────────────── */}
       <nav className="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 glass-nav bg-surface/95 border-b border-outline-variant/30 lux-shadow">
         <div className="flex items-center gap-8">
-          <Link href="/" className="font-display-lg text-headline-md tracking-widest text-primary">
+          <Link href="/" className="font-display-lg text-[26px] tracking-wide font-bold text-primary">
             EPILISSE
           </Link>
           <div className="hidden md:flex gap-8">
@@ -304,7 +304,7 @@ export default function ServicePageTemplate({ locale, categoryId, ...data }: Pro
       {/* ── FOOTER ───────────────────────────────────────────────────────── */}
       <footer className="bg-surface-container-highest w-full px-margin-mobile md:px-margin-desktop py-section-gap grid grid-cols-1 md:grid-cols-4 gap-gutter border-t border-outline-variant">
         <div>
-          <Link href="/" className="font-display-lg text-headline-md text-primary tracking-widest mb-6 block">
+          <Link href="/" className="font-display-lg text-[26px] text-primary tracking-wide font-bold mb-6 block">
             EPILISSE
           </Link>
           <p className="font-body-sm text-secondary leading-relaxed">

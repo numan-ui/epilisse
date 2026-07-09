@@ -4,13 +4,37 @@
 // and reconcile any drift against this file.
 
 export type AppointmentStatus = 'confirmed' | 'pending' | 'cancelled';
+export type CustomerGender = 'herr' | 'frau' | 'keine_angabe';
+export type CustomerClass = 'A' | 'B' | 'C';
 export type CampaignTargetType = 'all' | 'category' | 'customers';
 export type CampaignStatus = 'draft' | 'sending' | 'sent' | 'failed';
 export type RecipientStatus = 'pending' | 'sent' | 'failed';
+export type ConsentKind = 'datenschutz' | 'behandlung' | 'marketing';
+export type ConsentAction = 'granted' | 'withdrawn';
 
 export interface Database {
   public: {
     Tables: {
+      consent_log: {
+        Row: {
+          id: string; customer_id: string; kind: ConsentKind; action: ConsentAction;
+          source: string; created_at: string;
+        };
+        Insert: {
+          id?: string; customer_id: string; kind: ConsentKind; action: ConsentAction;
+          source: string; created_at?: string;
+        };
+        Update: Partial<{ kind: ConsentKind; action: ConsentAction; source: string }>;
+        Relationships: [
+          {
+            foreignKeyName: 'consent_log_customer_id_fkey';
+            columns: ['customer_id'];
+            isOneToOne: false;
+            referencedRelation: 'customers';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       categories: {
         Row: { id: string; name: string; created_at: string };
         Insert: { id: string; name: string; created_at?: string };
@@ -20,24 +44,38 @@ export interface Database {
       customers: {
         Row: {
           id: string; name: string; phone: string | null; email: string | null;
-          since: string; tags: string[]; notes: string;
+          since: string; tags: string[]; notes: string; gender: CustomerGender;
+          is_active: boolean; class: CustomerClass | null; category: string | null;
           consent_datenschutz_at: string | null; consent_behandlung_at: string | null;
-          consent_marketing_at: string | null;
+          consent_marketing_at: string | null; consent_request_last_sent_at: string | null;
+          consent_request_behandlung_sent_at: string | null;
           created_at: string; updated_at: string;
         };
         Insert: {
           id?: string; name: string; phone?: string | null; email?: string | null;
-          since?: string; tags?: string[]; notes?: string;
+          since?: string; tags?: string[]; notes?: string; gender?: CustomerGender;
+          is_active?: boolean; class?: CustomerClass | null; category?: string | null;
           consent_datenschutz_at?: string | null; consent_behandlung_at?: string | null;
-          consent_marketing_at?: string | null;
+          consent_marketing_at?: string | null; consent_request_last_sent_at?: string | null;
+          consent_request_behandlung_sent_at?: string | null;
         };
         Update: Partial<{
           name: string; phone: string | null; email: string | null;
-          since: string; tags: string[]; notes: string; updated_at: string;
+          since: string; tags: string[]; notes: string; updated_at: string; gender: CustomerGender;
+          is_active: boolean; class: CustomerClass | null; category: string | null;
           consent_datenschutz_at: string | null; consent_behandlung_at: string | null;
-          consent_marketing_at: string | null;
+          consent_marketing_at: string | null; consent_request_last_sent_at: string | null;
+          consent_request_behandlung_sent_at: string | null;
         }>;
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'customers_category_fkey';
+            columns: ['category'];
+            isOneToOne: false;
+            referencedRelation: 'categories';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       appointments: {
         Row: {
@@ -151,10 +189,24 @@ export interface Database {
         Relationships: [];
       };
       email_sends: {
-        Row: { id: string; kind: 'follow_up' | 'appointment_reminder' | 'campaign' | 'appointment_confirmation' | 'consent_request'; sent_at: string };
-        Insert: { id?: string; kind: 'follow_up' | 'appointment_reminder' | 'campaign' | 'appointment_confirmation' | 'consent_request'; sent_at?: string };
+        Row: {
+          id: string; kind: 'follow_up' | 'appointment_reminder' | 'campaign' | 'appointment_confirmation' | 'consent_request';
+          customer_id: string | null; recipient: string | null; sent_at: string;
+        };
+        Insert: {
+          id?: string; kind: 'follow_up' | 'appointment_reminder' | 'campaign' | 'appointment_confirmation' | 'consent_request';
+          customer_id?: string | null; recipient?: string | null; sent_at?: string;
+        };
         Update: never;
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'email_sends_customer_id_fkey';
+            columns: ['customer_id'];
+            isOneToOne: false;
+            referencedRelation: 'customers';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       business_hours: {
         Row: {

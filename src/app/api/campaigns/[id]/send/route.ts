@@ -79,7 +79,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     try {
       await sendEmail(email, content);
       await supabase.from('campaign_recipients').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', r.id);
-      await logEmailSent(supabase, 'campaign');
+      await logEmailSent(supabase, 'campaign', { customerId: r.customer_id, email });
       quotaRemaining--;
       sent++;
     } catch (err) {

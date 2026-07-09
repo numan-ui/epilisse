@@ -47,7 +47,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
 
   try {
     await sendEmail(appt.customers.email, content);
-    await logEmailSent(supabase, 'appointment_confirmation');
+    await logEmailSent(supabase, 'appointment_confirmation', { customerId: appt.customers.id, email: appt.customers.email });
   } catch {
     return NextResponse.json({ error: 'E-Mail konnte nicht gesendet werden.' }, { status: 502 });
   }

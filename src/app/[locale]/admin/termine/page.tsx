@@ -169,6 +169,11 @@ export default function TerminePage() {
   const nextWeek = () => setWeek(w => getWeekDays(new Date(w[0].getTime() + 7 * 86400000)));
   const goToday  = () => { setWeek(getWeekDays(TODAY)); setDate(TODAY); };
 
+  // List view has no day-stepper of its own — jumping a day also keeps the
+  // week strip in sync so switching to Woche still centers on the right week.
+  const prevDay = () => setDate(d => { const next = new Date(d.getTime() - 86400000); setWeek(getWeekDays(next)); return next; });
+  const nextDay = () => setDate(d => { const next = new Date(d.getTime() + 86400000); setWeek(getWeekDays(next)); return next; });
+
   const confirmed = dayAppointments.filter(a => a.status === 'confirmed').length;
   const pending   = dayAppointments.filter(a => a.status === 'pending').length;
   const totalMin  = dayAppointments.filter(a => a.status !== 'cancelled').reduce((s, a) => s + a.durationMin, 0);
@@ -243,9 +248,23 @@ export default function TerminePage() {
         <div className="flex items-center gap-4">
           <h2 className="font-headline-md text-headline-md text-on-surface">Termine</h2>
           <span className="text-outline-variant">|</span>
-          <p className="font-body-sm text-secondary">
-            {selectedDate.getDate()}. {DE_MONTHS[selectedDate.getMonth()]} {selectedDate.getFullYear()}
-          </p>
+          {view === 'list' ? (
+            <div className="flex items-center gap-1">
+              <button onClick={prevDay} className="p-1 text-outline hover:text-primary transition-colors" aria-label="Vorheriger Tag">
+                <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+              </button>
+              <p className="font-body-sm text-secondary w-[150px] text-center">
+                {selectedDate.getDate()}. {DE_MONTHS[selectedDate.getMonth()]} {selectedDate.getFullYear()}
+              </p>
+              <button onClick={nextDay} className="p-1 text-outline hover:text-primary transition-colors" aria-label="Nächster Tag">
+                <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+              </button>
+            </div>
+          ) : (
+            <p className="font-body-sm text-secondary">
+              {selectedDate.getDate()}. {DE_MONTHS[selectedDate.getMonth()]} {selectedDate.getFullYear()}
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-3">
           {/* View toggle */}

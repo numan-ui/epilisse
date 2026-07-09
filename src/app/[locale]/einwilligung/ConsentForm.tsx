@@ -6,7 +6,7 @@ import Link from 'next/link';
 type State =
   | { step: 'loading' }
   | { step: 'invalid' }
-  | { step: 'form'; name: string }
+  | { step: 'form'; name: string; requiresBehandlung: boolean; grantedDatenschutz: boolean; grantedBehandlung: boolean }
   | { step: 'done' };
 
 export default function ConsentForm() {
@@ -31,7 +31,13 @@ export default function ConsentForm() {
         setDatenschutz(!!data.datenschutz);
         setBehandlung(!!data.behandlung);
         setMarketing(!!data.marketing);
-        setState({ step: 'form', name: data.name });
+        setState({
+          step: 'form',
+          name: data.name,
+          requiresBehandlung: !!data.requiresBehandlung,
+          grantedDatenschutz: !!data.datenschutz,
+          grantedBehandlung: !!data.behandlung,
+        });
       })
       .catch(() => setState({ step: 'invalid' }));
   }, [customerId, token]);
@@ -80,29 +86,35 @@ export default function ConsentForm() {
       </p>
 
       <div className="space-y-4">
-        <label className="flex items-start gap-3 cursor-pointer">
+        <label className={`flex items-start gap-3 ${state.grantedDatenschutz ? '' : 'cursor-pointer'}`}>
           <input
             type="checkbox"
             checked={datenschutz}
+            disabled={state.grantedDatenschutz}
             onChange={(e) => setDatenschutz(e.target.checked)}
-            className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0"
+            className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0 disabled:opacity-70"
           />
           <span className="font-body-sm text-on-surface">
             Ich stimme der <Link href={`/${locale}/datenschutz`} className="underline hover:text-primary" target="_blank">Datenschutzerklärung</Link> zu. *
+            {state.grantedDatenschutz && <span className="text-primary"> — bereits erteilt</span>}
           </span>
         </label>
 
-        <label className="flex items-start gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={behandlung}
-            onChange={(e) => setBehandlung(e.target.checked)}
-            className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0"
-          />
-          <span className="font-body-sm text-on-surface">
-            Ich habe die <Link href={`/${locale}/behandlungseinwilligung`} className="underline hover:text-primary" target="_blank">Behandlungseinwilligung</Link> gelesen und stimme der Behandlung zu. *
-          </span>
-        </label>
+        {state.requiresBehandlung && (
+          <label className={`flex items-start gap-3 ${state.grantedBehandlung ? '' : 'cursor-pointer'}`}>
+            <input
+              type="checkbox"
+              checked={behandlung}
+              disabled={state.grantedBehandlung}
+              onChange={(e) => setBehandlung(e.target.checked)}
+              className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0 disabled:opacity-70"
+            />
+            <span className="font-body-sm text-on-surface">
+              Ich habe die <Link href={`/${locale}/behandlungseinwilligung`} className="underline hover:text-primary" target="_blank">Behandlungseinwilligung</Link> gelesen und stimme der Behandlung zu. *
+              {state.grantedBehandlung && <span className="text-primary"> — bereits erteilt</span>}
+            </span>
+          </label>
+        )}
 
         <label className="flex items-start gap-3 cursor-pointer">
           <input
@@ -121,7 +133,7 @@ export default function ConsentForm() {
 
       <button
         type="button"
-        disabled={!datenschutz || !behandlung || submitting}
+        disabled={!datenschutz || (state.requiresBehandlung && !behandlung) || submitting}
         onClick={submit}
         className="bg-primary text-on-primary py-3 px-6 font-label-caps text-label-caps hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >

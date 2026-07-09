@@ -1,5 +1,8 @@
 'use client';
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useAdminCategories } from '@/hooks/useAdminCategories';
+
+type Gender = 'herr' | 'frau' | 'keine_angabe';
 
 type Customer = {
   id: string;
@@ -13,6 +16,18 @@ type Customer = {
   lastVisit: string | null; // ISO timestamp
   tags: string[];
   notes: string;
+  gender: Gender;
+  is_active: boolean;
+  class: 'A' | 'B' | 'C' | null;
+  consent_datenschutz_at: string | null;
+  consent_behandlung_at: string | null;
+  consent_marketing_at: string | null;
+};
+
+const GENDER_LABEL: Record<Gender, string> = {
+  herr: 'Herr',
+  frau: 'Frau',
+  keine_angabe: 'Keine Angabe',
 };
 
 type CustomerAppointment = {
@@ -23,7 +38,13 @@ type CustomerAppointment = {
   status: 'confirmed' | 'pending' | 'cancelled';
 };
 
-const ALL_TAGS = ['Alle', 'VIP', 'Stammkundin', 'Neukundin'];
+const ALL_TAGS = ['Alle', 'VIP', 'Neu'];
+
+const isNewThisMonth = (sinceIso: string) => {
+  const since = new Date(sinceIso);
+  const now = new Date();
+  return since.getFullYear() === now.getFullYear() && since.getMonth() === now.getMonth();
+};
 
 const APPT_STATUS: Record<CustomerAppointment['status'], { label: string; badge: string }> = {
   confirmed: { label: 'Gekommen',        badge: 'bg-primary/10 text-primary' },
@@ -35,6 +56,8 @@ const formatMoney = (n: number) =>
   n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '€';
 
 const formatDate = (iso: string | null) => (iso ? iso.slice(0, 10) : '—');
+const formatDateTime = (iso: string | null) =>
+  iso ? new Date(iso).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
 
 export default function KundenPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -45,7 +68,13 @@ export default function KundenPage() {
   const [showAdd, setShowAdd]     = useState(false);
   const [sortBy, setSortBy]       = useState<'name' | 'visits' | 'spent'>('name');
   const [notesDraft, setNotesDraft] = useState('');
-  const [newCustomer, setNewCustomer] = useState({ name: '', phone: '', email: '', tag: 'Neukundin', notes: '' });
+  const [newCustomer, setNewCustomer] = useState<{ name: string; phone: string; email: string; vip: boolean; notes: string; gender: Gender; klass: '' | 'A' | 'B' | 'C'; category: string }>({ name: '', phone: '', email: '', vip: false, notes: '', gender: 'keine_angabe', klass: '', category: '' });
+  const categories = useAdminCategories();
+  const [editing, setEditing] = useState(false);
+  const [editDraft, setEditDraft] = useState({ name: '', phone: '', email: '', gender: 'keine_angabe' as Gender, klass: '' as '' | 'A' | 'B' | 'C' });
+  const [classFilter, setClassFilter] = useState<'Alle' | 'A' | 'B' | 'C'>('Alle');
+  const [showInactive, setShowInactive] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
   const [history, setHistory] = useState<CustomerAppointment[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
 
@@ -62,6 +91,17 @@ export default function KundenPage() {
   const selected = customers.find((c) => c.id === selectedId) ?? null;
 
   useEffect(() => { setNotesDraft(selected?.notes ?? ''); }, [selected?.id]);
+
+  useEffect(() => {
+    setEditing(false);
+    setEditDraft({
+      name: selected?.name ?? '',
+      phone: selected?.phone ?? '',
+      email: selected?.email ?? '',
+      gender: selected?.gender ?? 'keine_angabe',
+      klass: selected?.class ?? '',
+    });
+  }, [selected?.id]);
 
   useEffect(() => {
     if (!selected) { setHistory([]); return; }
@@ -82,24 +122,29 @@ export default function KundenPage() {
         (c.email ?? '').toLowerCase().includes(q)
       );
     }
-    if (tagFilter !== 'Alle') {
-      list = list.filter(c => c.tags.includes(tagFilter));
+    if (tagFilter === 'VIP') {
+      list = list.filter(c => c.tags.includes('VIP'));
+    } else if (tagFilter === 'Neu') {
+      list = list.filter(c => isNewThisMonth(c.since));
+    }
+    if (classFilter !== 'Alle') {
+      list = list.filter(c => c.class === classFilter);
+    }
+    if (!showInactive) {
+      list = list.filter(c => c.is_active !== false);
     }
     return [...list].sort((a, b) => {
       if (sortBy === 'name')   return a.name.localeCompare(b.name);
       if (sortBy === 'visits') return b.totalVisits - a.totalVisits;
       return b.totalSpent - a.totalSpent;
     });
-  }, [customers, search, tagFilter, sortBy]);
+  }, [customers, search, tagFilter, classFilter, showInactive, sortBy]);
 
-  const vipCount    = customers.filter(c => c.tags.includes('VIP')).length;
-  const newCount    = customers.filter(c => c.tags.includes('Neukundin')).length;
-  const returnCount = customers.filter(c => c.tags.includes('Stammkundin')).length;
+  const vipCount = customers.filter(c => c.tags.includes('VIP')).length;
+  const newCount = customers.filter(c => isNewThisMonth(c.since)).length;
 
   const tagBadge = (tag: string) => {
-    if (tag === 'VIP')         return 'bg-primary/10 text-primary';
-    if (tag === 'Stammkundin') return 'bg-secondary-container/60 text-on-surface-variant';
-    if (tag === 'Neukundin')   return 'bg-surface-container-high text-outline';
+    if (tag === 'VIP') return 'bg-primary/10 text-primary';
     return 'bg-surface-container text-outline';
   };
 
@@ -113,6 +158,35 @@ export default function KundenPage() {
     setCustomers(prev => prev.map(c => c.id === selected.id ? { ...c, notes: notesDraft } : c));
   };
 
+  const saveEdit = async () => {
+    if (!selected || !editDraft.name.trim()) return;
+    const res = await fetch(`/api/customers/${selected.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: editDraft.name,
+        phone: editDraft.phone || null,
+        email: editDraft.email || null,
+        gender: editDraft.gender,
+        class: editDraft.klass || null,
+      }),
+    });
+    const updated = await res.json();
+    setCustomers(prev => prev.map(c => c.id === selected.id ? { ...c, ...updated } : c));
+    setEditing(false);
+  };
+
+  const toggleActive = async () => {
+    if (!selected) return;
+    const nextActive = selected.is_active === false;
+    await fetch(`/api/customers/${selected.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_active: nextActive }),
+    });
+    setCustomers(prev => prev.map(c => c.id === selected.id ? { ...c, is_active: nextActive } : c));
+  };
+
   const deleteCustomer = async () => {
     if (!selected) return;
     if (!window.confirm(`${selected.name} wirklich löschen?`)) return;
@@ -123,6 +197,7 @@ export default function KundenPage() {
 
   const createCustomer = async () => {
     if (!newCustomer.name.trim()) return;
+    setAddError(null);
     const res = await fetch('/api/customers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -130,13 +205,21 @@ export default function KundenPage() {
         name: newCustomer.name,
         phone: newCustomer.phone || null,
         email: newCustomer.email || null,
-        tags: [newCustomer.tag],
+        tags: newCustomer.vip ? ['VIP'] : [],
         notes: newCustomer.notes,
+        gender: newCustomer.gender,
+        class: newCustomer.klass || null,
+        category: newCustomer.category || null,
       }),
     });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      setAddError(body.error ?? 'Etwas ist schiefgelaufen.');
+      return;
+    }
     const created = await res.json();
     setCustomers(prev => [...prev, { ...created, totalVisits: 0, totalSpent: 0, lastService: null, lastVisit: null }]);
-    setNewCustomer({ name: '', phone: '', email: '', tag: 'Neukundin', notes: '' });
+    setNewCustomer({ name: '', phone: '', email: '', vip: false, notes: '', gender: 'keine_angabe', klass: '', category: '' });
     setShowAdd(false);
   };
 
@@ -147,14 +230,14 @@ export default function KundenPage() {
         <div className="flex items-center gap-4">
           <h2 className="font-headline-md text-headline-md text-on-surface">Kunden</h2>
           <span className="text-outline-variant">|</span>
-          <p className="font-body-sm text-secondary">{customers.length} Kundinnen gesamt</p>
+          <p className="font-body-sm text-secondary">{customers.length} Kunden gesamt</p>
         </div>
         <button
-          onClick={() => setShowAdd(true)}
+          onClick={() => { setAddError(null); setShowAdd(true); }}
           className="flex items-center gap-2 bg-primary text-on-primary py-2.5 px-5 font-label-caps text-label-caps hover:brightness-110 transition-all"
         >
           <span className="material-symbols-outlined text-[18px]">person_add</span>
-          Neue Kundin
+          Kunde hinzufügen
         </button>
       </header>
 
@@ -167,9 +250,7 @@ export default function KundenPage() {
           <div className="flex items-center gap-6 px-6 py-3 border-b border-outline-variant/30 bg-surface-container-low shrink-0">
             <Stat icon="star" label="VIP" value={String(vipCount)} />
             <div className="w-px h-8 bg-outline-variant" />
-            <Stat icon="group" label="Stammkunden" value={String(returnCount)} />
-            <div className="w-px h-8 bg-outline-variant" />
-            <Stat icon="fiber_new" label="Neukunden" value={String(newCount)} />
+            <Stat icon="fiber_new" label="Neu diesen Monat" value={String(newCount)} />
           </div>
 
           {/* Search + filters */}
@@ -197,7 +278,7 @@ export default function KundenPage() {
                   onClick={() => setTagFilter(t)}
                   className={`font-label-caps text-[10px] px-3 py-1.5 transition-all ${
                     tagFilter === t
-                      ? 'bg-primary text-on-primary'
+                      ? 'border border-primary bg-primary text-on-primary'
                       : 'border border-outline-variant text-on-surface-variant hover:border-primary/50'
                   }`}
                 >
@@ -205,6 +286,29 @@ export default function KundenPage() {
                 </button>
               ))}
             </div>
+
+            {/* Class filter */}
+            <div className="flex gap-1">
+              {(['Alle', 'A', 'B', 'C'] as const).map((k) => (
+                <button
+                  key={k}
+                  onClick={() => setClassFilter(k)}
+                  className={`font-label-caps text-[10px] px-3 py-1.5 transition-all ${
+                    classFilter === k
+                      ? 'border border-primary bg-primary text-on-primary'
+                      : 'border border-outline-variant text-on-surface-variant hover:border-primary/50'
+                  }`}
+                >
+                  {k === 'Alle' ? 'Alle Klassen' : `Klasse ${k}`}
+                </button>
+              ))}
+            </div>
+
+            {/* Inactive toggle */}
+            <label className="flex items-center gap-1.5 font-label-caps text-[10px] text-on-surface-variant cursor-pointer select-none">
+              <input type="checkbox" checked={showInactive} onChange={(e) => setShowInactive(e.target.checked)} />
+              Inaktive anzeigen
+            </label>
 
             {/* Sort */}
             <select
@@ -239,7 +343,7 @@ export default function KundenPage() {
                   onClick={() => setSelectedId(isActive ? null : cust.id)}
                   className={`flex items-center gap-4 px-6 py-4 border-b border-outline-variant/20 cursor-pointer transition-all hover:bg-surface-container-low ${
                     isActive ? 'bg-primary/5 border-l-2 border-primary' : ''
-                  }`}
+                  } ${cust.is_active === false ? 'opacity-50' : ''}`}
                 >
                   {/* Avatar */}
                   <div className="w-9 h-9 rounded-full bg-secondary-container flex items-center justify-center shrink-0 font-headline-sm text-[14px] text-primary">
@@ -250,9 +354,18 @@ export default function KundenPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-body-md text-on-surface">{cust.name}</span>
+                      {cust.class && (
+                        <span className="font-label-caps text-[9px] px-1.5 py-0.5 bg-surface-container-high text-on-surface-variant border border-outline-variant/50">Klasse {cust.class}</span>
+                      )}
                       {cust.tags.map(t => (
                         <span key={t} className={`font-label-caps text-[9px] px-1.5 py-0.5 ${tagBadge(t)}`}>{t}</span>
                       ))}
+                      {isNewThisMonth(cust.since) && (
+                        <span className="font-label-caps text-[9px] px-1.5 py-0.5 bg-surface-container-high text-outline">Neu</span>
+                      )}
+                      {cust.is_active === false && (
+                        <span className="font-label-caps text-[9px] px-1.5 py-0.5 bg-error-container text-error">Inaktiv</span>
+                      )}
                     </div>
                     <p className="font-body-sm text-[12px] text-outline truncate mt-0.5">{cust.lastService ?? 'Noch kein Besuch'} · {formatDate(cust.lastVisit)}</p>
                   </div>
@@ -278,29 +391,58 @@ export default function KundenPage() {
             {/* Panel header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/30 bg-surface/80 backdrop-blur-sm shrink-0">
               <span className="font-label-caps text-[11px] text-primary uppercase tracking-wider">Kundenprofil</span>
-              <button
-                onClick={() => setSelectedId(null)}
-                className="text-outline hover:text-error transition-colors"
-              >
-                <span className="material-symbols-outlined text-[20px]">close</span>
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={toggleActive}
+                  className={`font-label-caps text-[10px] px-3 py-1.5 border transition-all ${
+                    selected.is_active !== false
+                      ? 'border-outline-variant text-on-surface-variant hover:border-error hover:text-error'
+                      : 'border-primary text-primary'
+                  }`}
+                >
+                  {selected.is_active !== false ? 'Deaktivieren' : 'Aktivieren'}
+                </button>
+                <button
+                  onClick={() => setSelectedId(null)}
+                  className="text-outline hover:text-error transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[20px]">close</span>
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               {/* Avatar + name */}
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-secondary-container flex items-center justify-center font-headline-sm text-xl text-primary">
-                  {selected.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
-                </div>
-                <div>
-                  <h3 className="font-headline-sm text-headline-sm text-on-surface">{selected.name}</h3>
-                  <p className="font-body-sm text-outline">Kundin seit {formatDate(selected.since)}</p>
-                  <div className="flex gap-1 mt-1 flex-wrap">
-                    {selected.tags.map(t => (
-                      <span key={t} className={`font-label-caps text-[9px] px-1.5 py-0.5 ${tagBadge(t)}`}>{t}</span>
-                    ))}
+              <div className="flex items-center gap-4 justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-full bg-secondary-container flex items-center justify-center font-headline-sm text-xl text-primary">
+                    {selected.name.split(' ').map(w => w[0]).join('').slice(0, 2)}
+                  </div>
+                  <div>
+                    <h3 className="font-headline-sm text-headline-sm text-on-surface">
+                      {GENDER_LABEL[selected.gender] !== 'Keine Angabe' ? `${GENDER_LABEL[selected.gender]} ` : ''}{selected.name}
+                    </h3>
+                    <p className="font-body-sm text-outline">Kundin seit {formatDate(selected.since)}</p>
+                    <div className="flex gap-1 mt-1 flex-wrap">
+                      {selected.class && (
+                        <span className="font-label-caps text-[9px] px-1.5 py-0.5 bg-surface-container-high text-on-surface-variant border border-outline-variant/50">Klasse {selected.class}</span>
+                      )}
+                      {selected.tags.map(t => (
+                        <span key={t} className={`font-label-caps text-[9px] px-1.5 py-0.5 ${tagBadge(t)}`}>{t}</span>
+                      ))}
+                      {isNewThisMonth(selected.since) && (
+                        <span className="font-label-caps text-[9px] px-1.5 py-0.5 bg-surface-container-high text-outline">Neu</span>
+                      )}
+                    </div>
                   </div>
                 </div>
+                <button
+                  onClick={() => setEditing(e => !e)}
+                  className="text-outline hover:text-primary transition-colors shrink-0"
+                  title="Bearbeiten"
+                >
+                  <span className="material-symbols-outlined text-[20px]">{editing ? 'close' : 'edit'}</span>
+                </button>
               </div>
 
               {/* Stats row */}
@@ -322,16 +464,107 @@ export default function KundenPage() {
               {/* Contact */}
               <div className="bg-surface-container-lowest border border-outline-variant p-5 space-y-4">
                 <h4 className="font-label-caps text-[10px] text-outline uppercase">Kontakt</h4>
-                {[
-                  { icon: 'phone', label: 'Telefon', value: selected.phone || '—' },
-                  { icon: 'mail',  label: 'E-Mail',  value: selected.email || '—' },
-                ].map(({ icon, label, value }) => (
-                  <div key={label} className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-[18px] text-outline">{icon}</span>
+                {!editing ? (
+                  <>
+                    {[
+                      { icon: 'phone', label: 'Telefon', value: selected.phone || '—' },
+                      { icon: 'mail',  label: 'E-Mail',  value: selected.email || '—' },
+                      { icon: 'badge', label: 'Anrede',  value: GENDER_LABEL[selected.gender] },
+                    ].map(({ icon, label, value }) => (
+                      <div key={label} className="flex items-center gap-3">
+                        <span className="material-symbols-outlined text-[18px] text-outline">{icon}</span>
+                        <div>
+                          <p className="font-label-caps text-[9px] text-outline uppercase">{label}</p>
+                          <p className="font-body-sm text-on-surface">{value}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <div className="space-y-3">
                     <div>
-                      <p className="font-label-caps text-[9px] text-outline uppercase">{label}</p>
-                      <p className="font-body-sm text-on-surface">{value}</p>
+                      <label className="font-label-caps text-[9px] text-outline uppercase block mb-1">Name</label>
+                      <input
+                        type="text"
+                        value={editDraft.name}
+                        onChange={(e) => setEditDraft(p => ({ ...p, name: e.target.value }))}
+                        className="w-full border-b border-outline-variant bg-transparent py-1.5 font-body-sm text-on-surface focus:border-primary focus:outline-none transition-all"
+                      />
                     </div>
+                    <div>
+                      <label className="font-label-caps text-[9px] text-outline uppercase block mb-1">Telefon</label>
+                      <input
+                        type="tel"
+                        value={editDraft.phone}
+                        onChange={(e) => setEditDraft(p => ({ ...p, phone: e.target.value }))}
+                        className="w-full border-b border-outline-variant bg-transparent py-1.5 font-body-sm text-on-surface focus:border-primary focus:outline-none transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-label-caps text-[9px] text-outline uppercase block mb-1">E-Mail</label>
+                      <input
+                        type="email"
+                        value={editDraft.email}
+                        onChange={(e) => setEditDraft(p => ({ ...p, email: e.target.value }))}
+                        className="w-full border-b border-outline-variant bg-transparent py-1.5 font-body-sm text-on-surface focus:border-primary focus:outline-none transition-all"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="font-label-caps text-[9px] text-outline uppercase block mb-1">Anrede</label>
+                        <select
+                          value={editDraft.gender}
+                          onChange={(e) => setEditDraft(p => ({ ...p, gender: e.target.value as Gender }))}
+                          className="w-full border-b border-outline-variant bg-transparent py-1.5 font-body-sm text-on-surface focus:border-primary focus:outline-none transition-all"
+                        >
+                          <option value="herr">Herr</option>
+                          <option value="frau">Frau</option>
+                          <option value="keine_angabe">Keine Angabe</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="font-label-caps text-[9px] text-outline uppercase block mb-1">Klasse</label>
+                        <select
+                          value={editDraft.klass}
+                          onChange={(e) => setEditDraft(p => ({ ...p, klass: e.target.value as typeof editDraft.klass }))}
+                          className="w-full border-b border-outline-variant bg-transparent py-1.5 font-body-sm text-on-surface focus:border-primary focus:outline-none transition-all"
+                        >
+                          <option value="">—</option>
+                          <option value="A">A</option>
+                          <option value="B">B</option>
+                          <option value="C">C</option>
+                        </select>
+                      </div>
+                    </div>
+                    <button
+                      onClick={saveEdit}
+                      className="w-full bg-primary text-on-primary py-2 font-label-caps text-label-caps hover:brightness-110 transition-all mt-1"
+                    >
+                      Speichern
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Consent / Einwilligungen */}
+              <div className="bg-surface-container-lowest border border-outline-variant p-5 space-y-3">
+                <h4 className="font-label-caps text-[10px] text-outline uppercase">Einwilligungen</h4>
+                {[
+                  { label: 'Datenschutz', at: selected.consent_datenschutz_at },
+                  { label: 'Behandlung',  at: selected.consent_behandlung_at },
+                  { label: 'Marketing',   at: selected.consent_marketing_at },
+                ].map(({ label, at }) => (
+                  <div key={label} className="flex items-center justify-between">
+                    <span className="font-body-sm text-on-surface">{label}</span>
+                    {at ? (
+                      <span className="font-label-caps text-[9px] px-2 py-1 uppercase bg-primary/10 text-primary">
+                        Erteilt · {formatDateTime(at)}
+                      </span>
+                    ) : (
+                      <span className="font-label-caps text-[9px] px-2 py-1 uppercase bg-error-container text-error">
+                        Nicht erteilt
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -406,11 +639,11 @@ export default function KundenPage() {
           onClick={() => setShowAdd(false)}
         >
           <div
-            className="bg-surface w-full max-w-md border border-outline-variant shadow-2xl p-8 space-y-6"
+            className="bg-surface w-full max-w-2xl border border-outline-variant shadow-2xl p-8 space-y-5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <h3 className="font-headline-sm text-headline-sm text-on-surface">Neue Kundin</h3>
+              <h3 className="font-headline-sm text-headline-sm text-on-surface">Neuer Kunde</h3>
               <button onClick={() => setShowAdd(false)} className="text-outline hover:text-error transition-colors">
                 <span className="material-symbols-outlined">close</span>
               </button>
@@ -418,47 +651,104 @@ export default function KundenPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Vorname & Nachname</label>
-                <input
-                  type="text"
-                  placeholder="Aylin Kaya"
-                  value={newCustomer.name}
-                  onChange={(e) => setNewCustomer(p => ({ ...p, name: e.target.value }))}
-                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Telefon</label>
-                <input
-                  type="tel"
-                  placeholder="+49 176 ..."
-                  value={newCustomer.phone}
-                  onChange={(e) => setNewCustomer(p => ({ ...p, phone: e.target.value }))}
-                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">E-Mail</label>
-                <input
-                  type="email"
-                  placeholder="info@example.de"
-                  value={newCustomer.email}
-                  onChange={(e) => setNewCustomer(p => ({ ...p, email: e.target.value }))}
-                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
-                />
+                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Anrede</label>
+                <div className="flex gap-2">
+                  {([
+                    { v: 'herr', l: 'Herr' },
+                    { v: 'frau', l: 'Frau' },
+                    { v: 'keine_angabe', l: 'Keine Angabe' },
+                  ] as const).map(({ v, l }) => (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => setNewCustomer(p => ({ ...p, gender: v }))}
+                      className={`font-label-caps text-[10px] px-3 py-1.5 transition-all ${
+                        newCustomer.gender === v
+                          ? 'border border-primary bg-primary text-on-primary'
+                          : 'border border-outline-variant text-on-surface-variant hover:border-primary/50'
+                      }`}
+                    >
+                      {l}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <div>
-                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Tag</label>
-                <select
-                  value={newCustomer.tag}
-                  onChange={(e) => setNewCustomer(p => ({ ...p, tag: e.target.value }))}
-                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
-                >
-                  <option>Neukundin</option>
-                  <option>Stammkundin</option>
-                  <option>VIP</option>
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Vorname & Nachname</label>
+                  <input
+                    type="text"
+                    placeholder="Aylin Kaya"
+                    value={newCustomer.name}
+                    onChange={(e) => setNewCustomer(p => ({ ...p, name: e.target.value }))}
+                    className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Telefon</label>
+                  <input
+                    type="tel"
+                    placeholder="+49 176 ..."
+                    value={newCustomer.phone}
+                    onChange={(e) => setNewCustomer(p => ({ ...p, phone: e.target.value }))}
+                    className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">E-Mail</label>
+                  <input
+                    type="email"
+                    placeholder="info@example.de"
+                    value={newCustomer.email}
+                    onChange={(e) => setNewCustomer(p => ({ ...p, email: e.target.value }))}
+                    className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Kategorie</label>
+                  <select
+                    value={newCustomer.category}
+                    onChange={(e) => setNewCustomer(p => ({ ...p, category: e.target.value }))}
+                    className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                  >
+                    <option value="">—</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <p className="font-body-sm text-outline -mt-2">
+                Kategorie „Laser“ fragt per Mail zusätzlich die Behandlungseinwilligung an.
+              </p>
+
+              <div className="grid grid-cols-2 gap-4 items-end">
+                <label className="flex items-center gap-2 font-label-caps text-[11px] text-on-surface-variant cursor-pointer select-none pb-2">
+                  <input
+                    type="checkbox"
+                    checked={newCustomer.vip}
+                    onChange={(e) => setNewCustomer(p => ({ ...p, vip: e.target.checked }))}
+                  />
+                  <span className="material-symbols-outlined text-[16px] text-primary">star</span>
+                  VIP-Kunde
+                </label>
+                <div>
+                  <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Klasse</label>
+                  <select
+                    value={newCustomer.klass}
+                    onChange={(e) => setNewCustomer(p => ({ ...p, klass: e.target.value as typeof newCustomer.klass }))}
+                    className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                  >
+                    <option value="">—</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                  </select>
+                </div>
               </div>
 
               <div>
@@ -472,6 +762,8 @@ export default function KundenPage() {
                 />
               </div>
             </div>
+
+            {addError && <p className="font-body-sm text-error">{addError}</p>}
 
             <div className="flex gap-3 pt-2">
               <button

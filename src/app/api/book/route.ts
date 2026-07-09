@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
 import { getAppointmentsForDate, getBlockedSlotsForDate, hasOverlap } from '@/lib/availability';
+import { consentConfirmedEmail, sendEmail, getSiteUrl, CONSENT_BCC_EMAIL } from '@/lib/email/resend';
+import { signConsentToken } from '@/lib/consentToken';
+import { getRemainingEmailQuota, logEmailSent } from '@/lib/emailQuota';
+import { logConsentEvent } from '@/lib/consentLog';
 
 interface BookingService {
   name: string;
@@ -33,7 +37,10 @@ export async function POST(request: Request) {
   if (!body.startsAt) {
     return NextResponse.json({ error: 'Bitte Datum und Uhrzeit auswählen.' }, { status: 400 });
   }
-  if (!body.consentDatenschutz || !body.consentBehandlung) {
+  // Behandlungseinwilligung is only legally relevant for Laser-Haarentfernung —
+  // every other category only needs Datenschutz (+ optional Marketing).
+  const requiresBehandlung = body.categoryId === 'laser';
+  if (!body.consentDatenschutz || (requiresBehandlung && !body.consentBehandlung)) {
     return NextResponse.json({ error: 'Zustimmung zu Datenschutz und Behandlung erforderlich.' }, { status: 400 });
   }
 
@@ -61,6 +68,10 @@ export async function POST(request: Request) {
 
   let customerId = existingCustomer?.id as string | undefined;
   const now = new Date().toISOString();
+  const customerName = body.name.trim();
+  let isFirstConfirmation = true;
+  let marketingNewlyGranted = !!body.consentMarketing;
+  let behandlungNewlyGranted = requiresBehandlung && !!body.consentBehandlung;
 
   if (!customerId) {
     const { data: created, error: createError } = await supabase
@@ -69,8 +80,9 @@ export async function POST(request: Request) {
         name: body.name.trim(),
         email,
         phone: body.phone.trim(),
+        category: body.categoryId,
         consent_datenschutz_at: now,
-        consent_behandlung_at: now,
+        consent_behandlung_at: requiresBehandlung && body.consentBehandlung ? now : null,
         consent_marketing_at: body.consentMarketing ? now : null,
       })
       .select('id')
@@ -78,12 +90,38 @@ export async function POST(request: Request) {
     if (createError) return NextResponse.json({ error: createError.message }, { status: 500 });
     customerId = created.id;
   } else if (existingCustomer) {
+    isFirstConfirmation = !existingCustomer.consent_datenschutz_at || (requiresBehandlung && !existingCustomer.consent_behandlung_at);
+    marketingNewlyGranted = !!body.consentMarketing && !existingCustomer.consent_marketing_at;
+    behandlungNewlyGranted = requiresBehandlung && !!body.consentBehandlung && !existingCustomer.consent_behandlung_at;
     const updates: { consent_datenschutz_at?: string; consent_behandlung_at?: string; consent_marketing_at?: string } = {};
     if (!existingCustomer.consent_datenschutz_at) updates.consent_datenschutz_at = now;
-    if (!existingCustomer.consent_behandlung_at) updates.consent_behandlung_at = now;
+    if (!existingCustomer.consent_behandlung_at && requiresBehandlung && body.consentBehandlung) updates.consent_behandlung_at = now;
     if (!existingCustomer.consent_marketing_at && body.consentMarketing) updates.consent_marketing_at = now;
     if (Object.keys(updates).length > 0) {
       await supabase.from('customers').update(updates).eq('id', customerId);
+    }
+  }
+
+  if (!existingCustomer || !existingCustomer.consent_datenschutz_at) {
+    await logConsentEvent(supabase, customerId, 'datenschutz', 'granted', 'booking');
+  }
+  if (behandlungNewlyGranted) await logConsentEvent(supabase, customerId, 'behandlung', 'granted', 'booking');
+  if (marketingNewlyGranted) await logConsentEvent(supabase, customerId, 'marketing', 'granted', 'booking');
+
+  if (isFirstConfirmation) {
+    try {
+      if ((await getRemainingEmailQuota(supabase)) > 0) {
+        const token = signConsentToken(customerId);
+        const manageUrl = `${getSiteUrl()}/de/einwilligung?c=${customerId}&t=${token}`;
+        await sendEmail(
+          email,
+          consentConfirmedEmail({ customerName, manageUrl, marketingGranted: !!body.consentMarketing }),
+          { bcc: CONSENT_BCC_EMAIL }
+        );
+        await logEmailSent(supabase, 'consent_request', { customerId, email });
+      }
+    } catch (err) {
+      console.error('consent_confirmed email failed:', err);
     }
   }
 

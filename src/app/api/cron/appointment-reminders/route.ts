@@ -52,7 +52,7 @@ export async function GET(request: Request) {
     try {
       await sendEmail(appt.customers.email, content);
       await supabase.from('appointments').update({ reminder_sent: true }).eq('id', appt.id);
-      await logEmailSent(supabase, 'appointment_reminder');
+      await logEmailSent(supabase, 'appointment_reminder', { customerId: appt.customer_id, email: appt.customers.email });
       quotaRemaining--;
       sent++;
     } catch {

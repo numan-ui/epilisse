@@ -86,6 +86,7 @@ export default function BookingModal() {
   const [consentDatenschutz, setConsentDatenschutz] = useState(false);
   const [consentBehandlung, setConsentBehandlung] = useState(false);
   const [consentMarketing, setConsentMarketing] = useState(false);
+  const [priorConsent, setPriorConsent] = useState<{ datenschutz: boolean; behandlung: boolean; marketing: boolean } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
@@ -141,13 +142,55 @@ export default function BookingModal() {
     setConsentDatenschutz(false);
     setConsentBehandlung(false);
     setConsentMarketing(false);
+    setPriorConsent(null);
     setError(null);
   }, [isOpen, preselectedCategory]);
+
+  // Returning customer who already gave consent shouldn't be forced to
+  // re-tick the checkboxes — look up their status once both contact fields
+  // are filled in (debounced) and lock in whichever consents are on file.
+  useEffect(() => {
+    if (step !== 'details') return;
+    const trimmedEmail = email.trim();
+    const trimmedPhone = phone.trim();
+    if (!trimmedEmail && !trimmedPhone) {
+      setPriorConsent(null);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      const qs = new URLSearchParams();
+      if (trimmedEmail) qs.set('email', trimmedEmail);
+      if (trimmedPhone) qs.set('phone', trimmedPhone);
+      fetch(`/api/consent-status?${qs.toString()}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (cancelled) return;
+          if (data.found) {
+            setPriorConsent({ datenschutz: data.datenschutz, behandlung: data.behandlung, marketing: data.marketing });
+            if (data.datenschutz) setConsentDatenschutz(true);
+            if (data.behandlung) setConsentBehandlung(true);
+            if (data.marketing) setConsentMarketing(true);
+          } else {
+            setPriorConsent(null);
+          }
+        })
+        .catch(() => {});
+    }, 500);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [step, email, phone]);
 
   const selectedCategoryName = useMemo(
     () => categories.find((c) => c.id === selectedCategory)?.name ?? '',
     [categories, selectedCategory]
   );
+
+  // Behandlungseinwilligung is only legally relevant for Laser-Haarentfernung —
+  // every other category only needs Datenschutz (+ optional Marketing).
+  const requiresBehandlung = selectedCategory === 'laser';
 
   if (!isOpen) return null;
 
@@ -174,7 +217,7 @@ export default function BookingModal() {
       setError('Bitte eine Uhrzeit auswählen.');
       return;
     }
-    if (!consentDatenschutz || !consentBehandlung) {
+    if (!consentDatenschutz || (requiresBehandlung && !consentBehandlung)) {
       setError('Bitte bestätigen Sie die Datenschutz- und Behandlungshinweise.');
       return;
     }
@@ -201,7 +244,7 @@ export default function BookingModal() {
           startsAt,
           notes,
           consentDatenschutz,
-          consentBehandlung,
+          consentBehandlung: requiresBehandlung ? consentBehandlung : false,
           consentMarketing,
         }),
       });
@@ -238,7 +281,7 @@ export default function BookingModal() {
           <div className="space-y-2">
             <p className="font-body-sm text-secondary mb-4">Wählen Sie eine Kategorie</p>
             <div className="grid grid-cols-2 gap-3">
-              {categories.map((c) => (
+              {categories.map((c, i) => (
                 <button
                   key={c.id}
                   onClick={() => {
@@ -248,7 +291,12 @@ export default function BookingModal() {
                   }}
                   className="flex flex-col items-center gap-2 p-5 border border-outline-variant hover:border-primary hover:bg-primary/5 transition-all text-center"
                 >
-                  <span className="material-symbols-outlined text-primary text-[28px]">{c.icon}</span>
+                  <span
+                    className="material-symbols-outlined text-primary text-[28px] category-icon-glow"
+                    style={{ animationDelay: `${0.6 + i * 4.8}s` }}
+                  >
+                    {c.icon}
+                  </span>
                   <span className="font-body-sm text-on-surface">{c.name}</span>
                 </button>
               ))}
@@ -371,12 +419,13 @@ export default function BookingModal() {
             </div>
 
             <div className="space-y-2 pt-2 border-t border-outline-variant/50">
-              <label className="flex items-start gap-2 cursor-pointer">
+              <label className={`flex items-start gap-2 ${priorConsent?.datenschutz ? '' : 'cursor-pointer'}`}>
                 <input
                   type="checkbox"
                   checked={consentDatenschutz}
+                  disabled={priorConsent?.datenschutz}
                   onChange={(e) => setConsentDatenschutz(e.target.checked)}
-                  className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0"
+                  className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0 disabled:opacity-70"
                 />
                 <span className="font-body-sm text-secondary">
                   Ich stimme der{' '}
@@ -389,39 +438,44 @@ export default function BookingModal() {
                   >
                     Datenschutzerklärung
                   </a>{' '}
-                  zu. *
+                  zu. *{priorConsent?.datenschutz && <span className="text-primary"> — bereits erteilt</span>}
                 </span>
               </label>
-              <label className="flex items-start gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={consentBehandlung}
-                  onChange={(e) => setConsentBehandlung(e.target.checked)}
-                  className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0"
-                />
-                <span className="font-body-sm text-secondary">
-                  Ich habe die{' '}
-                  <a
-                    href={`/${locale}/behandlungseinwilligung`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary underline hover:no-underline"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Behandlungseinwilligung
-                  </a>{' '}
-                  gelesen und stimme der Behandlung zu. *
-                </span>
-              </label>
-              <label className="flex items-start gap-2 cursor-pointer">
+              {requiresBehandlung && (
+                <label className={`flex items-start gap-2 ${priorConsent?.behandlung ? '' : 'cursor-pointer'}`}>
+                  <input
+                    type="checkbox"
+                    checked={consentBehandlung}
+                    disabled={priorConsent?.behandlung}
+                    onChange={(e) => setConsentBehandlung(e.target.checked)}
+                    className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0 disabled:opacity-70"
+                  />
+                  <span className="font-body-sm text-secondary">
+                    Ich habe die{' '}
+                    <a
+                      href={`/${locale}/behandlungseinwilligung`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline hover:no-underline"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Behandlungseinwilligung
+                    </a>{' '}
+                    gelesen und stimme der Behandlung zu. *{priorConsent?.behandlung && <span className="text-primary"> — bereits erteilt</span>}
+                  </span>
+                </label>
+              )}
+              <label className={`flex items-start gap-2 ${priorConsent?.marketing ? '' : 'cursor-pointer'}`}>
                 <input
                   type="checkbox"
                   checked={consentMarketing}
+                  disabled={priorConsent?.marketing}
                   onChange={(e) => setConsentMarketing(e.target.checked)}
-                  className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0"
+                  className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0 disabled:opacity-70"
                 />
                 <span className="font-body-sm text-secondary">
                   Ich möchte per E-Mail über Angebote und Aktionen informiert werden (optional).
+                  {priorConsent?.marketing && <span className="text-primary"> — bereits erteilt</span>}
                 </span>
               </label>
             </div>
@@ -430,7 +484,7 @@ export default function BookingModal() {
 
             <button
               onClick={handleSubmit}
-              disabled={submitting || !time || dayClosed || !consentDatenschutz || !consentBehandlung}
+              disabled={submitting || !time || dayClosed || !consentDatenschutz || (requiresBehandlung && !consentBehandlung)}
               className="w-full bg-primary text-on-primary py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all disabled:opacity-60"
             >
               {submitting ? 'Wird gesendet…' : 'Termin anfragen'}
