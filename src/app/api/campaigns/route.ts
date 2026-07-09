@@ -15,19 +15,20 @@ export async function GET() {
     .select('campaign_id, status');
   if (recError) return NextResponse.json({ error: recError.message }, { status: 500 });
 
-  const counts = new Map<string, { total: number; sent: number; failed: number }>();
+  const counts = new Map<string, { total: number; sent: number; failed: number; pending: number }>();
   for (const r of recipients ?? []) {
-    const c = counts.get(r.campaign_id) ?? { total: 0, sent: 0, failed: 0 };
+    const c = counts.get(r.campaign_id) ?? { total: 0, sent: 0, failed: 0, pending: 0 };
     c.total += 1;
     if (r.status === 'sent') c.sent += 1;
     if (r.status === 'failed') c.failed += 1;
+    if (r.status === 'pending') c.pending += 1;
     counts.set(r.campaign_id, c);
   }
 
   const enriched = (campaigns ?? []).map((c) => ({
     ...c,
     targetCategoryName: c.target_category?.name ?? null,
-    recipientCounts: counts.get(c.id) ?? { total: 0, sent: 0, failed: 0 },
+    recipientCounts: counts.get(c.id) ?? { total: 0, sent: 0, failed: 0, pending: 0 },
   }));
 
   return NextResponse.json(enriched);

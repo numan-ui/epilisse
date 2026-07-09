@@ -1,10 +1,22 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
+import { useParams } from 'next/navigation';
 import { useBookingModal } from '@/context/BookingModalContext';
 import { useAdminCategories } from '@/hooks/useAdminCategories';
 import { useCategoryServices, parseDurationMin } from '@/hooks/useCategoryServices';
 
 type Step = 'category' | 'services' | 'details' | 'success';
+
+interface AvailabilitySlot {
+  time: string;
+  available: boolean;
+}
+
+interface AvailabilityResponse {
+  closed: boolean;
+  dayLabel: string;
+  slots: AvailabilitySlot[];
+}
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -59,6 +71,8 @@ function ServiceStep({
 export default function BookingModal() {
   const { isOpen, categoryId: preselectedCategory, close } = useBookingModal();
   const categories = useAdminCategories().filter((c) => c.visible);
+  const params = useParams();
+  const locale = (params?.locale as string) || 'de';
 
   const [step, setStep] = useState<Step>('category');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -67,12 +81,49 @@ export default function BookingModal() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [date, setDate] = useState(todayISO());
-  const [time, setTime] = useState('10:00');
+  const [time, setTime] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
+  const [consentDatenschutz, setConsentDatenschutz] = useState(false);
+  const [consentBehandlung, setConsentBehandlung] = useState(false);
+  const [consentMarketing, setConsentMarketing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
+  const [dayClosed, setDayClosed] = useState(false);
+  const [loadingSlots, setLoadingSlots] = useState(false);
 
   const services = useCategoryServices(selectedCategory ?? '');
+
+  const totalDurationMin = useMemo(() => {
+    const chosen = services.filter((s) => selectedServiceIds.has(s.id));
+    return chosen.reduce((sum, s) => sum + parseDurationMin(s.duration), 0) || 30;
+  }, [services, selectedServiceIds]);
+
+  useEffect(() => {
+    if (step !== 'details') return;
+    let cancelled = false;
+    setLoadingSlots(true);
+    fetch(`/api/availability?date=${date}&durationMin=${totalDurationMin}`)
+      .then((res) => res.json())
+      .then((data: AvailabilityResponse) => {
+        if (cancelled) return;
+        setDayClosed(data.closed);
+        setSlots(data.slots ?? []);
+        setTime((prev) => (prev && data.slots?.some((s) => s.time === prev && s.available) ? prev : null));
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setSlots([]);
+          setDayClosed(false);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingSlots(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [step, date, totalDurationMin]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -83,8 +134,13 @@ export default function BookingModal() {
     setEmail('');
     setPhone('');
     setDate(todayISO());
-    setTime('10:00');
+    setTime(null);
+    setSlots([]);
+    setDayClosed(false);
     setNotes('');
+    setConsentDatenschutz(false);
+    setConsentBehandlung(false);
+    setConsentMarketing(false);
     setError(null);
   }, [isOpen, preselectedCategory]);
 
@@ -114,8 +170,18 @@ export default function BookingModal() {
       setError('Bitte mindestens einen Service auswählen.');
       return;
     }
+    if (!time) {
+      setError('Bitte eine Uhrzeit auswählen.');
+      return;
+    }
+    if (!consentDatenschutz || !consentBehandlung) {
+      setError('Bitte bestätigen Sie die Datenschutz- und Behandlungshinweise.');
+      return;
+    }
     const chosen = services.filter((s) => selectedServiceIds.has(s.id));
-    const startsAt = new Date(`${date}T${time}:00`).toISOString();
+    // Stored literally (no local-timezone conversion) so it lines up with the
+    // salon's naive wall-clock business hours / availability calculation.
+    const startsAt = `${date}T${time}:00.000Z`;
 
     setSubmitting(true);
     try {
@@ -134,6 +200,9 @@ export default function BookingModal() {
           })),
           startsAt,
           notes,
+          consentDatenschutz,
+          consentBehandlung,
+          consentMarketing,
         }),
       });
       if (!res.ok) {
@@ -249,26 +318,47 @@ export default function BookingModal() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Datum</label>
-                <input
-                  type="date"
-                  min={todayISO()}
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-sm text-on-surface focus:border-primary focus:outline-none transition-all"
-                />
-              </div>
-              <div>
-                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Uhrzeit</label>
-                <input
-                  type="time"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-sm text-on-surface focus:border-primary focus:outline-none transition-all"
-                />
-              </div>
+            <div>
+              <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Datum</label>
+              <input
+                type="date"
+                min={todayISO()}
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full border-b border-outline-variant bg-transparent py-2 font-body-sm text-on-surface focus:border-primary focus:outline-none transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="font-label-caps text-[10px] text-outline uppercase block mb-2">Uhrzeit</label>
+              {loadingSlots && <p className="font-body-sm text-outline">Lädt…</p>}
+              {!loadingSlots && dayClosed && (
+                <p className="font-body-sm text-error">Studio an diesem Tag geschlossen — bitte anderes Datum wählen.</p>
+              )}
+              {!loadingSlots && !dayClosed && slots.length > 0 && slots.every((s) => !s.available) && (
+                <p className="font-body-sm text-error">Keine freien Termine an diesem Tag.</p>
+              )}
+              {!loadingSlots && !dayClosed && slots.some((s) => s.available) && (
+                <div className="grid grid-cols-4 gap-2">
+                  {slots.map((s) => (
+                    <button
+                      key={s.time}
+                      type="button"
+                      disabled={!s.available}
+                      onClick={() => setTime(s.time)}
+                      className={`py-2 text-center font-body-sm border transition-all ${
+                        time === s.time
+                          ? 'border-primary bg-primary text-on-primary'
+                          : s.available
+                            ? 'border-outline-variant text-on-surface hover:border-primary/40'
+                            : 'border-outline-variant text-outline opacity-40 cursor-not-allowed line-through'
+                      }`}
+                    >
+                      {s.time}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
               <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Notiz (optional)</label>
@@ -280,11 +370,67 @@ export default function BookingModal() {
               />
             </div>
 
+            <div className="space-y-2 pt-2 border-t border-outline-variant/50">
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consentDatenschutz}
+                  onChange={(e) => setConsentDatenschutz(e.target.checked)}
+                  className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0"
+                />
+                <span className="font-body-sm text-secondary">
+                  Ich stimme der{' '}
+                  <a
+                    href={`/${locale}/datenschutz`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline hover:no-underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Datenschutzerklärung
+                  </a>{' '}
+                  zu. *
+                </span>
+              </label>
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consentBehandlung}
+                  onChange={(e) => setConsentBehandlung(e.target.checked)}
+                  className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0"
+                />
+                <span className="font-body-sm text-secondary">
+                  Ich habe die{' '}
+                  <a
+                    href={`/${locale}/behandlungseinwilligung`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline hover:no-underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Behandlungseinwilligung
+                  </a>{' '}
+                  gelesen und stimme der Behandlung zu. *
+                </span>
+              </label>
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consentMarketing}
+                  onChange={(e) => setConsentMarketing(e.target.checked)}
+                  className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0"
+                />
+                <span className="font-body-sm text-secondary">
+                  Ich möchte per E-Mail über Angebote und Aktionen informiert werden (optional).
+                </span>
+              </label>
+            </div>
+
             {error && <p className="font-body-sm text-error">{error}</p>}
 
             <button
               onClick={handleSubmit}
-              disabled={submitting}
+              disabled={submitting || !time || dayClosed || !consentDatenschutz || !consentBehandlung}
               className="w-full bg-primary text-on-primary py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all disabled:opacity-60"
             >
               {submitting ? 'Wird gesendet…' : 'Termin anfragen'}

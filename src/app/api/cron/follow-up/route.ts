@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
 import { followUpEmail, sendEmail } from '@/lib/email/resend';
+import { getRemainingEmailQuota, logEmailSent } from '@/lib/emailQuota';
 
 const MS_PER_DAY = 86_400_000;
 
@@ -19,6 +20,7 @@ export async function GET(request: Request) {
 
   let sent = 0;
   let skipped = 0;
+  let quotaRemaining = await getRemainingEmailQuota(supabase);
   const now = Date.now();
 
   for (const setting of settings ?? []) {
@@ -32,6 +34,8 @@ export async function GET(request: Request) {
     }
 
     for (const candidate of candidates ?? []) {
+      if (quotaRemaining <= 0) { skipped++; continue; }
+
       const daysSince = (now - new Date(candidate.starts_at).getTime()) / MS_PER_DAY;
       if (daysSince < cutoffDays) { skipped++; continue; }
 
@@ -46,10 +50,11 @@ export async function GET(request: Request) {
 
       const { data: customer } = await supabase
         .from('customers')
-        .select('name, email')
+        .select('name, email, consent_marketing_at')
         .eq('id', candidate.customer_id)
         .single();
       if (!customer?.email) { skipped++; continue; }
+      if (!customer?.consent_marketing_at) { skipped++; continue; }
 
       const content = followUpEmail({
         customerName: customer.name,
@@ -63,6 +68,8 @@ export async function GET(request: Request) {
           category_id: setting.category_id,
           appointment_id: candidate.appointment_id,
         });
+        await logEmailSent(supabase, 'follow_up');
+        quotaRemaining--;
         sent++;
       } catch {
         skipped++;

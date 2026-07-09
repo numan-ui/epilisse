@@ -694,7 +694,7 @@ export default function HomePage() {
             <ul className="flex flex-col gap-4 font-body-sm text-body-sm text-secondary">
               {[
                 { key: "footer.impressum", href: "#" },
-                { key: "footer.datenschutz", href: "#" },
+                { key: "footer.datenschutz", href: `/${locale}/datenschutz` },
                 { key: "footer.agb", href: "#" },
                 { key: "footer.karriere", href: "#" },
               ].map((item) => (

@@ -21,15 +21,21 @@ export interface Database {
         Row: {
           id: string; name: string; phone: string | null; email: string | null;
           since: string; tags: string[]; notes: string;
+          consent_datenschutz_at: string | null; consent_behandlung_at: string | null;
+          consent_marketing_at: string | null;
           created_at: string; updated_at: string;
         };
         Insert: {
           id?: string; name: string; phone?: string | null; email?: string | null;
           since?: string; tags?: string[]; notes?: string;
+          consent_datenschutz_at?: string | null; consent_behandlung_at?: string | null;
+          consent_marketing_at?: string | null;
         };
         Update: Partial<{
           name: string; phone: string | null; email: string | null;
           since: string; tags: string[]; notes: string; updated_at: string;
+          consent_datenschutz_at: string | null; consent_behandlung_at: string | null;
+          consent_marketing_at: string | null;
         }>;
         Relationships: [];
       };
@@ -38,17 +44,19 @@ export interface Database {
           id: string; customer_id: string; category_id: string; service_name: string;
           price: number | null;
           starts_at: string; duration_min: number; status: AppointmentStatus; notes: string;
+          reminder_sent: boolean;
           created_at: string; updated_at: string;
         };
         Insert: {
           id?: string; customer_id: string; category_id: string; service_name: string;
           price?: number | null;
           starts_at: string; duration_min?: number; status?: AppointmentStatus; notes?: string;
+          reminder_sent?: boolean;
         };
         Update: Partial<{
           customer_id: string; category_id: string; service_name: string; price: number | null;
           starts_at: string; duration_min: number; status: AppointmentStatus; notes: string;
-          updated_at: string;
+          reminder_sent: boolean; updated_at: string;
         }>;
         Relationships: [
           {
@@ -135,6 +143,30 @@ export interface Database {
             referencedColumns: ['id'];
           },
         ];
+      };
+      blocked_slots: {
+        Row: { id: string; starts_at: string; duration_min: number; reason: string; created_at: string };
+        Insert: { id?: string; starts_at: string; duration_min?: number; reason?: string };
+        Update: never;
+        Relationships: [];
+      };
+      email_sends: {
+        Row: { id: string; kind: 'follow_up' | 'appointment_reminder' | 'campaign' | 'appointment_confirmation' | 'consent_request'; sent_at: string };
+        Insert: { id?: string; kind: 'follow_up' | 'appointment_reminder' | 'campaign' | 'appointment_confirmation' | 'consent_request'; sent_at?: string };
+        Update: never;
+        Relationships: [];
+      };
+      business_hours: {
+        Row: {
+          weekday: number; day_label: string; open_time: string; close_time: string;
+          closed: boolean; updated_at: string;
+        };
+        Insert: {
+          weekday: number; day_label: string; open_time: string; close_time: string;
+          closed?: boolean;
+        };
+        Update: Partial<{ day_label: string; open_time: string; close_time: string; closed: boolean; updated_at: string }>;
+        Relationships: [];
       };
       follow_up_reminders: {
         Row: {

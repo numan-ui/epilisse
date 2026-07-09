@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
 import { campaignEmail, sendEmail } from '@/lib/email/resend';
+import { getRemainingEmailQuota, logEmailSent } from '@/lib/emailQuota';
 
 // Resolves the campaign's audience into campaign_recipients rows (if not
 // already materialized at creation time, i.e. target_type is 'all'/'category'),
@@ -21,7 +22,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   // Materialize the audience for 'all' / 'category' targets. For 'customers',
   // rows were already inserted at creation time (POST /api/campaigns).
   if (campaign.target_type !== 'customers') {
-    let query = supabase.from('customers').select('id').not('email', 'is', null);
+    let query = supabase.from('customers').select('id').not('email', 'is', null).not('consent_marketing_at', 'is', null);
     if (campaign.target_type === 'category') {
       const { data: apts } = await supabase
         .from('appointments')
@@ -45,7 +46,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
 
   const { data: recipients, error: recError } = await supabase
     .from('campaign_recipients')
-    .select('*, customers(email)')
+    .select('*, customers(email, consent_marketing_at)')
     .eq('campaign_id', id)
     .eq('status', 'pending');
   if (recError) return NextResponse.json({ error: recError.message }, { status: 500 });
@@ -58,16 +59,28 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
 
   let sent = 0;
   let failed = 0;
+  let quotaExhausted = false;
+  let quotaRemaining = await getRemainingEmailQuota(supabase);
+
   for (const r of recipients ?? []) {
+    if (quotaRemaining <= 0) { quotaExhausted = true; break; }
+
     const email = r.customers?.email;
     if (!email) {
       await supabase.from('campaign_recipients').update({ status: 'failed', error: 'Keine E-Mail-Adresse' }).eq('id', r.id);
       failed++;
       continue;
     }
+    if (!r.customers?.consent_marketing_at) {
+      await supabase.from('campaign_recipients').update({ status: 'failed', error: 'Kein Marketing-Einverständnis' }).eq('id', r.id);
+      failed++;
+      continue;
+    }
     try {
       await sendEmail(email, content);
       await supabase.from('campaign_recipients').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', r.id);
+      await logEmailSent(supabase, 'campaign');
+      quotaRemaining--;
       sent++;
     } catch (err) {
       await supabase.from('campaign_recipients').update({ status: 'failed', error: (err as Error).message }).eq('id', r.id);
@@ -75,7 +88,11 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     }
   }
 
-  await supabase.from('campaigns').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', id);
+  // Recipients left untouched here keep status 'pending' — not marked
+  // 'failed' — so a re-send tomorrow (once quota resets) picks them up.
+  if (!quotaExhausted) {
+    await supabase.from('campaigns').update({ status: 'sent', sent_at: new Date().toISOString() }).eq('id', id);
+  }
 
-  return NextResponse.json({ sent, failed });
+  return NextResponse.json({ sent, failed, quotaExhausted });
 }

@@ -15,7 +15,21 @@ type Customer = {
   notes: string;
 };
 
+type CustomerAppointment = {
+  id: string;
+  service_name: string;
+  price: number | null;
+  starts_at: string;
+  status: 'confirmed' | 'pending' | 'cancelled';
+};
+
 const ALL_TAGS = ['Alle', 'VIP', 'Stammkundin', 'Neukundin'];
+
+const APPT_STATUS: Record<CustomerAppointment['status'], { label: string; badge: string }> = {
+  confirmed: { label: 'Gekommen',        badge: 'bg-primary/10 text-primary' },
+  pending:   { label: 'Ausstehend',      badge: 'bg-amber-50 text-amber-700' },
+  cancelled: { label: 'Nicht erschienen',badge: 'bg-error-container text-error' },
+};
 
 const formatMoney = (n: number) =>
   n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '€';
@@ -32,6 +46,8 @@ export default function KundenPage() {
   const [sortBy, setSortBy]       = useState<'name' | 'visits' | 'spent'>('name');
   const [notesDraft, setNotesDraft] = useState('');
   const [newCustomer, setNewCustomer] = useState({ name: '', phone: '', email: '', tag: 'Neukundin', notes: '' });
+  const [history, setHistory] = useState<CustomerAppointment[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const loadCustomers = useCallback(() => {
     setLoading(true);
@@ -46,6 +62,15 @@ export default function KundenPage() {
   const selected = customers.find((c) => c.id === selectedId) ?? null;
 
   useEffect(() => { setNotesDraft(selected?.notes ?? ''); }, [selected?.id]);
+
+  useEffect(() => {
+    if (!selected) { setHistory([]); return; }
+    setHistoryLoading(true);
+    fetch(`/api/customers/${selected.id}`)
+      .then((r) => r.json())
+      .then((data) => setHistory(data.appointments ?? []))
+      .finally(() => setHistoryLoading(false));
+  }, [selected?.id]);
 
   const filtered = useMemo(() => {
     let list = customers;
@@ -311,13 +336,36 @@ export default function KundenPage() {
                 ))}
               </div>
 
-              {/* Last service */}
-              <div className="bg-surface-container-lowest border border-outline-variant p-5 space-y-2">
-                <h4 className="font-label-caps text-[10px] text-outline uppercase">Letzter Service</h4>
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-[18px]">content_cut</span>
-                  <span className="font-body-md text-on-surface">{selected.lastService ?? 'Noch kein Besuch'}</span>
-                </div>
+              {/* Appointment history */}
+              <div className="bg-surface-container-lowest border border-outline-variant p-5 space-y-3">
+                <h4 className="font-label-caps text-[10px] text-outline uppercase">Terminverlauf</h4>
+                {historyLoading && (
+                  <p className="font-body-sm text-outline">Lädt…</p>
+                )}
+                {!historyLoading && history.length === 0 && (
+                  <p className="font-body-sm text-outline">Noch kein Termin.</p>
+                )}
+                {!historyLoading && history.length > 0 && (
+                  <div className="divide-y divide-outline-variant/20">
+                    {history.map((a) => {
+                      const st = APPT_STATUS[a.status];
+                      return (
+                        <div key={a.id} className="flex items-center justify-between py-2.5 gap-3">
+                          <div className="min-w-0">
+                            <p className="font-body-sm text-on-surface truncate">{a.service_name}</p>
+                            <p className="font-label-caps text-[9px] text-outline">{formatDate(a.starts_at)}</p>
+                          </div>
+                          <div className="flex items-center gap-3 shrink-0">
+                            <span className={`font-label-caps text-[9px] px-2 py-1 uppercase ${st.badge}`}>{st.label}</span>
+                            <span className="font-body-sm text-on-surface w-16 text-right">
+                              {a.status === 'confirmed' ? formatMoney(a.price ?? 0) : '—'}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Notes */}

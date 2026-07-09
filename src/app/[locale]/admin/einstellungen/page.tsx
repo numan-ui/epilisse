@@ -15,17 +15,48 @@ type FollowUpSetting = {
   reminderLeadDays: number;
 };
 
+type BusinessHourRow = {
+  weekday: number;
+  dayLabel: string;
+  open: string;
+  close: string;
+  closed: boolean;
+};
+
 export default function EinstellungenPage() {
   const { settings, updateSetting, updateSettingHours } = useAdminData();
   const [active, setActive] = useState<Section>('Studio-Informationen');
   const [saved, setSaved] = useState(false);
   const [followUp, setFollowUp] = useState<FollowUpSetting[]>([]);
+  const [businessHours, setBusinessHours] = useState<BusinessHourRow[]>([]);
 
   const loadFollowUp = useCallback(() => {
     fetch('/api/follow-up-settings').then(r => r.json()).then(setFollowUp);
   }, []);
 
+  const loadBusinessHours = useCallback(() => {
+    fetch('/api/business-hours').then(r => r.json()).then(setBusinessHours);
+  }, []);
+
   useEffect(() => { loadFollowUp(); }, [loadFollowUp]);
+  useEffect(() => { loadBusinessHours(); }, [loadBusinessHours]);
+
+  const patchBusinessHours = async (row: BusinessHourRow, patch: Partial<Pick<BusinessHourRow, 'open' | 'close' | 'closed'>>) => {
+    const next = businessHours.map(h => h.weekday === row.weekday ? { ...h, ...patch } : h);
+    setBusinessHours(next);
+    await fetch('/api/business-hours', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ weekday: row.weekday, ...patch }),
+    });
+    // Keep the localStorage copy (used for the public Kontakt section display) in sync.
+    const localIndex = settings.hours.findIndex(d => d.day === row.dayLabel);
+    if (localIndex !== -1) {
+      for (const [field, value] of Object.entries(patch)) {
+        updateSettingHours(localIndex, field as 'open' | 'close' | 'closed', value as string | boolean);
+      }
+    }
+  };
 
   const patchFollowUp = async (categoryId: string, patch: Partial<FollowUpSetting>) => {
     const next = followUp.map(f => f.categoryId === categoryId ? { ...f, ...patch } : f);
@@ -126,15 +157,15 @@ export default function EinstellungenPage() {
                 <p className="font-body-sm text-on-surface-variant opacity-70">Werden auf der Website im Kontakt-Bereich angezeigt.</p>
               </div>
               <div className="bg-surface-container-lowest border border-outline-variant divide-y divide-outline-variant/30">
-                {settings.hours.map((d, i) => (
-                  <div key={d.day} className={`flex items-center gap-4 px-6 py-4 ${d.closed ? 'opacity-50' : ''}`}>
-                    <span className="font-body-md text-on-surface w-28 shrink-0">{d.day}</span>
+                {[...businessHours].sort((a, b) => ((a.weekday + 6) % 7) - ((b.weekday + 6) % 7)).map((d) => (
+                  <div key={d.weekday} className={`flex items-center gap-4 px-6 py-4 ${d.closed ? 'opacity-50' : ''}`}>
+                    <span className="font-body-md text-on-surface w-28 shrink-0">{d.dayLabel}</span>
                     <input
                       type="time"
                       className="border border-outline-variant px-2 py-1 font-body-sm text-on-surface bg-transparent focus:border-primary focus:outline-none disabled:opacity-40"
                       value={d.open}
                       disabled={d.closed}
-                      onChange={e => updateSettingHours(i, 'open', e.target.value)}
+                      onChange={e => patchBusinessHours(d, { open: e.target.value })}
                     />
                     <span className="text-outline font-body-sm">–</span>
                     <input
@@ -142,12 +173,12 @@ export default function EinstellungenPage() {
                       className="border border-outline-variant px-2 py-1 font-body-sm text-on-surface bg-transparent focus:border-primary focus:outline-none disabled:opacity-40"
                       value={d.close}
                       disabled={d.closed}
-                      onChange={e => updateSettingHours(i, 'close', e.target.value)}
+                      onChange={e => patchBusinessHours(d, { close: e.target.value })}
                     />
                     <div className="ml-auto flex items-center gap-2">
                       <span className="font-body-sm text-outline text-[12px]">{d.closed ? 'Geschlossen' : 'Geöffnet'}</span>
                       <button
-                        onClick={() => updateSettingHours(i, 'closed', !d.closed)}
+                        onClick={() => patchBusinessHours(d, { closed: !d.closed })}
                         className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors shrink-0 ${d.closed ? 'bg-outline-variant' : 'bg-primary'}`}
                       >
                         <div className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-transform ${d.closed ? 'translate-x-0' : 'translate-x-5'}`} />

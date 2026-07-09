@@ -35,7 +35,13 @@ export function CustomerPicker({
 
   const toggle = (id: string) => {
     if (multiple) {
-      onChange(value.includes(id) ? value.filter(v => v !== id) : [...value, id]);
+      if (value.includes(id)) {
+        onChange(value.filter(v => v !== id));
+      } else {
+        onChange([...value, id]);
+        setOpen(false);
+        setQuery('');
+      }
     } else {
       onChange([id]);
       setOpen(false);

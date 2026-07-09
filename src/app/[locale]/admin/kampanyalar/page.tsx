@@ -15,7 +15,7 @@ type Campaign = {
   status: 'draft' | 'sending' | 'sent' | 'failed';
   created_at: string;
   sent_at: string | null;
-  recipientCounts: { total: number; sent: number; failed: number };
+  recipientCounts: { total: number; sent: number; failed: number; pending: number };
 };
 
 type Category = { id: string; name: string };
@@ -86,6 +86,16 @@ export default function KampanyalarPage() {
     }
   };
 
+  const continueSending = async (id: string) => {
+    setSending(true);
+    try {
+      await fetch(`/api/campaigns/${id}/send`, { method: 'POST' });
+      loadCampaigns();
+    } finally {
+      setSending(false);
+    }
+  };
+
   const audienceSummary =
     draft.targetType === 'all' ? `alle ${customers.length} Kundinnen` :
     draft.targetType === 'category' ? `Kundinnen der Kategorie "${categories.find(c => c.id === draft.targetCategoryId)?.name ?? ''}"` :
@@ -128,17 +138,35 @@ export default function KampanyalarPage() {
               <span className={`font-label-caps text-[10px] px-2 py-0.5 ${
                 c.status === 'sent' ? 'bg-primary/10 text-primary' : 'bg-surface-container-high text-outline'
               }`}>
-                {c.status === 'sent' ? 'Gesendet' : c.status === 'sending' ? 'Wird gesendet…' : 'Entwurf'}
+                {c.status === 'sent' ? 'Gesendet' : c.status === 'sending' ? 'Tageslimit erreicht' : 'Entwurf'}
               </span>
             </div>
             <p className="font-body-sm text-on-surface-variant">{c.message}</p>
             <div className="flex items-center gap-4 pt-1 font-label-caps text-[10px] text-outline">
               <span>{audienceLabel(c)}</span>
-              {c.status === 'sent' && (
-                <span>{c.recipientCounts.sent} gesendet{c.recipientCounts.failed > 0 ? `, ${c.recipientCounts.failed} fehlgeschlagen` : ''}</span>
+              {(c.status === 'sent' || c.status === 'sending') && (
+                <span>
+                  {c.recipientCounts.sent} gesendet
+                  {c.recipientCounts.failed > 0 ? `, ${c.recipientCounts.failed} fehlgeschlagen` : ''}
+                  {c.recipientCounts.pending > 0 ? `, ${c.recipientCounts.pending} ausstehend` : ''}
+                </span>
               )}
               {c.sent_at && <span>{new Date(c.sent_at).toLocaleString('de-DE')}</span>}
             </div>
+            {c.status === 'sending' && c.recipientCounts.pending > 0 && (
+              <div className="flex items-center justify-between bg-amber-50 border border-amber-200 px-3 py-2">
+                <span className="font-body-sm text-amber-700">
+                  Tägliches Mail-Limit erreicht — {c.recipientCounts.pending} Kundinnen warten noch.
+                </span>
+                <button
+                  onClick={() => continueSending(c.id)}
+                  disabled={sending}
+                  className="font-label-caps text-[10px] bg-primary text-on-primary px-3 py-1.5 hover:brightness-110 transition-all disabled:opacity-50"
+                >
+                  Fortsetzen
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

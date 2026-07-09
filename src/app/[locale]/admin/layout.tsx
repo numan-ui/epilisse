@@ -50,10 +50,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         <div className="p-6 border-t border-outline-variant">
-          <button className="w-full bg-primary text-on-primary py-3 px-4 flex items-center justify-center gap-2 rounded hover:brightness-90 transition-all active:scale-95 font-label-caps text-label-caps uppercase">
+          <Link
+            href={`/${locale}/admin/termine`}
+            className="w-full bg-primary text-on-primary py-3 px-4 flex items-center justify-center gap-2 rounded hover:brightness-90 transition-all active:scale-95 font-label-caps text-label-caps uppercase"
+          >
             <span className="material-symbols-outlined text-[20px]">add</span>
             Neuer Termin
-          </button>
+          </Link>
         </div>
       </aside>
 
