@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import ServicePageTemplate from '@/components/ServicePageTemplate';
 import { useAdminServices } from '@/hooks/useAdminServices';
 import { useAdminPageContent } from '@/hooks/useAdminPageContent';
-import { useAdminCampaigns } from '@/hooks/useAdminCampaigns';
+import { useAdminCampaigns, resolveCampaigns } from '@/hooks/useAdminCampaigns';
 import { useAdminCategories } from '@/hooks/useAdminCategories';
 import { INIT_PAGE_CONTENT } from '@/app/[locale]/admin/behandlungen/data';
 import { Link } from '@/i18n/navigation';
@@ -64,9 +64,9 @@ export default function DynamicCategoryPage() {
     <ServicePageTemplate
       locale={locale}
       categoryId={slug}
+      categoryImage={category.image}
       {...pc}
-      {...(adminCamps.campaign1 ? { campaign1: adminCamps.campaign1 } : {})}
-      {...(adminCamps.campaign2 ? { campaign2: adminCamps.campaign2 } : {})}
+      campaigns={resolveCampaigns(pc, adminCamps)}
       pricingLabel="Preise & Services"
       pricingTitle={`${category.name} Behandlungen`}
       pricingItems={pricingItems}

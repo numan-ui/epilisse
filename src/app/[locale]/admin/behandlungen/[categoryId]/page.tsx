@@ -1,17 +1,18 @@
 'use client';
 import { useState, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { PREVIEW_GRADIENT, FRONTEND_SLUG, type Service, type Campaign, type PageBanner } from '../data';
+import { PREVIEW_GRADIENT, FRONTEND_SLUG, type Service, type Campaign, type PageBanner, type ImagePosition } from '../data';
 import { useAdminData } from '../AdminDataContext';
 
 const EMPTY_SERVICE: Omit<Service, 'id'> = { name: '', price: '', duration: '', active: true };
-const EMPTY_CAMPAIGN: Omit<Campaign, 'id'> = { label: '', title: '', desc: '', price: '', oldPrice: '', cta: 'JETZT BUCHEN', icon: 'auto_fix_high', image: '', active: true };
+const EMPTY_CAMPAIGN: Omit<Campaign, 'id'> = { label: '', title: '', desc: '', price: '', oldPrice: '', cta: 'JETZT BUCHEN', icon: 'auto_fix_high', image: '', imagePosition: 'top', active: true };
 
 const BANNER_ICONS = ['auto_awesome', 'spa', 'diamond', 'loyalty', 'favorite', 'face_retouching_natural', 'health_and_beauty', 'self_improvement', 'fitness_center', 'card_membership', 'auto_fix_high', 'star'];
 
 export default function CategoryDetailPage() {
   const params    = useParams();
+  const router    = useRouter();
   const locale    = (params?.locale as string) || 'de';
   const catId     = params?.categoryId as string;
 
@@ -20,7 +21,7 @@ export default function CategoryDetailPage() {
     updateService: ctxUpdateService, deleteService: ctxDeleteService, addService: ctxAddService,
     updateCampaign: ctxUpdateCampaign, deleteCampaign: ctxDeleteCampaign, addCampaign: ctxAddCampaign,
     updatePageField, updatePageParagraph, updatePageBenefit, addPageBenefit, removePageBenefit, updatePageBanner,
-    categories, updateCategory,
+    categories, updateCategory, deleteCategory,
   } = useAdminData();
 
   const category = categories.find((c) => c.id === catId);
@@ -30,6 +31,7 @@ export default function CategoryDetailPage() {
   const pc         = allPageContent[catId];
 
   const [saved, setSaved]         = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [addSvcOpen, setAddSvcOpen] = useState(false);
   const [addCmpOpen, setAddCmpOpen] = useState(false);
   const [newSvc, setNewSvc]       = useState(EMPTY_SERVICE);
@@ -64,6 +66,12 @@ export default function CategoryDetailPage() {
   const handleSave = () => {
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleDeleteCategory = () => {
+    if (!confirmDelete) { setConfirmDelete(true); return; }
+    deleteCategory(catId);
+    router.push(`/${locale}/admin/behandlungen`);
   };
 
   if (!category) {
@@ -119,6 +127,34 @@ export default function CategoryDetailPage() {
               Vorschau
             </a>
           )}
+          {catId.startsWith('cat-') && (
+            confirmDelete ? (
+              <div className="flex items-center gap-2">
+                <span className="font-label-caps text-[11px] text-error">Wirklich löschen?</span>
+                <button
+                  onClick={handleDeleteCategory}
+                  className="flex items-center gap-1.5 py-2.5 px-4 font-label-caps text-label-caps bg-error text-white hover:brightness-110 transition-all"
+                >
+                  Ja, löschen
+                </button>
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  className="py-2.5 px-4 font-label-caps text-label-caps border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all"
+                >
+                  Abbrechen
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={handleDeleteCategory}
+                className="flex items-center gap-1.5 py-2.5 px-4 font-label-caps text-label-caps border border-outline-variant text-on-surface-variant hover:border-error hover:text-error transition-all"
+                title="Kategorie löschen"
+              >
+                <span className="material-symbols-outlined text-[16px]">delete_outline</span>
+                Löschen
+              </button>
+            )
+          )}
           <button
             onClick={handleSave}
             className={`flex items-center gap-2 py-2.5 px-5 font-label-caps text-label-caps transition-all ${
@@ -132,10 +168,9 @@ export default function CategoryDetailPage() {
       </header>
 
       <div className="flex-1 overflow-y-auto p-8 space-y-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
 
-          {/* ── Service List (col-span-2) ──────────────────── */}
-          <section className="lg:col-span-2 space-y-0 bg-white border border-outline-variant shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+          {/* ── Service List ──────────────────── */}
+          <section className="space-y-0 bg-white border border-outline-variant shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
             <div className="flex justify-between items-center p-6 border-b border-outline-variant/40">
               <div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">Services</h3>
@@ -277,10 +312,7 @@ export default function CategoryDetailPage() {
             )}
           </section>
 
-          {/* ── Right: Campaigns + Image ───────────────────── */}
-          <div className="space-y-6">
-
-            {/* Campaigns */}
+            {/* Campaigns — full-width, spacious grid below the services */}
             <section className="bg-surface-container-lowest border border-outline-variant shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
               <div className="flex items-center justify-between p-6 border-b border-outline-variant/40">
                 <div className="flex items-center gap-2">
@@ -295,15 +327,32 @@ export default function CategoryDetailPage() {
                 </button>
               </div>
 
-              <div className="divide-y divide-outline-variant/20">
+              <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
                 {campaigns.length === 0 && (
-                  <p className="py-10 text-center font-body-sm text-outline opacity-60">
+                  <p className="md:col-span-2 py-10 text-center font-body-sm text-outline opacity-60">
                     Noch keine Kampagnen.
                   </p>
                 )}
-                {campaigns.map((cmp) => (
-                  <div key={cmp.id} className={`p-5 space-y-3 relative group transition-opacity ${!cmp.active ? 'opacity-40' : ''}`}>
-                    <div className="absolute top-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                {(() => {
+                  const activeIds = campaigns.filter(c => c.active).map(c => c.id);
+                  return campaigns.map((cmp) => {
+                    const activeSlot = cmp.active ? activeIds.indexOf(cmp.id) : -1;
+                    const slotLabel =
+                      !cmp.active ? null :
+                      activeSlot === 0 ? 'Banner 1' :
+                      activeSlot === 1 ? 'Banner 2' :
+                      'Kein Banner-Platz (nur Liste)';
+                    return (
+                  <div key={cmp.id} className={`bg-white border border-outline-variant/60 shadow-[0_1px_6px_rgba(0,0,0,0.05)] p-5 space-y-3 relative group transition-opacity ${!cmp.active ? 'opacity-40' : ''}`}>
+                    <div className="flex items-center justify-between">
+                      {slotLabel && (
+                        <span className={`font-label-caps text-[9px] px-2 py-0.5 ${
+                          activeSlot < 2 ? 'bg-primary/10 text-primary' : 'bg-outline-variant/20 text-outline'
+                        }`}>
+                          {slotLabel}
+                        </span>
+                      )}
+                      <div className="flex items-center gap-2 ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => updateCampaign(cmp.id, 'active', !cmp.active)}
                         className={`relative w-8 h-4 rounded-full transition-colors shrink-0 ${cmp.active ? 'bg-primary' : 'bg-outline-variant'}`}
@@ -319,6 +368,7 @@ export default function CategoryDetailPage() {
                       >
                         <span className="material-symbols-outlined text-[18px]">delete_outline</span>
                       </button>
+                      </div>
                     </div>
                     <input
                       className="font-label-caps text-[10px] text-primary bg-transparent border-none focus:outline-none w-full"
@@ -377,12 +427,16 @@ export default function CategoryDetailPage() {
                     <ImageUpload
                       value={cmp.image}
                       onChange={v => updateCampaign(cmp.id, 'image', v)}
+                      position={cmp.imagePosition}
+                      onPositionChange={p => updateCampaign(cmp.id, 'imagePosition', p)}
                     />
                   </div>
-                ))}
+                    );
+                  });
+                })()}
 
                 {addCmpOpen && (
-                  <div className="p-5 bg-primary/5 space-y-3">
+                  <div className="md:col-span-2 p-5 bg-primary/5 space-y-3">
                     <input
                       className="font-label-caps text-[10px] text-primary bg-transparent border-b border-primary/40 focus:outline-none w-full placeholder:text-outline"
                       value={newCmp.label}
@@ -453,9 +507,31 @@ export default function CategoryDetailPage() {
               </div>
             </section>
 
+            {/* Category details — name & the short hover-description shown on the landing page card */}
+            <section className="bg-surface-container-lowest border border-outline-variant p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)] space-y-4">
+              <span className="font-label-caps text-[10px] text-outline block">KATEGORIE-DETAILS</span>
+              <div>
+                <label className="font-label-caps text-[9px] text-outline uppercase tracking-wider block mb-1">Name</label>
+                <input
+                  className="w-full bg-transparent border-b border-outline-variant/50 focus:border-primary focus:outline-none font-headline-sm text-[15px] text-on-surface py-1 transition-colors"
+                  value={category.name}
+                  onChange={e => updateCategory(catId, 'name', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="font-label-caps text-[9px] text-outline uppercase tracking-wider block mb-1">Kurzbeschreibung (Hover-Text auf der Karte)</label>
+                <input
+                  className="w-full bg-transparent border-b border-outline-variant/50 focus:border-primary focus:outline-none font-body-sm text-[13px] text-on-surface py-1 transition-colors"
+                  value={category.desc}
+                  onChange={e => updateCategory(catId, 'desc', e.target.value)}
+                />
+              </div>
+            </section>
+
             {/* Category image (used for the tile on the landing page) */}
             <section className="bg-surface-container-lowest border border-outline-variant p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
               <span className="font-label-caps text-[10px] text-outline mb-3 block">KATEGORIE-BILD (FRONTEND)</span>
+              <div className="max-w-xs">
               {category.image ? (
                 <div className="relative group cursor-pointer" onClick={() => catImgRef.current?.click()}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -500,9 +576,8 @@ export default function CategoryDetailPage() {
                 }}
               />
               <p className="font-body-sm text-[12px] italic text-outline mt-3">Ohne eigenes Bild wird das Standardfoto verwendet.</p>
+              </div>
             </section>
-          </div>
-        </div>
 
         {/* ── Seiteninhalt ─────────────────────────────────── */}
         {pc && (
@@ -763,7 +838,18 @@ function Field({ label, children, className = '' }: { label: string; children: R
   );
 }
 
-function ImageUpload({ value, onChange, className }: { value: string; onChange: (v: string) => void; className?: string }) {
+const POSITION_OPTIONS: { value: ImagePosition; label: string; icon: string }[] = [
+  { value: 'top',    label: 'Oben',  icon: 'vertical_align_top' },
+  { value: 'center', label: 'Mitte', icon: 'vertical_align_center' },
+  { value: 'bottom', label: 'Unten', icon: 'vertical_align_bottom' },
+];
+
+function ImageUpload({
+  value, onChange, className, position, onPositionChange,
+}: {
+  value: string; onChange: (v: string) => void; className?: string;
+  position?: ImagePosition; onPositionChange?: (p: ImagePosition) => void;
+}) {
   const ref = useRef<HTMLInputElement>(null);
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -797,6 +883,26 @@ function ImageUpload({ value, onChange, className }: { value: string; onChange: 
           <span className="material-symbols-outlined text-[20px] text-outline group-hover:text-primary transition-colors">cloud_upload</span>
           <span className="font-label-caps text-[10px] text-outline group-hover:text-primary transition-colors">Bild hochladen</span>
         </button>
+      )}
+      {value && onPositionChange && (
+        <div className="flex gap-1">
+          {POSITION_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => onPositionChange(opt.value)}
+              title={`Bildausschnitt: ${opt.label}`}
+              className={`flex-1 flex items-center justify-center gap-1 py-1 font-label-caps text-[9px] border transition-colors ${
+                (position ?? 'top') === opt.value
+                  ? 'border-primary text-primary bg-primary/5'
+                  : 'border-outline-variant/40 text-outline hover:border-primary hover:text-primary'
+              }`}
+            >
+              <span className="material-symbols-outlined text-[13px]">{opt.icon}</span>
+              {opt.label}
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );

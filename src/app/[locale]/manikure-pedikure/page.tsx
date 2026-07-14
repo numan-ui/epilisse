@@ -2,7 +2,8 @@
 import ServicePageTemplate from "@/components/ServicePageTemplate";
 import { useAdminServices } from "@/hooks/useAdminServices";
 import { useAdminPageContent } from "@/hooks/useAdminPageContent";
-import { useAdminCampaigns } from "@/hooks/useAdminCampaigns";
+import { useAdminCampaigns, resolveCampaigns } from "@/hooks/useAdminCampaigns";
+import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useParams } from "next/navigation";
 
 const FALLBACK_PRICING = [
@@ -21,14 +22,15 @@ export default function ManiPediPage() {
   const locale = (params?.locale as string) || 'de';
   const pageContent  = useAdminPageContent('mani');
   const adminCamps   = useAdminCampaigns('mani');
+  const categories   = useAdminCategories();
   const pricingItems = useAdminServices('mani', FALLBACK_PRICING);
   return (
     <ServicePageTemplate
       locale={locale}
       categoryId="mani"
+      categoryImage={categories.find(c => c.id === 'mani')?.image}
       {...pageContent}
-      {...(adminCamps.campaign1 ? { campaign1: adminCamps.campaign1 } : {})}
-      {...(adminCamps.campaign2 ? { campaign2: adminCamps.campaign2 } : {})}
+      campaigns={resolveCampaigns(pageContent, adminCamps)}
       pricingLabel="Preise & Services"
       pricingTitle="Investition in Ihre Perfektion"
       pricingItems={pricingItems}

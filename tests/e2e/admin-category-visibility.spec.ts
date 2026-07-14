@@ -13,7 +13,6 @@ const CATEGORY_ID_TO_SLUG: Record<string, string> = {
   body: 'body-contouring',
   inject: 'injectables',
   mani: 'manikure-pedikure',
-  andere: 'andere',
 };
 
 test('every category the admin marks "Sichtbar" has a link on the landing bento grid, and none marked "Verborgen" does', async ({ page }) => {

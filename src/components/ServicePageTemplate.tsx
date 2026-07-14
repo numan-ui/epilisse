@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useBookingModal } from "@/context/BookingModalContext";
+import { PREVIEW_GRADIENT } from "@/app/[locale]/admin/behandlungen/data";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 export interface PricingItem {
@@ -20,6 +21,9 @@ export interface Campaign {
   cta: string;
   icon: string;
   image: string;
+  imagePosition?: "top" | "center" | "bottom";
+  price?: string;
+  oldPrice?: string;
 }
 
 export interface ServicePageData {
@@ -34,13 +38,14 @@ export interface ServicePageData {
   pricingLabel: string;
   pricingTitle: string;
   pricingItems: PricingItem[];
-  campaign1: Campaign;
-  campaign2: Campaign;
+  campaigns: Campaign[];
 }
 
 interface Props extends ServicePageData {
   locale: string;
   categoryId: string;
+  /** The category tile photo (admin's Kategorie-Bild) — used as a 2nd, distinct fallback image so two banners without their own photo don't show the same picture twice. */
+  categoryImage?: string;
 }
 
 const LOCALES = [
@@ -49,18 +54,42 @@ const LOCALES = [
 ] as const;
 
 // ── Component ─────────────────────────────────────────────────────────────
-export default function ServicePageTemplate({ locale, categoryId, ...data }: Props) {
+export default function ServicePageTemplate({ locale, categoryId, categoryImage, ...data }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const settings = useAdminSettings();
   const lc = useAdminLandingContent();
   const booking = useBookingModal();
 
   const bookingCta = lc.navCta || "Termin Buchen";
+  const fallbackBg = PREVIEW_GRADIENT[categoryId] ?? "linear-gradient(135deg,#f6f3f2,#e5e2dc)";
+
+  // Only the first 2 campaigns get the full-width photo banner treatment; anything beyond
+  // that is shown as a smaller, image-free "Weitere Angebote" card further down the page.
+  const bigBanners = data.campaigns.slice(0, 2);
+  const moreOffers = data.campaigns.slice(2);
+
+  // Pool of every real photo already available anywhere for this category (hero image,
+  // category tile, any campaign's own uploaded photo) — a bannerless campaign borrows from
+  // this pool (cycling if it has to reuse one) so it never shows an empty-looking banner.
+  const imagePool = [data.heroImage, categoryImage, ...data.campaigns.map((c) => c.image)].filter(
+    (img): img is string => !!img
+  );
+  let fallbackIdx = 0;
+  const resolvedBanners = bigBanners.map((c) => {
+    let image = c.image;
+    let position: "top" | "center" | "bottom" = c.imagePosition ?? "top";
+    if (!image && imagePool.length > 0) {
+      image = imagePool[fallbackIdx % imagePool.length];
+      position = "top";
+      fallbackIdx++;
+    }
+    return { ...c, resolvedImage: image, resolvedPosition: position };
+  });
 
   const NAV_LINKS = [
-    { href: "/#behandlungen", label: lc.navBehandlungen || "Behandlungen" },
-    { href: "/#preise", label: lc.navPreise || "Preise" },
-    { href: "/#uber-uns", label: lc.navUeberUns || "Über Uns" },
+    { href: "/behandlungen", label: lc.navBehandlungen || "Behandlungen" },
+    { href: "/preise", label: lc.navPreise || "Preise" },
+    { href: "/ueber-uns", label: lc.navUeberUns || "Über Uns" },
     { href: "/#kontakt", label: lc.navKontakt || "Kontakt" },
   ];
 
@@ -78,7 +107,7 @@ export default function ServicePageTemplate({ locale, categoryId, ...data }: Pro
               <Link
                 key={item.href}
                 href={item.href}
-                className="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300"
+                className="font-label-caps text-label-caps font-semibold text-on-surface-variant hover:text-primary transition-colors duration-300"
               >
                 {item.label}
               </Link>
@@ -237,68 +266,126 @@ export default function ServicePageTemplate({ locale, categoryId, ...data }: Pro
         </section>
 
         {/* ── CAMPAIGN BANNERS ─────────────────────────────────────────── */}
-        <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop my-section-gap space-y-8">
-
-          {/* Campaign 1 — primary-container */}
-          <div className="relative overflow-hidden lux-shadow border border-outline-variant/30">
-            <div className="grid grid-cols-1 md:grid-cols-2">
-              <div className="p-12 md:p-20 bg-primary-container text-on-primary-container flex flex-col justify-center relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-10 opacity-10">
-                  <span className="material-symbols-outlined text-[180px]">{data.campaign1.icon}</span>
+        {resolvedBanners.length > 0 && (
+          <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop my-section-gap space-y-8">
+            {resolvedBanners.map((banner, i) => {
+              const imageLeft = i % 2 === 1; // alternate sides: 1st image-right, 2nd image-left, ...
+              const dark = i % 2 === 0;
+              const imageBlock = (
+                <div
+                  key={`img-${i}`}
+                  className="h-[380px] md:h-auto bg-cover"
+                  style={
+                    banner.resolvedImage
+                      ? { backgroundImage: `url('${banner.resolvedImage}')`, backgroundPosition: banner.resolvedPosition }
+                      : { background: fallbackBg }
+                  }
+                />
+              );
+              const textBlock = (
+                <div
+                  key={`text-${i}`}
+                  className={`p-12 md:p-20 flex flex-col justify-center relative overflow-hidden ${
+                    dark ? "bg-primary-container text-on-primary-container" : "bg-surface-container-low text-on-surface"
+                  }`}
+                >
+                  <div className="absolute top-0 right-0 p-10 opacity-10">
+                    <span className="material-symbols-outlined text-[180px]">{banner.icon}</span>
+                  </div>
+                  <span className={`font-label-caps text-label-caps tracking-[0.4em] mb-4 ${dark ? "" : "text-primary"}`}>
+                    {banner.label}
+                  </span>
+                  <h2 className={`font-headline-lg text-display-lg mb-6 leading-tight ${dark ? "text-on-primary-container" : ""}`}>
+                    {banner.title}
+                  </h2>
+                  <p className={`font-body-lg text-body-lg mb-8 ${dark ? "opacity-90" : "text-secondary"}`}>{banner.body}</p>
+                  {banner.price && (
+                    <div className="mb-8">
+                      <span className={`font-label-caps text-label-caps tracking-widest block mb-1.5 ${dark ? "opacity-80" : "text-primary"}`}>
+                        AKTIONSPREIS
+                      </span>
+                      <div className="flex items-baseline gap-3">
+                        <span className={`font-headline-lg text-headline-lg ${dark ? "text-on-primary-container" : "text-primary"}`}>
+                          {banner.price}
+                        </span>
+                        {banner.oldPrice && (
+                          <span className={`font-body-md line-through ${dark ? "opacity-60" : "text-outline"}`}>
+                            {banner.oldPrice}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => booking.open(categoryId)}
+                      className={`inline-block px-10 py-4 font-label-caps text-label-caps tracking-widest transition-all ${
+                        dark
+                          ? "bg-on-primary-container text-primary-container hover:opacity-90"
+                          : "bg-primary text-on-primary hover:bg-primary-container"
+                      }`}
+                    >
+                      {banner.cta}
+                    </button>
+                  </div>
                 </div>
-                <span className="font-label-caps text-label-caps tracking-[0.4em] mb-4">
-                  {data.campaign1.label}
-                </span>
-                <h2 className="font-headline-lg text-display-lg mb-6 text-on-primary-container leading-tight">
-                  {data.campaign1.title}
-                </h2>
-                <p className="font-body-lg text-body-lg mb-10 opacity-90">{data.campaign1.body}</p>
-                <div>
+              );
+              return (
+                <div key={i} className="relative overflow-hidden lux-shadow border border-outline-variant/30">
+                  <div className="grid grid-cols-1 md:grid-cols-2">
+                    {imageLeft ? (
+                      <>
+                        <div className="order-last md:order-first">{imageBlock}</div>
+                        {textBlock}
+                      </>
+                    ) : (
+                      <>
+                        {textBlock}
+                        {imageBlock}
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </section>
+        )}
+
+        {/* ── WEITERE ANGEBOTE (campaigns beyond the first 2, image-free) ──── */}
+        {moreOffers.length > 0 && (
+          <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop my-section-gap">
+            <h3 className="font-headline-sm text-headline-sm text-primary text-center mb-10">Weitere Angebote</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {moreOffers.map((offer, i) => (
+                <div
+                  key={i}
+                  className="bg-surface-container-low border border-outline-variant/40 p-8 flex flex-col items-start lux-shadow hover:border-primary/50 transition-all"
+                >
+                  <span className="material-symbols-outlined text-primary text-[32px] mb-4">{offer.icon}</span>
+                  <span className="font-label-caps text-label-caps tracking-[0.3em] text-primary mb-2">{offer.label}</span>
+                  <h4 className="font-headline-sm text-headline-sm text-on-surface mb-3">{offer.title}</h4>
+                  <p className="font-body-sm text-secondary mb-6 flex-1">{offer.body}</p>
+                  {offer.price && (
+                    <div className="flex items-baseline gap-2 mb-5">
+                      <span className="font-headline-sm text-headline-sm text-primary">{offer.price}</span>
+                      {offer.oldPrice && (
+                        <span className="font-body-sm text-outline line-through">{offer.oldPrice}</span>
+                      )}
+                    </div>
+                  )}
                   <button
                     type="button"
                     onClick={() => booking.open(categoryId)}
-                    className="inline-block bg-on-primary-container text-primary-container px-10 py-4 font-label-caps text-label-caps tracking-widest hover:opacity-90 transition-all"
+                    className="w-full bg-primary text-on-primary py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all"
                   >
-                    {data.campaign1.cta}
+                    {offer.cta}
                   </button>
                 </div>
-              </div>
-              <div
-                className="h-[380px] md:h-auto bg-cover bg-center"
-                style={{ backgroundImage: `url('${data.campaign1.image}')` }}
-              />
+              ))}
             </div>
-          </div>
-
-          {/* Campaign 2 — surface-container-low, image left */}
-          <div className="relative overflow-hidden lux-shadow border border-outline-variant/30">
-            <div className="grid grid-cols-1 md:grid-cols-2">
-              <div
-                className="h-[380px] md:h-auto bg-cover bg-center order-last md:order-first"
-                style={{ backgroundImage: `url('${data.campaign2.image}')` }}
-              />
-              <div className="p-12 md:p-20 bg-surface-container-low text-on-surface flex flex-col justify-center relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-10 opacity-10">
-                  <span className="material-symbols-outlined text-[180px]">{data.campaign2.icon}</span>
-                </div>
-                <span className="font-label-caps text-label-caps tracking-[0.4em] mb-4 text-primary">
-                  {data.campaign2.label}
-                </span>
-                <h2 className="font-headline-lg text-display-lg mb-6 leading-tight">{data.campaign2.title}</h2>
-                <p className="font-body-lg text-body-lg mb-10 text-secondary">{data.campaign2.body}</p>
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => booking.open(categoryId)}
-                    className="inline-block bg-primary text-on-primary px-10 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all"
-                  >
-                    {data.campaign2.cta}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
       </main>
 
       {/* ── FOOTER ───────────────────────────────────────────────────────── */}

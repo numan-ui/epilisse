@@ -57,6 +57,12 @@
     "value3Title": "Perfektion",
     "value3Desc": "Jede Behandlung wird individuell auf Ihren Hauttyp und Ihre Wünsche abgestimmt."
   },
+  "reviews": {
+    "sectionLabel": "KUNDENSTIMMEN",
+    "title": "Was unsere Kundinnen sagen",
+    "desc": "Lesen Sie echte Bewertungen unserer Kundinnen auf Treatwell und überzeugen Sie sich selbst.",
+    "cta": "Bewertungen auf Treatwell ansehen"
+  },
   "contact": {
     "sectionLabel": "KONTAKT & STANDORT",
     "title": "Besuchen Sie uns in München",

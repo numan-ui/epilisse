@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
@@ -36,7 +37,31 @@ const OVERLAYS = [
 ];
 
 /* ── Original fallback images (replaced by admin settings when set) ── */
-const ORIG_IDS = ['laser', 'gesicht', 'andere', 'body', 'inject', 'mani'];
+const ORIG_IDS = ['laser', 'gesicht', 'body', 'inject', 'mani'];
+
+/* ── Core category display order/links/fallback images for the equal-width services grid ── */
+const CORE_CAT_ORDER = ['laser', 'gesicht', 'body', 'inject', 'mani'] as const;
+const CORE_CAT_HREF: Record<string, string> = {
+  laser: '/laser-haarentfernung',
+  gesicht: '/gesichtsaesthetik',
+  body: '/body-contouring',
+  inject: '/injectables',
+  mani: '/manikure-pedikure',
+};
+const CORE_CAT_IMG: Record<string, string> = {
+  laser: IMG.laser,
+  gesicht: IMG.facial,
+  body: IMG.body,
+  inject: IMG.injectables,
+  mani: IMG.mani,
+};
+const CORE_CAT_KICKER: Record<string, string> = {
+  laser: 'TECHNOLOGIE',
+  gesicht: 'GESICHTSPFLEGE',
+  body: 'BODY CARE',
+  inject: 'ÄSTHETIK',
+  mani: 'NAGELPFLEGE',
+};
 
 export default function HomePage() {
   const t = useTranslations();
@@ -71,6 +96,7 @@ export default function HomePage() {
   /* ── Images: admin override or fallback to originals ─── */
   const aboutImg = settings.aboutImage || IMG.about;
   const getCatImage = (id: string) => categories.find(c => c.id === id)?.image || '';
+  const getCatDesc  = (id: string) => categories.find(c => c.id === id)?.desc || '';
 
   /* ── Bento grid: visible original cats + custom cats ─── */
   const visibleCats  = categories.filter(c => c.visible);
@@ -81,6 +107,14 @@ export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideKey, setSlideKey] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [heroParallax, setHeroParallax] = useState({ x: 0, y: 0 });
+
+  const handleHeroMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    setHeroParallax({ x: px * -48, y: py * -48 });
+  };
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
@@ -117,16 +151,16 @@ export default function HomePage() {
 
         {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-10">
-          <a href="#behandlungen" className="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300">
+          <Link href="/behandlungen" className="font-label-caps text-label-caps font-semibold text-on-surface-variant hover:text-primary transition-colors duration-300">
             {lc.navBehandlungen || t("nav.behandlungen")}
-          </a>
-          <a href="#preise" className="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300">
+          </Link>
+          <Link href="/preise" className="font-label-caps text-label-caps font-semibold text-on-surface-variant hover:text-primary transition-colors duration-300">
             {lc.navPreise || t("nav.preise")}
-          </a>
-          <a href="#uber-uns" className="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300">
+          </Link>
+          <Link href="/ueber-uns" className="font-label-caps text-label-caps font-semibold text-on-surface-variant hover:text-primary transition-colors duration-300">
             {lc.navUeberUns || t("nav.ueberUns")}
-          </a>
-          <a href="#kontakt" className="font-label-caps text-label-caps text-secondary hover:text-primary transition-colors duration-300">
+          </Link>
+          <a href="#kontakt" className="font-label-caps text-label-caps font-semibold text-on-surface-variant hover:text-primary transition-colors duration-300">
             {lc.navKontakt || t("nav.kontakt")}
           </a>
         </div>
@@ -175,20 +209,31 @@ export default function HomePage() {
       {menuOpen && (
         <div className="fixed inset-0 z-40 bg-surface flex flex-col items-center justify-center gap-8">
           {[
-            { href: "#behandlungen", label: lc.navBehandlungen || t("nav.behandlungen") },
-            { href: "#preise", label: lc.navPreise || t("nav.preise") },
-            { href: "#uber-uns", label: lc.navUeberUns || t("nav.ueberUns") },
-            { href: "#kontakt", label: lc.navKontakt || t("nav.kontakt") },
-          ].map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              onClick={() => setMenuOpen(false)}
-              className="font-headline-md text-headline-md text-on-surface hover:text-primary transition-colors"
-            >
-              {item.label}
-            </a>
-          ))}
+            { href: "/behandlungen", label: lc.navBehandlungen || t("nav.behandlungen"), internal: true },
+            { href: "/preise", label: lc.navPreise || t("nav.preise"), internal: true },
+            { href: "/ueber-uns", label: lc.navUeberUns || t("nav.ueberUns"), internal: true },
+            { href: "#kontakt", label: lc.navKontakt || t("nav.kontakt"), internal: false },
+          ].map((item) =>
+            item.internal ? (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMenuOpen(false)}
+                className="font-headline-md text-headline-md text-on-surface hover:text-primary transition-colors"
+              >
+                {item.label}
+              </Link>
+            ) : (
+              <a
+                key={item.href}
+                href={item.href}
+                onClick={() => setMenuOpen(false)}
+                className="font-headline-md text-headline-md text-on-surface hover:text-primary transition-colors"
+              >
+                {item.label}
+              </a>
+            )
+          )}
           <div className="flex gap-4 mt-4">
             {locales.map((loc) => (
               <Link
@@ -210,7 +255,11 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════════════
           HERO — Instagram-style story slider
       ══════════════════════════════════════════════════════ */}
-      <section className="relative h-[921px] md:h-screen w-full overflow-hidden">
+      <section
+        className="relative h-[921px] md:h-screen w-full overflow-hidden"
+        onMouseMove={handleHeroMouseMove}
+        onMouseLeave={() => setHeroParallax({ x: 0, y: 0 })}
+      >
         {/* Progress bars */}
         <div className="absolute top-24 left-0 w-full px-margin-mobile md:px-margin-desktop z-30 flex gap-2">
           {heroSlides.map((slide, i) => (
@@ -240,33 +289,62 @@ export default function HomePage() {
             {/* Dark overlay */}
             <div className={`absolute inset-0 ${OVERLAYS[i % OVERLAYS.length]} z-10`} />
 
-            {/* Background image */}
+            {/* Background image — Ken Burns zoom (img) + cursor parallax (wrapper) for depth */}
             {slide.image ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={slide.image}
-                alt={slide.headline}
-                className="w-full h-full object-cover"
-              />
+              <div
+                className="absolute -inset-16"
+                style={
+                  i === currentSlide
+                    ? {
+                        transform: `translate3d(${heroParallax.x}px, ${heroParallax.y}px, 0)`,
+                        transition: "transform 0.6s ease-out",
+                      }
+                    : undefined
+                }
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={slide.image}
+                  alt={slide.headline}
+                  className={`brand-photo w-full h-full object-cover ${i === currentSlide ? "kenburns" : ""}`}
+                  style={i === currentSlide ? { animationDuration: `${(slide.duration || 10) + 2}s` } : undefined}
+                />
+              </div>
             ) : (
               <div className="w-full h-full" style={{ background: 'linear-gradient(135deg,#3a3226 0%,#1a1712 100%)' }} />
             )}
 
             {/* Content */}
             <div className="absolute inset-0 z-20 flex flex-col justify-center items-start px-margin-mobile md:px-margin-desktop">
-              <h1 className="font-display-lg text-display-lg md:text-[80px] font-bold leading-none text-white max-w-2xl mb-6">
+              <motion.h1
+                key={`h-${slideKey}`}
+                initial={{ opacity: 0, y: 24 }}
+                animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.7, ease: "easeOut" }}
+                className="font-display-lg text-display-lg md:text-[80px] font-bold leading-none text-white max-w-2xl mb-6"
+              >
                 {slide.headline}
-              </h1>
-              <p className="font-body-lg text-body-lg text-white/90 max-w-lg mb-10">
+              </motion.h1>
+              <motion.p
+                key={`p-${slideKey}`}
+                initial={{ opacity: 0, y: 24 }}
+                animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
+                className="font-body-lg text-body-lg text-white/90 max-w-lg mb-10"
+              >
                 {slide.sub}
-              </p>
-              <button
+              </motion.p>
+              <motion.button
+                key={`b-${slideKey}`}
                 type="button"
+                initial={{ opacity: 0, y: 24 }}
+                animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
                 onClick={() => booking.open()}
                 className="bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-all"
               >
                 {slide.cta}
-              </button>
+              </motion.button>
             </div>
           </div>
         ))}
@@ -287,14 +365,20 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════
-          SERVICES — Bento grid (asymmetric)
+          SERVICES — Equal-width category grid
       ══════════════════════════════════════════════════════ */}
       <section
         id="behandlungen"
         className="py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
       >
         {/* Section header */}
-        <div className="text-center mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="text-center mb-20"
+        >
           <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-3">
             {lc.servicesSectionLabel || t("services.sectionLabel")}
           </span>
@@ -302,117 +386,63 @@ export default function HomePage() {
             {lc.servicesSectionTitle || t("services.sectionTitle")}
           </h2>
           <div className="w-20 h-[2px] bg-primary-fixed-dim mx-auto" />
-        </div>
+        </motion.div>
 
-        {/* Bento grid — respects category visibility from admin */}
-        <div className="grid grid-cols-1 md:grid-cols-6 md:grid-rows-2 gap-gutter h-auto md:h-[900px]">
-
-          {/* Laser-Haarentfernung — large card (3×2) */}
-          {isVisible('laser') && (
-            <Link href="/laser-haarentfernung" className="md:col-span-3 md:row-span-2 group relative overflow-hidden bg-surface-container-lowest border border-outline-variant/30 cursor-pointer min-h-[400px] md:min-h-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={getCatImage('laser') || IMG.laser} alt={getCatName('laser')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8">
-                <span className="font-label-caps text-label-caps text-primary-fixed-dim/70 mb-2 tracking-widest">{t("services.laserSeo")}</span>
-                <h3 className="font-headline-lg text-headline-lg font-semibold text-white mb-2">{getCatName('laser')}</h3>
-                <p className="text-white/80 font-body-sm text-body-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 mb-4">{lc.servicesLaserDesc || t("services.laserDesc")}</p>
-                <span className="text-primary-fixed-dim font-label-caps text-label-caps flex items-center gap-2">{t("services.discover")}<span className="material-symbols-outlined text-sm">arrow_forward</span></span>
+        {/* Every visible category — core + custom — strictly uniform cards, 3 per row, identical geometry */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter"
+        >
+          {CORE_CAT_ORDER.filter(isVisible).map(id => (
+            <Link
+              key={id}
+              href={CORE_CAT_HREF[id]}
+              className="bento-card group bg-surface-container-lowest border border-outline-variant/30 cursor-pointer flex flex-col"
+            >
+              <div className="relative overflow-hidden aspect-square">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={getCatImage(id) || CORE_CAT_IMG[id]} alt={getCatName(id)} className="brand-photo w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              </div>
+              <div className="p-6">
+                <span className="font-label-caps text-[10px] text-primary tracking-widest block mb-2">
+                  {CORE_CAT_KICKER[id]}
+                </span>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{getCatName(id)}</h3>
+                <p className="font-body-sm text-body-sm text-secondary">{getCatDesc(id)}</p>
               </div>
             </Link>
-          )}
+          ))}
 
-          {/* Gesichtsästhetik (2×1) */}
-          {isVisible('gesicht') && (
-            <Link href="/gesichtsaesthetik" className="md:col-span-2 md:row-span-1 group relative overflow-hidden bg-surface-container-lowest border border-outline-variant/30 cursor-pointer min-h-[280px] md:min-h-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={getCatImage('gesicht') || IMG.facial} alt={getCatName('gesicht')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-8">
-                <h3 className="font-headline-md text-headline-md font-medium text-white mb-1">{getCatName('gesicht')}</h3>
-                <p className="text-white/70 font-body-sm text-body-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500 mb-2">{lc.servicesFacialDesc || t("services.facialDesc")}</p>
-                <span className="text-primary-fixed-dim font-label-caps text-label-caps flex items-center gap-2">{t("services.details")}<span className="material-symbols-outlined text-sm">arrow_forward</span></span>
-              </div>
-            </Link>
-          )}
-
-          {/* Andere (1×1) */}
-          {isVisible('andere') && (
-            <Link href="/andere" className="md:col-span-1 md:row-span-1 group relative overflow-hidden border border-outline-variant/30 cursor-pointer min-h-[200px] md:min-h-0" style={{ background: 'linear-gradient(135deg,#ecfdf5 0%,#6ee7b7 100%)' }}>
-              {getCatImage('andere') && (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={getCatImage('andere')} alt={getCatName('andere')} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex flex-col justify-end p-4">
-                <h3 className="font-headline-sm font-medium text-white text-[16px]">{getCatName('andere')}</h3>
-              </div>
-              {!getCatImage('andere') && (
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20 group-hover:opacity-30 transition-opacity">
-                  <span className="material-symbols-outlined text-on-surface" style={{ fontSize: '64px' }}>spa</span>
-                </div>
-              )}
-            </Link>
-          )}
-
-          {/* Body Contouring (1×1) */}
-          {isVisible('body') && (
-            <Link href="/body-contouring" className="md:col-span-1 md:row-span-1 group relative overflow-hidden bg-surface-container-lowest border border-outline-variant/30 cursor-pointer min-h-[200px] md:min-h-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={getCatImage('body') || IMG.body} alt={getCatName('body')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4">
-                <h3 className="font-headline-sm font-medium text-white text-[16px]">{getCatName('body')}</h3>
-              </div>
-            </Link>
-          )}
-
-          {/* Injectables (1×1) */}
-          {isVisible('inject') && (
-            <Link href="/injectables" className="md:col-span-1 md:row-span-1 group relative overflow-hidden bg-surface-container-lowest border border-outline-variant/30 cursor-pointer min-h-[200px] md:min-h-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={getCatImage('inject') || IMG.injectables} alt={getCatName('inject')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4">
-                <h3 className="font-headline-sm font-medium text-white text-[16px]">{getCatName('inject')}</h3>
-              </div>
-            </Link>
-          )}
-
-          {/* Maniküre (1×1) */}
-          {isVisible('mani') && (
-            <Link href="/manikure-pedikure" className="md:col-span-1 md:row-span-1 group relative overflow-hidden bg-surface-container-lowest border border-outline-variant/30 cursor-pointer min-h-[200px] md:min-h-0">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={getCatImage('mani') || IMG.mani} alt={getCatName('mani')} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4">
-                <h3 className="font-headline-sm font-medium text-white text-[16px]">{getCatName('mani')}</h3>
-              </div>
-            </Link>
-          )}
-
-        </div>
-
-        {/* Custom categories (not in original 6) */}
-        {customCats.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-gutter mt-gutter">
-            {customCats.map(cat => {
-              const slug = FRONTEND_SLUG[cat.id] ?? cat.id;
-              return (
-                <Link
-                  key={cat.id}
-                  href={`/${slug}`}
-                  className="group relative overflow-hidden bg-surface-container-lowest border border-outline-variant/30 cursor-pointer min-h-[200px] flex flex-col items-center justify-center"
-                  style={{ background: 'linear-gradient(135deg,#fff8e7 0%,#f5e5a0 100%)' }}
-                >
+          {customCats.map(cat => {
+            const slug = FRONTEND_SLUG[cat.id] ?? cat.id;
+            return (
+              <Link
+                key={cat.id}
+                href={`/${slug}`}
+                className="bento-card group bg-surface-container-lowest border border-outline-variant/30 cursor-pointer flex flex-col"
+              >
+                <div className="relative overflow-hidden aspect-square">
                   {cat.image ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={cat.image} alt={cat.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <img src={cat.image} alt={cat.name} className="brand-photo w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   ) : (
-                    <span className="material-symbols-outlined text-[48px] text-primary/30 group-hover:text-primary/50 transition-colors">{cat.icon}</span>
+                    <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#fff8e7 0%,#f5e5a0 100%)' }}>
+                      <span className="material-symbols-outlined text-[48px] text-primary/30">{cat.icon}</span>
+                    </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex flex-col justify-end p-4">
-                    <h3 className="font-headline-sm font-medium text-white text-[16px]">{cat.name}</h3>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        )}
+                </div>
+                <div className="p-6">
+                  <span className="font-label-caps text-[10px] text-primary tracking-widest block mb-2">BEHANDLUNG</span>
+                  <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{cat.name}</h3>
+                  <p className="font-body-sm text-body-sm text-secondary">{cat.desc}</p>
+                </div>
+              </Link>
+            );
+          })}
+        </motion.div>
       </section>
 
       {/* ══════════════════════════════════════════════════════
@@ -423,7 +453,14 @@ export default function HomePage() {
         className="mb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto space-y-8"
       >
         {promoBanners.map((banner) => (
-          <div key={banner.id} className="relative w-full min-h-[400px] overflow-hidden group border border-outline-variant/30">
+          <motion.div
+            key={banner.id}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            className="relative w-full min-h-[400px] overflow-hidden group border border-outline-variant/30"
+          >
             <div className="absolute inset-0 bg-secondary-container/30 z-10" />
             <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between z-20 px-8 md:px-24">
               {/* Text */}
@@ -465,12 +502,12 @@ export default function HomePage() {
                     src={banner.image}
                     alt={banner.title}
                     onError={e => { e.currentTarget.style.display = 'none'; }}
-                    className="absolute inset-0 w-full h-full object-cover shadow-2xl scale-110 group-hover:scale-100 transition-transform duration-1000"
+                    className="brand-photo absolute inset-0 w-full h-full object-cover shadow-2xl scale-110 group-hover:scale-100 transition-transform duration-1000"
                   />
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </section>
 
@@ -481,7 +518,13 @@ export default function HomePage() {
         id="uber-uns"
         className="py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center"
+        >
           {/* Left: text */}
           <div>
             <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-3">
@@ -518,7 +561,7 @@ export default function HomePage() {
             <img
               src={aboutImg}
               alt="EPILISSE Studio München"
-              className="w-full h-full object-cover"
+              className="brand-photo w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6">
@@ -527,7 +570,7 @@ export default function HomePage() {
               </span>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ══════════════════════════════════════════════════════
@@ -537,17 +580,32 @@ export default function HomePage() {
         id="kontakt"
         className="py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
       >
-        <div className="text-center mb-16">
-          <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-3">
-            {lc.contactSectionLabel || t("contact.sectionLabel")}
-          </span>
-          <h2 className="font-display-lg text-headline-lg font-semibold text-on-surface mb-4">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="flex flex-col items-center mb-20"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+            <span className="font-label-caps text-label-caps text-primary tracking-[0.3em]">
+              {lc.contactSectionLabel || t("contact.sectionLabel")}
+            </span>
+            <span className="w-16 h-[2px] bg-primary" />
+          </div>
+          <h2 className="font-display-lg text-headline-lg font-semibold text-on-surface">
             {lc.contactTitle || t("contact.title")}
           </h2>
-          <div className="w-20 h-[2px] bg-primary-fixed-dim mx-auto" />
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-gutter"
+        >
 
           {/* Address card */}
           <div className="bg-surface-container-low border border-outline-variant/30 p-8 flex flex-col gap-4">
@@ -590,7 +648,7 @@ export default function HomePage() {
               {displayPhone}
             </a>
           </div>
-        </div>
+        </motion.div>
 
         {/* CTA buttons row */}
         <div className="flex flex-col sm:flex-row justify-center gap-4 mt-12">
@@ -637,14 +695,18 @@ export default function HomePage() {
               {lc.footerTagline || t("footer.tagline")}
             </p>
             <div className="flex gap-4">
-              <a href="#" className="text-primary hover:scale-110 transition-transform" aria-label="Facebook">
-                <span className="material-symbols-outlined">brand_family</span>
-              </a>
-              <a href="#" className="text-primary hover:scale-110 transition-transform" aria-label="Instagram">
-                <span className="material-symbols-outlined">photo_camera</span>
-              </a>
-              <a href="#" className="text-primary hover:scale-110 transition-transform" aria-label="Share">
-                <span className="material-symbols-outlined">share</span>
+              <a
+                href={`https://instagram.com/${settings.instagram.replace(/^@/, "")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:scale-110 transition-transform"
+                aria-label="Instagram"
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" strokeWidth="1.8" />
+                  <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.8" />
+                  <circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" />
+                </svg>
               </a>
             </div>
           </div>

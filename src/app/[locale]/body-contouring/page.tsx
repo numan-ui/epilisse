@@ -2,7 +2,8 @@
 import ServicePageTemplate from "@/components/ServicePageTemplate";
 import { useAdminServices } from "@/hooks/useAdminServices";
 import { useAdminPageContent } from "@/hooks/useAdminPageContent";
-import { useAdminCampaigns } from "@/hooks/useAdminCampaigns";
+import { useAdminCampaigns, resolveCampaigns } from "@/hooks/useAdminCampaigns";
+import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useParams } from "next/navigation";
 
 const FALLBACK_PRICING = [
@@ -19,14 +20,15 @@ export default function BodyContouringPage() {
   const locale = (params?.locale as string) || 'de';
   const pageContent  = useAdminPageContent('body');
   const adminCamps   = useAdminCampaigns('body');
+  const categories   = useAdminCategories();
   const pricingItems = useAdminServices('body', FALLBACK_PRICING);
   return (
     <ServicePageTemplate
       locale={locale}
       categoryId="body"
+      categoryImage={categories.find(c => c.id === 'body')?.image}
       {...pageContent}
-      {...(adminCamps.campaign1 ? { campaign1: adminCamps.campaign1 } : {})}
-      {...(adminCamps.campaign2 ? { campaign2: adminCamps.campaign2 } : {})}
+      campaigns={resolveCampaigns(pageContent, adminCamps)}
       pricingLabel="Preise & Services"
       pricingTitle="Investition in Ihre Silhouette"
       pricingItems={pricingItems}

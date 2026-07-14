@@ -21,11 +21,13 @@ export default function BehandlungenPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [newCat, setNewCat]   = useState<Omit<Category, 'id'>>(EMPTY_CAT);
   const [iconPickerOpen, setIconPickerOpen] = useState(false);
+  const [templateId, setTemplateId] = useState<string>('');
 
   const handleAdd = () => {
     if (!newCat.name.trim()) return;
-    addCategory(newCat);
+    addCategory(newCat, templateId || undefined);
     setNewCat(EMPTY_CAT);
+    setTemplateId('');
     setAddOpen(false);
     setIconPickerOpen(false);
   };
@@ -56,7 +58,7 @@ export default function BehandlungenPage() {
               <Link
                 key={cat.id}
                 href={`/${locale}/admin/behandlungen/${cat.id}`}
-                className="group bg-surface-container-lowest border border-outline-variant/60 p-5 rounded-xl flex flex-col gap-3 hover:border-primary/50 hover:shadow-md transition-all"
+                className="group relative bg-surface-container-lowest border border-outline-variant/60 p-5 rounded-xl flex flex-col gap-3 hover:border-primary/50 hover:shadow-md transition-all"
               >
                 <div className="flex items-center justify-between">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
@@ -141,6 +143,22 @@ export default function BehandlungenPage() {
                 onChange={e => setNewCat(p => ({ ...p, desc: e.target.value }))}
                 onKeyDown={e => e.key === 'Enter' && handleAdd()}
               />
+
+              <div>
+                <label className="font-label-caps text-[9px] text-outline uppercase tracking-wider block mb-1">
+                  Vorlage (kopiert Seiteninhalt &amp; Beispiel-Services)
+                </label>
+                <select
+                  className="w-full bg-surface border border-outline-variant/50 focus:border-primary focus:outline-none font-body-sm text-[12px] text-on-surface py-1.5 px-2 transition-colors"
+                  value={templateId}
+                  onChange={e => setTemplateId(e.target.value)}
+                >
+                  <option value="">Keine Vorlage (leer beginnen)</option>
+                  {categories.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
 
               <div className="flex items-center gap-2 mt-1">
                 <button

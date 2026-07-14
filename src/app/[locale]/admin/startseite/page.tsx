@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { useAdminData } from '../behandlungen/AdminDataContext';
-import { HERO_SLIDE_LIMIT, PROMO_BANNER_LIMIT, ABOUT_VALUE_LIMIT, type LandingContent } from '../behandlungen/data';
+import { HERO_SLIDE_LIMIT, PROMO_BANNER_LIMIT, ABOUT_VALUE_LIMIT, REVIEW_LIMIT, FRONTEND_SLUG, type LandingContent } from '../behandlungen/data';
 
 const SECTIONS = ['Navigation', 'Hero-Slider', 'Angebot', 'Kombi-Angebot', 'Über Uns', 'Kontakt-Texte', 'Footer'] as const;
 type Section = typeof SECTIONS[number];
@@ -67,6 +67,8 @@ export default function StartseitePage() {
     heroSlides, updateHeroSlide, addHeroSlide, removeHeroSlide,
     promoBanners, updatePromoBanner, addPromoBanner, removePromoBanner,
     aboutValues, updateAboutValue, addAboutValue, removeAboutValue,
+    reviews, updateReview, addReview, removeReview,
+    categories,
     settings, updateSetting, updateSettingHours,
   } = useAdminData();
   const [active, setActive] = useState<Section>('Navigation');
@@ -239,7 +241,7 @@ export default function StartseitePage() {
             <section className="max-w-2xl space-y-6">
               <div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface mb-1">Angebot-Sektion</h3>
-                <p className="font-body-sm text-on-surface-variant opacity-70">Überschrift des Behandlungs-Rasters. Kategorienamen &amp; Sichtbarkeit werden unter Behandlungen gepflegt.</p>
+                <p className="font-body-sm text-on-surface-variant opacity-70">Überschrift des Behandlungs-Rasters. Kategorienamen, Kurzbeschreibung (Hover-Text auf jeder Karte) &amp; Sichtbarkeit werden unter Behandlungen gepflegt.</p>
               </div>
               <div className="bg-surface-container-lowest border border-outline-variant p-8 space-y-6">
                 <Field label="Label (Kicker)">
@@ -247,12 +249,6 @@ export default function StartseitePage() {
                 </Field>
                 <Field label="Titel">
                   <input className={INPUT_CLS} value={lc.servicesSectionTitle} onChange={e => set('servicesSectionTitle', e.target.value)} />
-                </Field>
-                <Field label="Laser-Karte: Hover-Beschreibung">
-                  <input className={INPUT_CLS} value={lc.servicesLaserDesc} onChange={e => set('servicesLaserDesc', e.target.value)} />
-                </Field>
-                <Field label="Gesichtsästhetik-Karte: Hover-Beschreibung">
-                  <input className={INPUT_CLS} value={lc.servicesFacialDesc} onChange={e => set('servicesFacialDesc', e.target.value)} />
                 </Field>
               </div>
             </section>
@@ -387,6 +383,63 @@ export default function StartseitePage() {
                   >
                     <span className="material-symbols-outlined text-[18px]">add_circle</span>
                     Wert hinzufügen
+                  </button>
+                )}
+              </div>
+
+              {/* ── Bewertungen (Treatwell) ────────────────── */}
+              <div className="bg-surface-container-lowest border border-outline-variant p-8 space-y-6">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-headline-sm text-[15px] text-on-surface">Bewertungen (Treatwell)</h4>
+                    <span className="font-label-caps text-[10px] text-outline shrink-0">{reviews.length} / {REVIEW_LIMIT}</span>
+                  </div>
+                  <p className="font-body-sm text-[12px] text-on-surface-variant opacity-70 mt-1">
+                    Erscheinen auf der Über-Uns-Seite. Kopieren Sie echte Bewertungen 1:1 aus Ihrem Treatwell-Profil.
+                  </p>
+                </div>
+                {reviews.map((r, i) => (
+                  <div key={r.id} className="border-t border-outline-variant/30 pt-4 first:border-t-0 first:pt-0 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-label-caps text-[10px] text-primary">BEWERTUNG {i + 1}</span>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => updateReview(r.id, 'active', !r.active)}
+                          className={`relative w-8 h-4 rounded-full transition-colors shrink-0 ${r.active ? 'bg-primary' : 'bg-outline-variant'}`}
+                          aria-label={r.active ? 'Verbergen' : 'Anzeigen'}
+                          title={r.active ? 'Bewertung verbergen' : 'Bewertung anzeigen'}
+                        >
+                          <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${r.active ? 'translate-x-4' : 'translate-x-0'}`} />
+                        </button>
+                        <button
+                          onClick={() => removeReview(r.id)}
+                          className="text-outline hover:text-error transition-colors"
+                          title="Bewertung löschen"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">delete_outline</span>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <Field label="Name">
+                        <input className={INPUT_CLS} value={r.name} onChange={e => updateReview(r.id, 'name', e.target.value)} placeholder="z.B. Amélie" />
+                      </Field>
+                      <Field label="Behandlung">
+                        <input className={INPUT_CLS} value={r.treatment} onChange={e => updateReview(r.id, 'treatment', e.target.value)} placeholder="z.B. Laser-Haarentfernung" />
+                      </Field>
+                    </div>
+                    <Field label="Bewertungstext">
+                      <textarea className={`${INPUT_CLS} resize-none`} rows={2} value={r.text} onChange={e => updateReview(r.id, 'text', e.target.value)} />
+                    </Field>
+                  </div>
+                ))}
+                {reviews.length < REVIEW_LIMIT && (
+                  <button
+                    onClick={() => addReview({ name: '', text: '', treatment: '', active: true })}
+                    className="w-full border-2 border-dashed border-outline-variant py-3 flex items-center justify-center gap-2 text-outline hover:text-primary hover:border-primary transition-all font-label-caps text-[11px]"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">add_circle</span>
+                    Bewertung hinzufügen
                   </button>
                 )}
               </div>

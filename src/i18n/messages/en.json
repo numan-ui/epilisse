@@ -57,6 +57,12 @@
     "value3Title": "Perfection",
     "value3Desc": "Every treatment is individually tailored to your skin type and wishes."
   },
+  "reviews": {
+    "sectionLabel": "TESTIMONIALS",
+    "title": "What our clients say",
+    "desc": "Read genuine reviews from our clients on Treatwell and see for yourself.",
+    "cta": "See reviews on Treatwell"
+  },
   "contact": {
     "sectionLabel": "CONTACT & LOCATION",
     "title": "Visit Us in Munich",

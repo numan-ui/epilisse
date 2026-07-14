@@ -273,6 +273,7 @@ export default function EinstellungenPage() {
                   { label: 'Facebook Seite',   key: 'facebook'  as const, icon: 'thumb_up',    placeholder: 'epilisse.munich' },
                   { label: 'TikTok Handle',    key: 'tiktok'    as const, icon: 'music_video',  placeholder: '@epilisse' },
                   { label: 'Google My Business', key: 'google'  as const, icon: 'location_on',  placeholder: 'https://g.page/epilisse-munich' },
+                  { label: 'Treatwell Profil-URL', key: 'treatwellUrl' as const, icon: 'reviews', placeholder: 'https://www.treatwell.de/ort/...' },
                 ].map(({ label, key, icon, placeholder }) => (
                   <div key={key}>
                     <label className="font-label-caps text-[10px] text-outline uppercase block mb-2">{label}</label>

@@ -57,6 +57,12 @@
     "value3Title": "Mükemmellik",
     "value3Desc": "Her tedavi, cilt tipinize ve isteklerinize göre bireysel olarak uyarlanır."
   },
+  "reviews": {
+    "sectionLabel": "MÜŞTERİ YORUMLARI",
+    "title": "Müşterilerimiz ne diyor",
+    "desc": "Treatwell üzerindeki gerçek müşteri yorumlarımızı okuyun ve kendiniz görün.",
+    "cta": "Treatwell'de yorumları gör"
+  },
   "contact": {
     "sectionLabel": "İLETİŞİM & KONUM",
     "title": "Münih'te Bizi Ziyaret Edin",

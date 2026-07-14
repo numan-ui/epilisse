@@ -16,6 +16,7 @@ function mergeBanner(stored: PageBanner | undefined, fallback: PageBanner): Page
     cta:   str(stored.cta, fallback.cta),
     icon:  str(stored.icon, fallback.icon),
     image: str(stored.image, fallback.image),
+    imagePosition: stored.imagePosition ?? fallback.imagePosition,
   };
 }
 

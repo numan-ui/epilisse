@@ -8,12 +8,16 @@ const LS_CAT = 'epilisse_admin_categories';
 const str = (v: string | undefined, fallback: string) => (v && v.trim() !== '') ? v : fallback;
 
 function mergeCategories(stored: Category[]): Category[] {
-  return stored.map(c => {
-    const def = CATEGORIES.find(d => d.id === c.id);
-    if (!def) return c; // custom, admin-created category — no default to fall back to
-    // image is intentionally not force-defaulted here: empty means "use the built-in photo", a valid state (see usage site fallback)
-    return { id: c.id, icon: str(c.icon, def.icon), name: str(c.name, def.name), desc: str(c.desc, def.desc), visible: c.visible, image: c.image ?? '' };
-  });
+  return stored
+    // Drop stale localStorage entries for built-in categories that no longer exist in code
+    // (e.g. a removed default category) — only keep current built-ins plus admin-created ('cat-') ones.
+    .filter(c => CATEGORIES.some(d => d.id === c.id) || c.id.startsWith('cat-'))
+    .map(c => {
+      const def = CATEGORIES.find(d => d.id === c.id);
+      if (!def) return c; // custom, admin-created category — no default to fall back to
+      // image is intentionally not force-defaulted here: empty means "use the built-in photo", a valid state (see usage site fallback)
+      return { id: c.id, icon: str(c.icon, def.icon), name: str(c.name, def.name), desc: str(c.desc, def.desc), visible: c.visible, image: c.image ?? '' };
+    });
 }
 
 export function useAdminCategories(): Category[] {

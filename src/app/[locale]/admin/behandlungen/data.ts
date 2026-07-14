@@ -1,5 +1,8 @@
+/** Where the focal point of a banner image sits, so cropping (bg-cover) doesn't cut off the subject. */
+export type ImagePosition = 'top' | 'center' | 'bottom';
+
 export type Service  = { id: string; name: string; price: string; duration: string; active: boolean };
-export type Campaign = { id: string; label: string; title: string; desc: string; price: string; oldPrice?: string; cta: string; icon: string; image: string; active: boolean };
+export type Campaign = { id: string; label: string; title: string; desc: string; price: string; oldPrice?: string; cta: string; icon: string; image: string; imagePosition?: ImagePosition; active: boolean };
 export type Category = { id: string; icon: string; name: string; desc: string; visible: boolean; image: string };
 
 export const CATEGORIES: Category[] = [
@@ -8,7 +11,6 @@ export const CATEGORIES: Category[] = [
   { id: 'body',    icon: 'self_improvement', name: 'Body Contouring',      desc: 'Nicht-invasive Formung Ihrer Silhouette.',                      visible: true,  image: '' },
   { id: 'inject',  icon: 'vaccines',         name: 'Injectables',          desc: 'Präzise Hyaluron- und Botox-Behandlungen.',                     visible: true,  image: '' },
   { id: 'mani',    icon: 'spa',              name: 'Maniküre',             desc: 'Luxuriöse Nagelpflege und Handmassage.',                        visible: true,  image: '' },
-  { id: 'andere',  icon: 'favorite',         name: 'Andere',               desc: 'Weitere Wellness- und Beauty-Services für Ihr Wohlbefinden.',   visible: true,  image: '' },
 ];
 
 const s = (id: string, name: string, price: string, duration: string, active = true): Service =>
@@ -54,15 +56,6 @@ export const INIT_SERVICES: Record<string, Service[]> = {
     s('m7', 'Paraffin-Behandlung', '30.00', '30 min'),
     s('m8', 'Nagelverstärkung',    '50.00', '60 min', false),
   ],
-  andere: [
-    s('a1', 'Aromatherapie-Massage', '79.00',  '60 min'),
-    s('a2', 'Hot Stone Massage',     '95.00',  '75 min'),
-    s('a3', 'Wimpernverlängerung',   '120.00', '90 min'),
-    s('a4', 'Augenbrauen-Styling',   '35.00',  '30 min'),
-    s('a5', 'Brow Lamination',       '55.00',  '45 min'),
-    s('a6', 'Lash Lifting',          '75.00',  '60 min', false),
-    s('a7', 'Deep Tissue Massage',   '110.00', '90 min'),
-  ],
 };
 
 const c = (
@@ -86,10 +79,6 @@ export const INIT_CAMPAIGNS: Record<string, Campaign[]> = {
   mani: [
     c('cm1', 'DUO DEAL',      'Mani & Pedi Paket',          'Gel-Maniküre + Spa-Pediküre zusammen.',           '99,00€',  '130,00€', 'JETZT BUCHEN', 'favorite'),
   ],
-  andere: [
-    c('ca1', 'SOMMER DEAL',   'Wellness Paket Deluxe',      'Aromamassage + Hot Stone — 2 Stunden Entspannung.','89,00€', '120,00€', 'JETZT BUCHEN', 'self_improvement'),
-    c('ca2', 'NEU',           'Lash & Brow Kombi-Set',      'Wimpernverlängerung + Brow Lamination im Kombi-Angebot.','155,00€','195,00€', 'JETZT BUCHEN', 'face_retouching_natural'),
-  ],
 };
 
 export type OpeningDay = { day: string; open: string; close: string; closed: boolean };
@@ -98,6 +87,7 @@ export type SiteSettings = {
   name: string; tagline: string; address: string; phone: string; email: string; whatsapp: string;
   calendarUrl: string; whatsappMsg: string; bookingActive: boolean; whatsappActive: boolean;
   instagram: string; facebook: string; tiktok: string; google: string;
+  treatwellUrl: string;
   aboutImage: string;
   hours: OpeningDay[];
 };
@@ -117,6 +107,7 @@ export const INIT_SETTINGS: SiteSettings = {
   facebook: 'epilisse.munich',
   tiktok: '@epilisse',
   google: '',
+  treatwellUrl: 'https://www.treatwell.de/ort/studio-adisa-the-beauty-experience/',
   aboutImage: '',
   hours: [
     { day: 'Montag',     open: '09:00', close: '19:00', closed: false },
@@ -132,7 +123,6 @@ export const INIT_SETTINGS: SiteSettings = {
 export type LandingContent = {
   navBehandlungen: string; navPreise: string; navUeberUns: string; navKontakt: string; navCta: string;
   servicesSectionLabel: string; servicesSectionTitle: string;
-  servicesLaserDesc: string; servicesFacialDesc: string;
   aboutSectionLabel: string; aboutTitle: string; aboutDesc: string;
   contactSectionLabel: string; contactTitle: string;
   contactAddressTitle: string; contactHoursTitle: string; contactPhoneTitle: string;
@@ -143,8 +133,6 @@ export type LandingContent = {
 export const INIT_LANDING_CONTENT: LandingContent = {
   navBehandlungen: 'Behandlungen', navPreise: 'Preise', navUeberUns: 'Über Uns', navKontakt: 'Kontakt', navCta: 'TERMIN BUCHEN',
   servicesSectionLabel: 'UNSER ANGEBOT', servicesSectionTitle: 'Exklusive Behandlungen',
-  servicesLaserDesc: 'Dauerhafte Glätte durch modernste Technologie.',
-  servicesFacialDesc: 'Hydrafacial & Premium-Hautpflege in München.',
   aboutSectionLabel: 'ÜBER EPILISSE', aboutTitle: 'Münchens Adresse für Premium-Ästhetik',
   aboutDesc: 'Willkommen im EPILISSE Studio – Ihrem exklusiven Kosmetikstudio im Herzen von München. Wir vereinen modernste Behandlungsmethoden mit einem tiefen Verständnis für individuelle Schönheit.',
   contactSectionLabel: 'KONTAKT & STANDORT', contactTitle: 'Besuchen Sie uns in München',
@@ -155,7 +143,8 @@ export const INIT_LANDING_CONTENT: LandingContent = {
   footerBadge1: 'MADE IN MUNICH', footerBadge2: 'SECURE PAYMENT',
 };
 
-export type HeroSlide = { id: string; headline: string; sub: string; cta: string; image: string; duration: number };
+/** ctaLink: '' → opens the booking modal. Otherwise an internal path (e.g. '/laser-haarentfernung', '/behandlungen') the CTA navigates to. */
+export type HeroSlide = { id: string; headline: string; sub: string; cta: string; ctaLink: string; image: string; duration: number };
 
 export const HERO_SLIDE_LIMIT = 10;
 
@@ -165,6 +154,7 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
     headline: 'Zeitlose Schönheit.',
     sub: 'Entdecken Sie die Kunst der ästhetischen Perfektion in unserem Exklusiv-Studio in München.',
     cta: 'TERMIN BUCHEN',
+    ctaLink: '',
     image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD_YasW9q229vcdUMyOWhsXE0U56gXDW6IhxHCHslvhyudCbfAceKlPVs2XmGP2zRTNgbrCpnW7wLqysQlSs-XP9sR0JO7XReZFC7rVxns2gpe1h7jVgIztmgeZnC8P0gK6eqoAbqsiq_aXBWC0sFVsNmsdZg8ysh_1BdL-yWU858EORE7eXi0v1mssia4G2iXsFBhPOxJd618fsVSgIMKlsRJaBTUn8FqwRk8M5F9VQFNNmVgaWeU-KnCcASqRauKgP4vjhali-pMt',
   },
   {
@@ -172,6 +162,7 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
     headline: 'Sanfte Glätte.',
     sub: 'Präzise Laser-Haarentfernung für ein seidiges Hautgefühl, das bleibt. Schmerzfrei und effektiv.',
     cta: 'ERFAHREN SIE MEHR',
+    ctaLink: '/laser-haarentfernung',
     image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB19c_exWt7H0n9vAsZz2kxGDGG-6ta5oPx7QUek7amnLk9lSKwX1U_2_UteAPk9YQWV_scOgE7XPR5xRwTS7UypBg55Iu2kTWSkUW7OqfwIwzNXIySxYdJxoUlzxitWwOn7KgNTrchQ3eQQbo5DN4XztJEAbo0D3vbPu97mCC59GSXoe7oe1x7mq3RC3iapMSvwggpNh8aqy0oMDqRZSfEq4tlt61cSnUlFuSXgKZjLrmBnJxSZ6geu2ibj9T1rqUv8BoIVmoSYDke',
   },
   {
@@ -179,6 +170,7 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
     headline: 'Gesichtsästhetik.',
     sub: 'Individuelle Behandlungen für eine strahlende Haut und natürliche Verjüngung.',
     cta: 'ZUM ANGEBOT',
+    ctaLink: '/gesichtsaesthetik',
     image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCDCTVBkANRMCY5r7E2JLvTph0kXEA4T7GxktWv_bKMsgdG-AzO4MqdgFWvxeMIo4R4mlT3yzjHXFTmz2RMdSYBujyVKX-cIPUOMYrFBB2ecuVjcgYnes1xN_ami77RkyJfoZ850mfG5EwXU8-B_9qIIv66-_hQmWFSIruc6mQD8FuAZoQ9poHrEZJ1OhiQ92g2-Wr5bKJd6ZeyHf3zmq1k6SioVRtxAlftGRh3_AXEo5W9nWYw4m18vMFt9BX55pIVBkjVLW8zw2To',
   },
   {
@@ -186,6 +178,7 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
     headline: 'Perfekte Pflege.',
     sub: 'Maniküre & Pediküre auf höchstem Niveau für Ihre Hände und Füße.',
     cta: 'JETZT BUCHEN',
+    ctaLink: '',
     image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAb0Xk8wJSTpOUGnUD4StyAC2X_a5HESgSsYNy02I50YB_F081P4wFEpLLa3HWYmPBVpi2nDPPOAy0_8C2Qdpfl2a9dZ-vx5kuLRWfWCnLSNk3pf7GP-8KlvRZUjHoayjhKxkAEfyVMfcA6MG2jqqpmCCqbmIqrxvAVImnfhZxf_0DcCu_hTAoRnkq3Dan1OvZbY3PTrpL-he-a5fk5zE2Pkg4ranUUJlJT3SVH73E1zMstR68y86JSpWTYQXQxapywC4Mypwk7ZMux',
   },
 ];
@@ -214,13 +207,27 @@ export const INIT_ABOUT_VALUES: AboutValue[] = [
   { id: 'av3', icon: 'star', title: 'Perfektion', desc: 'Jede Behandlung wird individuell auf Ihren Hauttyp und Ihre Wünsche abgestimmt.' },
 ];
 
+export type Review = { id: string; name: string; text: string; treatment: string; active: boolean };
+
+export const REVIEW_LIMIT = 24;
+
+export const INIT_REVIEWS: Review[] = [
+  { id: 'rv1', name: 'Liv', text: 'War wie immer sehr zufrieden, super Behandlung.', treatment: 'Laser-Haarentfernung', active: true },
+  { id: 'rv2', name: 'Amélie', text: 'Ich buchte bei STUDIO ADISA um meine gelaserte Zonen „aufzufrischen“ und ich wurde nicht enttäuscht: Studio ist sauber und total schön, die Behandlung wird professionell durchgeführt und Senem war super nett! Ich komme in ein paar Monate wieder danke', treatment: 'Laser-Haarentfernung', active: true },
+  { id: 'rv3', name: 'Sabrina', text: 'Jetzt kann der Sommer wieder kommen. Danke Senem!!!', treatment: 'Pediküre', active: true },
+  { id: 'rv4', name: 'Vanessa', text: 'Super lieb und hat mir wirklich gut geholfen obwohl es ein sehr kurzfristiger Termin war, Dankeschön!', treatment: 'Entfernung des Nageldesigns', active: true },
+  { id: 'rv5', name: 'Stef', text: 'Sehr nette Beratung für eine laser Behandlung. Senem war sehr sympathisch und ich habe mich wohl gefühlt.', treatment: 'Laser-Haarentfernung', active: true },
+  { id: 'rv6', name: 'JP', text: 'Sehr nette und professionelle Behandlung :)', treatment: 'Laser-Haarentfernung', active: true },
+  { id: 'rv7', name: 'Isabella', text: 'Es war eine richtig gute und gründliche Behandlung. Sehr einfühlsam, sympathisch und ich habe mich direkt wohlgefühlt. Es wurde mir ein gutes Gefühl vermittelt, ebenso wurde ich kompetent beraten für ggf. andere Behandlungen.', treatment: 'Damen Waxing – Bikini', active: true },
+  { id: 'rv8', name: 'Katharina', text: 'Ich war inzwischen zweimal dort und bin super zufrieden. Waxing gründlich und die Behandlung sehr nett.', treatment: 'Damen Waxing – Bikini', active: true },
+];
+
 export const FRONTEND_SLUG: Record<string, string> = {
   laser:   'laser-haarentfernung',
   gesicht: 'gesichtsaesthetik',
   body:    'body-contouring',
   inject:  'injectables',
   mani:    'manikure-pedikure',
-  andere:  'andere',
 };
 
 export const PREVIEW_GRADIENT: Record<string, string> = {
@@ -229,11 +236,10 @@ export const PREVIEW_GRADIENT: Record<string, string> = {
   body:    'linear-gradient(135deg,#f0f9ff 0%,#bae6fd 100%)',
   inject:  'linear-gradient(135deg,#faf5ff 0%,#d8b4fe 100%)',
   mani:    'linear-gradient(135deg,#fff1f2 0%,#fecdd3 100%)',
-  andere:  'linear-gradient(135deg,#ecfdf5 0%,#6ee7b7 100%)',
 };
 
 export type PageBanner = {
-  label: string; title: string; body: string; cta: string; icon: string; image: string;
+  label: string; title: string; body: string; cta: string; icon: string; image: string; imagePosition?: ImagePosition;
 };
 
 export type PageContent = {
@@ -351,25 +357,5 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
     ],
     campaign1: { label: 'Limited Edition', title: 'Velvet Touch Combo', body: 'Das ultimative Duo: Spa-Maniküre & Spa-Pediküre inkl. Shellac und einem Glas Champagner während der Behandlung. Normaler Einzelpreis: 180 € – jetzt 145 €.', cta: 'ANGEBOT SICHERN', icon: 'favorite', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD9Jgcgz1lnxvUeFEc6mJMhe2fEQ_S7p7HqKt66Xz-k9ENiAAqtl5TMcgoL8KLRf78R0-wppwEv-4FLWZqaQ-5eJphTdHeXT8VwSjV2KqVi_XldRkOSaQSereWSQNPe2HOnDACmji6f22QeEcZUQSqoZHT7oiyLRNYYPsb69N6HuRaI0SUP0BrdNcAW08nJmomDxLZadSl9ZKoER-eetlH2O2cNrFikoJfTnvg0pKM_AvPxwDxBPA6NpLhfP0TI-YyWHtuvNutTlkHk' },
     campaign2: { label: 'Exklusives Membership', title: 'Nail Membership', body: 'Monatliche Shellac-Maniküre zum exklusiven Vorzugspreis. Als Mitglied profitieren Sie von Premium-Service, Prioritätsbuchung und 10% Rabatt auf alle Zusatzleistungen.', cta: 'MEHR ERFAHREN', icon: 'card_membership', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAtJndxncsaGViuLmDZDBacgojv8siWTA93LPFPxNKQpEt2zcmQOehCknTGGJyu6i6UnkaiofOhED7An8f2QpALTSIozuiak5h3D6E_eJGWt9ZvHmvNcykq9-o53KhIoV6PlcBlXDxkJoMv-p60rCfkvezFpByYXAE-Nf2Yqu6Ce3WZ-puxUEYanR11hTB_J-X_htoKYgGVsUvScVZLae2VUaXdaKyQuFNuH1TxcUFPuaVWjKQRAg8BbvmnFqGiwILaxXwCVD4uJQFs' },
-  },
-  andere: {
-    label: 'Wellness & Beauty',
-    h1: 'Andere',
-    heroDesc: 'Gönnen Sie sich eine Auszeit vom Alltag — von entspannenden Massagen bis zu professionellem Lash & Brow Styling. Ihr Wohlbefinden ist unsere Passion.',
-    heroImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCDCTVBkANRMCY5r7E2JLvTph0kXEA4T7GxktWv_bKMsgdG-AzO4MqdgFWvxeMIo4R4mlT3yzjHXFTmz2RMdSYBujyVKX-cIPUOMYrFBB2ecuVjcgYnes1xN_ami77RkyJfoZ850mfG5EwXU8-B_9qIIv66-_hQmWFSIruc6mQD8FuAZoQ9poHrEZJ1OhiQ92g2-Wr5bKJd6ZeyHf3zmq1k6SioVRtxAlftGRh3_AXEo5W9nWYw4m18vMFt9BX55pIVBkjVLW8zw2To',
-    infoTitle: 'Körper, Geist & Seele',
-    infoParagraphs: [
-      'Unser Wellness-Bereich bietet Ihnen eine einzigartige Kombination aus ganzheitlichen Körperbehandlungen und präzisem Beauty-Styling. Von der tiefen Muskelentspannung durch Hot Stone-Massage bis zur eleganten Wimpernverlängerung — wir verbinden Wohlbefinden mit Ästhetik.',
-      'Jede Behandlung wird individuell auf Ihre Bedürfnisse abgestimmt. Unsere zertifizierten Therapeutinnen setzen hochwertige Produkte und modernste Techniken ein, damit Sie das Studio nicht nur schöner, sondern auch entspannter und ausgeglichener verlassen.',
-    ],
-    benefitsTitle: 'Ihre Vorteile',
-    benefits: [
-      'Tiefe Muskelentspannung und nachhaltige Stressreduktion',
-      'Professionelles Lash & Brow Styling für einen perfekten Auftritt',
-      'Natürliche Inhaltsstoffe für maximale Hautverträglichkeit',
-      'Flexible Kombination mehrerer Treatments in einer Sitzung',
-    ],
-    campaign1: { label: 'Sommer Deal', title: 'Wellness Paket Deluxe', body: 'Aromamassage + Hot Stone Massage — 2 Stunden pure Entspannung zum Sonderpreis. Perfekt für Körper und Geist.', cta: 'JETZT BUCHEN', icon: 'spa', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB19c_exWt7H0n9vAsZz2kxGDGG-6ta5oPx7QUek7amnLk9lSKwX1U_2_UteAPk9YQWV_scOgE7XPR5xRwTS7UypBg55Iu2kTWSkUW7OqfwIwzNXIySxYdJxoUlzxitWwOn7KgNTrchQ3eQQbo5DN4XztJEAbo0D3vbPu97mCC59GSXoe7oe1x7mq3RC3iapMSvwggpNh8aqy0oMDqRZSfEq4tlt61cSnUlFuSXgKZjLrmBnJxSZ6geu2ibj9T1rqUv8BoIVmoSYDke' },
-    campaign2: { label: 'Neu im Sortiment', title: 'Lash & Brow Kombi-Set', body: 'Wimpernverlängerung + Brow Lamination im attraktiven Kombi-Angebot. Perfekter Look — komplett in einer Sitzung.', cta: 'MEHR ERFAHREN', icon: 'auto_fix_high', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDIuAiDdbAK4CrXw6oHsfzE6njj8oU_GLTVmeN887IeJ9LSEhN3wMEyrsaniFNs6hCqZqiBWwa6T3DLyBT1xiUX-ltBxIZz1qmQ225pSUE2_r-F6xiecsWuxSwFSuALS27sTeLB-zBdRQH8wHKf238lSfEkgf6PS5Ui-fa1WSDmHkJrtrkSPfoxQ2avWCM-quoxjreGE1a1JTpQsscngWwDnXqKUEY6HX5K4eolmXmjl6n8XLFOAOvahUS_bUyEjdBhoQA5--HmLmCN' },
   },
 };

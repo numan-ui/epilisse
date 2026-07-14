@@ -58,15 +58,15 @@
   --color-on-background: #1c1b1b;
 
   /* ── Typography: Font Families ─────────────────────────── */
-  --font-display-lg: "Playfair Display", serif;
-  --font-headline-lg: "Playfair Display", serif;
-  --font-headline-lg-mobile: "Playfair Display", serif;
-  --font-headline-md: "Playfair Display", serif;
-  --font-headline-sm: "Playfair Display", serif;
-  --font-body-lg: "Manrope", sans-serif;
-  --font-body-md: "Manrope", sans-serif;
-  --font-body-sm: "Manrope", sans-serif;
-  --font-label-caps: "Manrope", sans-serif;
+  --font-display-lg: var(--font-playfair-display), serif;
+  --font-headline-lg: var(--font-playfair-display), serif;
+  --font-headline-lg-mobile: var(--font-playfair-display), serif;
+  --font-headline-md: var(--font-playfair-display), serif;
+  --font-headline-sm: var(--font-playfair-display), serif;
+  --font-body-lg: var(--font-manrope), sans-serif;
+  --font-body-md: var(--font-manrope), sans-serif;
+  --font-body-sm: var(--font-manrope), sans-serif;
+  --font-label-caps: var(--font-manrope), sans-serif;
 
   /* ── Typography: Font Sizes ────────────────────────────── */
   --text-display-lg: 48px;
@@ -101,7 +101,7 @@
   /* ── Spacing ────────────────────────────────────────────── */
   --spacing-margin-mobile: 16px;
   --spacing-margin-desktop: 64px;
-  --spacing-section-gap: 80px;
+  --spacing-section-gap: 128px;
   --spacing-gutter: 24px;
 
   /* ── Width ──────────────────────────────────────────────── */
@@ -136,6 +136,32 @@
 
 .progress-animate {
   animation: progress 10s linear forwards;
+}
+
+/* ── Hero slide Ken Burns zoom ────────────────────────────── */
+@keyframes kenburns {
+  from { transform: scale(1); }
+  to   { transform: scale(1.09); }
+}
+
+.kenburns {
+  animation: kenburns linear forwards;
+}
+
+/* ── Unified warm color-grade so mismatched stock photos read as one shoot ── */
+.brand-photo {
+  filter: saturate(0.9) contrast(1.04) brightness(0.99) sepia(0.06);
+}
+
+/* ── Bento grid card: gold-tone lift on hover ─────────────── */
+.bento-card {
+  transition: box-shadow 0.5s ease, border-color 0.5s ease, transform 0.5s ease;
+}
+
+.bento-card:hover {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14), 0 0 0 1px rgba(197, 160, 33, 0.35);
+  border-color: rgba(197, 160, 33, 0.4);
+  transform: translateY(-4px);
 }
 
 /* ── EPILISSE logo shimmer ────────────────────────────────── */

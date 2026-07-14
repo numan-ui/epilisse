@@ -15,6 +15,8 @@ function mergeSlide(stored: HeroSlide, fallback?: HeroSlide): HeroSlide {
     headline: str(stored.headline, fallback.headline),
     sub:      str(stored.sub, fallback.sub),
     cta:      str(stored.cta, fallback.cta),
+    // '' is a valid, meaningful choice (booking modal) — only fall back when the field is missing entirely (pre-existing saved slides).
+    ctaLink:  stored.ctaLink ?? fallback.ctaLink ?? '',
     image:    str(stored.image, fallback.image),
     duration,
   };

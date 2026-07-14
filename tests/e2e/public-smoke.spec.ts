@@ -6,7 +6,6 @@ const SERVICE_PAGES = [
   'body-contouring',
   'injectables',
   'manikure-pedikure',
-  'andere',
 ];
 
 test.describe('Landing page', () => {
