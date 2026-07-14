@@ -47,7 +47,8 @@ export default function KampanyalarPage() {
   const [confirming, setConfirming] = useState(false);
   const [error, setError]           = useState<string | null>(null);
   const [query, setQuery]           = useState('');
-  const [yearFilter, setYearFilter] = useState<string>('all');
+  const [yearFilter, setYearFilter]   = useState<string>('all');
+  const [monthFilter, setMonthFilter] = useState<string>('all');
 
   const loadCampaigns = useCallback(() => {
     setLoading(true);
@@ -110,14 +111,27 @@ export default function KampanyalarPage() {
     [campaigns]
   );
 
+  const months = useMemo(
+    () => [...new Set(
+      campaigns
+        .filter(c => yearFilter === 'all' || new Date(c.created_at).getFullYear().toString() === yearFilter)
+        .map(c => (new Date(c.created_at).getMonth() + 1).toString())
+    )].sort((a, b) => Number(a) - Number(b)),
+    [campaigns, yearFilter]
+  );
+
+  const MONTH_NAMES = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
   const filteredCampaigns = useMemo(() => {
     const q = query.trim().toLowerCase();
     return campaigns.filter((c) => {
-      if (yearFilter !== 'all' && new Date(c.created_at).getFullYear().toString() !== yearFilter) return false;
+      const d = new Date(c.created_at);
+      if (yearFilter !== 'all' && d.getFullYear().toString() !== yearFilter) return false;
+      if (monthFilter !== 'all' && (d.getMonth() + 1).toString() !== monthFilter) return false;
       if (!q) return true;
       return (c.name ?? '').toLowerCase().includes(q) || c.title.toLowerCase().includes(q);
     });
-  }, [campaigns, query, yearFilter]);
+  }, [campaigns, query, yearFilter, monthFilter]);
 
   const continueSending = async (id: string) => {
     setSending(true);
@@ -170,16 +184,22 @@ export default function KampanyalarPage() {
               onChange={(e) => setQuery(e.target.value)}
               className="flex-1 min-w-[220px] border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
             />
-            {years.length > 1 && (
-              <select
-                value={yearFilter}
-                onChange={(e) => setYearFilter(e.target.value)}
-                className="border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
-              >
-                <option value="all">Alle Jahre</option>
-                {years.map(y => <option key={y} value={y}>{y}</option>)}
-              </select>
-            )}
+            <select
+              value={monthFilter}
+              onChange={(e) => setMonthFilter(e.target.value)}
+              className="border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+            >
+              <option value="all">Alle Monate</option>
+              {months.map(m => <option key={m} value={m}>{MONTH_NAMES[Number(m) - 1]}</option>)}
+            </select>
+            <select
+              value={yearFilter}
+              onChange={(e) => { setYearFilter(e.target.value); setMonthFilter('all'); }}
+              className="border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+            >
+              <option value="all">Alle Jahre</option>
+              {years.map(y => <option key={y} value={y}>{y}</option>)}
+            </select>
           </div>
         )}
 
