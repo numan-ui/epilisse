@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { getAdminSession } from '@/lib/supabase/authServer';
 
 export async function GET() {
+  if (!(await getAdminSession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const supabase = supabaseServer();
 
   const { data: campaigns, error } = await supabase
@@ -35,6 +37,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!(await getAdminSession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const supabase = supabaseServer();
   const body = await request.json();
 

@@ -46,7 +46,7 @@ export default function BehandlungenPage() {
       </header>
 
       <div className="flex-1 overflow-y-auto p-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {categories.map((cat) => {
             const svcs          = services[cat.id]  ?? [];
             const cmps          = campaigns[cat.id] ?? [];

@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { getAdminSession } from '@/lib/supabase/authServer';
 
 export async function GET() {
+  if (!(await getAdminSession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const supabase = supabaseServer();
   const { data, error } = await supabase
     .from('category_follow_up_settings')
@@ -21,6 +23,7 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  if (!(await getAdminSession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const supabase = supabaseServer();
   const body = await request.json();
 

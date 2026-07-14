@@ -13,19 +13,20 @@ import { useAdminHeroSlides } from "@/hooks/useAdminHeroSlides";
 import { useAdminPromoBanners } from "@/hooks/useAdminPromoBanners";
 import { useAdminAboutValues } from "@/hooks/useAdminAboutValues";
 import { useBookingModal } from "@/context/BookingModalContext";
+import SmartImage from "@/components/SmartImage";
 
 /* ── Image constants (Stitch AI – replace with real salon photos) ── */
 const IMG = {
   laser:
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuA3IvtG-coL1R-rxRRkCnvRhXTeCycUg1nJq-MJ9OwNUG_hyq5EKihhgBnZ6-I8FAXVro5Kaa5XCJjLSIsa6Xb7xroT8mf9NdJM89YISQMXd0yIQ_HlT9Ex29xuoiRwoTc0hr0Yn3r8_n9K0e5RlFX-CeRmNZdVeFcpCDBQ0OB8n0Y6aBnvXrJX1wH1cWYO97zGEQPOmnnZE13-I2ZEY81xSze4Uv-GEDoHwfTQnB2_t-NNQGEPkoA5XgHE4w9KWM4CAJG-EdG8Cy_z",
+    "/images/laser-hair-removal.png",
   facial:
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuDrgLWhl7EjgUAhqHCfTK1D52PmXPF9J-BJYYc_ojdoV_gy4UGXEjkgANF3wWYjHqy53LTIplM-oEpi7cxFjRPMtQ1bDsidV5LBX3bL8Sfb-RDP7uopJFXAFj30wN3qxWCSR6iuYoaAF86bhNElVdByUZ2wKcEt_5GPybU5jCI8h0_dZa6oLHxRSXbODo0jVVObxQw5TcoKOL-Xy3V_7f0RZxvB2a9aoXyvX-0QNPChRJ8wJT_7b5ipFi3L6aybwqTrlQZMuPLtmWRQ",
-  body: "https://lh3.googleusercontent.com/aida-public/AB6AXuAS7VEqn3YLIpzxeNRbM1gcyi8MJr1qDdhCbgVl3FgIek9EyqNPv0_RSpzK4D8Fj_sjWdLM3pAfQAOR3aelWP54bwPTkASLYexbRvDWiWqoOKudhs8auDngKhBI3OapBF6Q5nwLH0MoCdYY77ZDOyrZ4Utsa0vpTToujP6rCNRlUYOJkmc6h4lIkPVLpiYi_z5U9a40yt2bqbxzsI4U_adkDSi5HdYRzHkCtDQUSdtlUs2B7TFDMBv6Br8-tRgx1sCaravafH3RZyOU",
+    "/images/gesichtsaesthetik.png",
+  body: "/images/body-contouring.png",
   injectables:
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuB2R1r5IBHzprIEBLdeHT1f02OFMOX85Ol0fXFMTE8Mn9Nlc1lMes1BoOgj1lwKVSGR-dIFS-r-gyxMLZZESLXUcH_zS9UBq5T3z81zaxMXyfkXaTN50ZQOxmiM9kMWb4FbuKoODmgwAvE3ta_i60Ekgbw0pVcC1SjtZtC__ZxTNJSwkcNaB_h8XguwNKKEQmQHrBovNuCFUoWvqMpN2bzbrTH7ZN2a66uUpCi_65MRDuC8j05691WrlUa-ULD7rQ27qkKsnnnR_7Q7",
-  mani: "https://lh3.googleusercontent.com/aida-public/AB6AXuAtJndxncsaGViuLmDZDBacgojv8siWTA93LPFPxNKQpEt2zcmQOehCknTGGJyu6i6UnkaiofOhED7An8f2QpALTSIozuiak5h3D6E_eJGWt9ZvHmvNcykq9-o53KhIoV6PlcBlXDxkJoMv-p60rCfkvezFpByYXAE-Nf2Yqu6Ce3WZ-puxUEYanR11hTB_J-X_htoKYgGVsUvScVZLae2VUaXdaKyQuFNuH1TxcUFPuaVWjKQRAg8BbvmnFqGiwILaxXwCVD4uJQFs",
+    "/images/injectables.png",
+  mani: "/images/manikure-pedikure.png",
   about:
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuCDCTVBkANRMCY5r7E2JLvTph0kXEA4T7GxktWv_bKMsgdG-AzO4MqdgFWvxeMIo4R4mlT3yzjHXFTmz2RMdSYBujyVKX-cIPUOMYrFBB2ecuVjcgYnes1xN_ami77RkyJfoZ850mfG5EwXU8-B_9qIIv66-_hQmWFSIruc6mQD8FuAZoQ9poHrEZJ1OhiQ92g2-Wr5bKJd6ZeyHf3zmq1k6SioVRtxAlftGRh3_AXEo5W9nWYw4m18vMFt9BX55pIVBkjVLW8zw2To",
+    "/images/about-studio.png",
 };
 
 /* ── Hero slide overlays ────────────────────────────────────── */
@@ -302,12 +303,13 @@ export default function HomePage() {
                     : undefined
                 }
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <SmartImage
                   src={slide.image}
                   alt={slide.headline}
-                  className={`brand-photo w-full h-full object-cover ${i === currentSlide ? "kenburns" : ""}`}
+                  className={`brand-photo object-cover ${i === currentSlide ? "kenburns" : ""}`}
                   style={i === currentSlide ? { animationDuration: `${(slide.duration || 10) + 2}s` } : undefined}
+                  sizes="100vw"
+                  priority
                 />
               </div>
             ) : (
@@ -403,8 +405,12 @@ export default function HomePage() {
               className="bento-card group bg-surface-container-lowest border border-outline-variant/30 cursor-pointer flex flex-col"
             >
               <div className="relative overflow-hidden aspect-square">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={getCatImage(id) || CORE_CAT_IMG[id]} alt={getCatName(id)} className="brand-photo w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                <SmartImage
+                  src={getCatImage(id) || CORE_CAT_IMG[id]}
+                  alt={getCatName(id)}
+                  className="brand-photo object-cover group-hover:scale-105 transition-transform duration-700"
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                />
               </div>
               <div className="p-6">
                 <span className="font-label-caps text-[10px] text-primary tracking-widest block mb-2">
@@ -426,8 +432,12 @@ export default function HomePage() {
               >
                 <div className="relative overflow-hidden aspect-square">
                   {cat.image ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={cat.image} alt={cat.name} className="brand-photo w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <SmartImage
+                      src={cat.image}
+                      alt={cat.name}
+                      className="brand-photo object-cover group-hover:scale-105 transition-transform duration-700"
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#fff8e7 0%,#f5e5a0 100%)' }}>
                       <span className="material-symbols-outlined text-[48px] text-primary/30">{cat.icon}</span>
@@ -459,7 +469,7 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.7, ease: "easeOut" }}
-            className="relative w-full min-h-[400px] overflow-hidden group border border-outline-variant/30"
+            className="bento-card relative w-full min-h-[400px] overflow-hidden group border border-outline-variant/30"
           >
             <div className="absolute inset-0 bg-secondary-container/30 z-10" />
             <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between z-20 px-8 md:px-24">
@@ -497,12 +507,12 @@ export default function HomePage() {
               <div className="hidden md:block w-[380px] h-[400px] relative overflow-hidden flex-shrink-0">
                 <div className="absolute inset-0 shadow-2xl" style={{ background: 'linear-gradient(135deg,#f6f3f2,#e5e2dc)' }} />
                 {banner.image && (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
+                  <SmartImage
                     src={banner.image}
                     alt={banner.title}
                     onError={e => { e.currentTarget.style.display = 'none'; }}
-                    className="brand-photo absolute inset-0 w-full h-full object-cover shadow-2xl scale-110 group-hover:scale-100 transition-transform duration-1000"
+                    className="brand-photo object-cover shadow-2xl scale-110 group-hover:scale-100 transition-transform duration-1000"
+                    sizes="380px"
                   />
                 )}
               </div>
@@ -556,12 +566,12 @@ export default function HomePage() {
           </div>
 
           {/* Right: image */}
-          <div className="relative overflow-hidden rounded-xl aspect-[4/5]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+          <div className="bento-card group relative overflow-hidden rounded-xl aspect-[4/5]">
+            <SmartImage
               src={aboutImg}
               alt="EPILISSE Studio München"
-              className="brand-photo w-full h-full object-cover"
+              className="brand-photo object-cover group-hover:scale-105 transition-transform duration-700"
+              sizes="(min-width: 768px) 50vw, 100vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6">
@@ -608,7 +618,7 @@ export default function HomePage() {
         >
 
           {/* Address card */}
-          <div className="bg-surface-container-low border border-outline-variant/30 p-8 flex flex-col gap-4">
+          <div className="bento-card bg-surface-container-low border border-outline-variant/30 p-8 flex flex-col gap-4">
             <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
               <span className="material-symbols-outlined text-primary">location_on</span>
             </div>
@@ -621,7 +631,7 @@ export default function HomePage() {
           </div>
 
           {/* Hours card */}
-          <div className="bg-surface-container-low border border-outline-variant/30 p-8 flex flex-col gap-4">
+          <div className="bento-card bg-surface-container-low border border-outline-variant/30 p-8 flex flex-col gap-4">
             <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
               <span className="material-symbols-outlined text-primary">schedule</span>
             </div>
@@ -634,7 +644,7 @@ export default function HomePage() {
           </div>
 
           {/* Phone card */}
-          <div className="bg-surface-container-low border border-outline-variant/30 p-8 flex flex-col gap-4">
+          <div className="bento-card bg-surface-container-low border border-outline-variant/30 p-8 flex flex-col gap-4">
             <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
               <span className="material-symbols-outlined text-primary">phone</span>
             </div>
@@ -738,11 +748,14 @@ export default function HomePage() {
               {lc.footerStudioTitle || t("footer.studioTitle")}
             </h4>
             <ul className="flex flex-col gap-4 font-body-sm text-body-sm text-secondary">
-              <li className="whitespace-pre-line">{displayAddress}</li>
-              <li className="whitespace-pre-line">{displayHours}</li>
               <li>
                 <a href={`tel:${phoneHref}`} className="hover:text-primary transition-colors">
                   {displayPhone}
+                </a>
+              </li>
+              <li>
+                <a href="#kontakt" className="hover:text-primary transition-colors">
+                  {t("contact.addressTitle")} &amp; {t("contact.hoursTitle")} →
                 </a>
               </li>
             </ul>

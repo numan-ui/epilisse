@@ -3,10 +3,12 @@ import { supabaseServer } from '@/lib/supabase/server';
 import { appointmentConfirmationEmail, sendEmail, getSiteUrl } from '@/lib/email/resend';
 import { signConsentToken } from '@/lib/consentToken';
 import { getRemainingEmailQuota, logEmailSent } from '@/lib/emailQuota';
+import { getAdminSession } from '@/lib/supabase/authServer';
 
 const DE_MONTHS = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 
 export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!(await getAdminSession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { id } = await params;
   const supabase = supabaseServer();
 

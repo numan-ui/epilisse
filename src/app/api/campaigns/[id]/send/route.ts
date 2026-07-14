@@ -2,12 +2,14 @@ import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
 import { campaignEmail, sendEmail } from '@/lib/email/resend';
 import { getRemainingEmailQuota, logEmailSent } from '@/lib/emailQuota';
+import { getAdminSession } from '@/lib/supabase/authServer';
 
 // Resolves the campaign's audience into campaign_recipients rows (if not
 // already materialized at creation time, i.e. target_type is 'all'/'category'),
 // then sends via Resend and flips each recipient's status. Safe to call more
 // than once: recipients already 'sent' are skipped.
 export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!(await getAdminSession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { id } = await params;
   const supabase = supabaseServer();
 

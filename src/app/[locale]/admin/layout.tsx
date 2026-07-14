@@ -1,7 +1,9 @@
 'use client';
-import { useParams, usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AdminDataProvider } from './behandlungen/AdminDataContext';
+import { supabaseBrowser } from '@/lib/supabase/browser';
 
 const NAV_ITEMS = [
   { href: '/admin', icon: 'dashboard', label: 'Dashboard' },
@@ -9,7 +11,7 @@ const NAV_ITEMS = [
   { href: '/admin/termine', icon: 'calendar_month', label: 'Termine' },
   { href: '/admin/behandlungen', icon: 'content_cut', label: 'Behandlungen' },
   { href: '/admin/kunden', icon: 'group', label: 'Kunden' },
-  { href: '/admin/kampanyalar', icon: 'campaign', label: 'Kampanyalar' },
+  { href: '/admin/kampagnen', icon: 'campaign', label: 'Kampagnen' },
   { href: '/admin/einstellungen', icon: 'settings', label: 'Einstellungen' },
 ];
 
@@ -17,10 +19,38 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const params = useParams();
   const locale = (params?.locale as string) || 'de';
   const pathname = usePathname();
+  const router = useRouter();
+  const [role, setRole] = useState<'super_admin' | 'admin' | null>(null);
+  const [email, setEmail] = useState<string>('');
+
+  const isLoginPage = pathname.startsWith(`/${locale}/admin/login`);
+
+  useEffect(() => {
+    if (isLoginPage) return;
+    const supabase = supabaseBrowser();
+    supabase.auth.getUser().then(({ data }) => {
+      setRole((data.user?.app_metadata?.role as 'super_admin' | 'admin' | undefined) ?? 'admin');
+      setEmail(data.user?.email ?? '');
+    });
+  }, [isLoginPage]);
+
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
+  const navItems = role === 'super_admin'
+    ? [...NAV_ITEMS, { href: '/admin/team', icon: 'admin_panel_settings', label: 'Team' }]
+    : NAV_ITEMS;
 
   const isActive = (href: string) => {
     const full = `/${locale}${href}`;
     return href === '/admin' ? pathname === full : pathname.startsWith(full);
+  };
+
+  const handleLogout = async () => {
+    const supabase = supabaseBrowser();
+    await supabase.auth.signOut();
+    router.push(`/${locale}/admin/login`);
   };
 
   return (
@@ -32,7 +62,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <Link
               key={item.href}
               href={`/${locale}${item.href}`}
@@ -49,7 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           ))}
         </nav>
 
-        <div className="p-6 border-t border-outline-variant">
+        <div className="p-6 border-t border-outline-variant space-y-3">
           <Link
             href={`/${locale}/admin/termine`}
             className="w-full bg-primary text-on-primary py-3 px-4 flex items-center justify-center gap-2 rounded hover:brightness-90 transition-all active:scale-95 font-label-caps text-label-caps uppercase"
@@ -57,6 +87,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span className="material-symbols-outlined text-[20px]">add</span>
             Neuer Termin
           </Link>
+
+          <div className="flex items-center justify-between gap-2 pt-1">
+            <span className="font-body-sm text-body-sm text-on-surface-variant truncate" title={email}>{email}</span>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="text-on-surface-variant hover:text-primary transition-colors shrink-0"
+              aria-label="Abmelden"
+              title="Abmelden"
+            >
+              <span className="material-symbols-outlined text-[20px]">logout</span>
+            </button>
+          </div>
         </div>
       </aside>
 

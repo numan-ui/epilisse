@@ -28,7 +28,14 @@ export function useAdminCategories(): Category[] {
       const raw = localStorage.getItem(LS_CAT);
       if (raw) {
         const stored: Category[] = JSON.parse(raw);
-        if (stored.length > 0) setCats(mergeCategories(stored));
+        if (stored.length > 0) {
+          const merged = mergeCategories(stored);
+          setCats(merged);
+          // Persist the cleanup here too — otherwise a stale built-in id (e.g. a
+          // removed default category) lingers until the admin page happens to be
+          // the first tab to load and rewrite it.
+          if (merged.length !== stored.length) localStorage.setItem(LS_CAT, JSON.stringify(merged));
+        }
       }
     } catch { /* ignore */ }
   }, []);

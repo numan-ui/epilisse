@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
+import SmartImage from "@/components/SmartImage";
 import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useBookingModal } from "@/context/BookingModalContext";
@@ -170,11 +171,12 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
         {/* ── HERO ─────────────────────────────────────────────────────── */}
         <section className="relative w-full h-[620px] md:h-[716px] overflow-hidden">
           <div className="absolute inset-0 z-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <SmartImage
               src={data.heroImage}
               alt={data.h1}
-              className="w-full h-full object-cover"
+              className="object-cover"
+              sizes="100vw"
+              priority
             />
             <div className="absolute inset-0 bg-black/25" />
           </div>

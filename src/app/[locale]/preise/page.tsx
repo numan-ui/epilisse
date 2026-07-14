@@ -83,10 +83,9 @@ export default function PreisePage() {
   const body    = useAdminServices("body", FALLBACK_PRICING.body);
   const inject  = useAdminServices("inject", FALLBACK_PRICING.inject);
   const mani    = useAdminServices("mani", FALLBACK_PRICING.mani);
-  const andere  = useAdminServices("andere", FALLBACK_PRICING.andere);
 
   const pricingByCat: Record<string, { name: string; duration: string; price: string }[]> = {
-    laser, gesicht, body, inject, mani, andere,
+    laser, gesicht, body, inject, mani,
   };
 
   const visibleCats = categories.filter(c => c.visible && pricingByCat[c.id]);

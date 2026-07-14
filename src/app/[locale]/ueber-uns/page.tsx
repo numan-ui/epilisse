@@ -8,6 +8,7 @@ import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useAdminAboutValues } from "@/hooks/useAdminAboutValues";
 import { useAdminReviews } from "@/hooks/useAdminReviews";
 import { useBookingModal } from "@/context/BookingModalContext";
+import SmartImage from "@/components/SmartImage";
 
 const LOCALES = [
   { code: "de", label: "DE" },
@@ -15,7 +16,7 @@ const LOCALES = [
 ] as const;
 
 const FALLBACK_ABOUT_IMAGE =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuCDCTVBkANRMCY5r7E2JLvTph0kXEA4T7GxktWv_bKMsgdG-AzO4MqdgFWvxeMIo4R4mlT3yzjHXFTmz2RMdSYBujyVKX-cIPUOMYrFBB2ecuVjcgYnes1xN_ami77RkyJfoZ850mfG5EwXU8-B_9qIIv66-_hQmWFSIruc6mQD8FuAZoQ9poHrEZJ1OhiQ92g2-Wr5bKJd6ZeyHf3zmq1k6SioVRtxAlftGRh3_AXEo5W9nWYw4m18vMFt9BX55pIVBkjVLW8zw2To";
+  "/images/about-studio.png";
 
 export default function UeberUnsPage() {
   const t = useTranslations();
@@ -157,11 +158,11 @@ export default function UeberUnsPage() {
 
           {/* Right: image */}
           <div className="relative overflow-hidden rounded-xl aspect-[4/5]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <SmartImage
               src={aboutImg}
               alt="EPILISSE Studio München"
-              className="w-full h-full object-cover"
+              className="object-cover"
+              sizes="(min-width: 768px) 50vw, 100vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6">

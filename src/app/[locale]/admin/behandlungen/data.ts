@@ -95,7 +95,7 @@ export type SiteSettings = {
 export const INIT_SETTINGS: SiteSettings = {
   name: 'EPILISSE Beauty Studio',
   tagline: 'Luxury Beauty Care Munich',
-  address: 'Musterstraße 1, 80331 München',
+  address: 'Berlepschstraße 2, 81373 München-Sendling',
   phone: '+49 89 000000',
   email: 'info@epilisse.de',
   whatsapp: '+49 89 000000',
@@ -155,7 +155,7 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
     sub: 'Entdecken Sie die Kunst der ästhetischen Perfektion in unserem Exklusiv-Studio in München.',
     cta: 'TERMIN BUCHEN',
     ctaLink: '',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD_YasW9q229vcdUMyOWhsXE0U56gXDW6IhxHCHslvhyudCbfAceKlPVs2XmGP2zRTNgbrCpnW7wLqysQlSs-XP9sR0JO7XReZFC7rVxns2gpe1h7jVgIztmgeZnC8P0gK6eqoAbqsiq_aXBWC0sFVsNmsdZg8ysh_1BdL-yWU858EORE7eXi0v1mssia4G2iXsFBhPOxJd618fsVSgIMKlsRJaBTUn8FqwRk8M5F9VQFNNmVgaWeU-KnCcASqRauKgP4vjhali-pMt',
+    image: '/images/hero-1.png',
   },
   {
     id: 'hero2', duration: 10,
@@ -163,7 +163,7 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
     sub: 'Präzise Laser-Haarentfernung für ein seidiges Hautgefühl, das bleibt. Schmerzfrei und effektiv.',
     cta: 'ERFAHREN SIE MEHR',
     ctaLink: '/laser-haarentfernung',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB19c_exWt7H0n9vAsZz2kxGDGG-6ta5oPx7QUek7amnLk9lSKwX1U_2_UteAPk9YQWV_scOgE7XPR5xRwTS7UypBg55Iu2kTWSkUW7OqfwIwzNXIySxYdJxoUlzxitWwOn7KgNTrchQ3eQQbo5DN4XztJEAbo0D3vbPu97mCC59GSXoe7oe1x7mq3RC3iapMSvwggpNh8aqy0oMDqRZSfEq4tlt61cSnUlFuSXgKZjLrmBnJxSZ6geu2ibj9T1rqUv8BoIVmoSYDke',
+    image: '/images/hero-2.png',
   },
   {
     id: 'hero3', duration: 10,
@@ -171,7 +171,7 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
     sub: 'Individuelle Behandlungen für eine strahlende Haut und natürliche Verjüngung.',
     cta: 'ZUM ANGEBOT',
     ctaLink: '/gesichtsaesthetik',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCDCTVBkANRMCY5r7E2JLvTph0kXEA4T7GxktWv_bKMsgdG-AzO4MqdgFWvxeMIo4R4mlT3yzjHXFTmz2RMdSYBujyVKX-cIPUOMYrFBB2ecuVjcgYnes1xN_ami77RkyJfoZ850mfG5EwXU8-B_9qIIv66-_hQmWFSIruc6mQD8FuAZoQ9poHrEZJ1OhiQ92g2-Wr5bKJd6ZeyHf3zmq1k6SioVRtxAlftGRh3_AXEo5W9nWYw4m18vMFt9BX55pIVBkjVLW8zw2To',
+    image: '/images/about-studio.png',
   },
   {
     id: 'hero4', duration: 10,
@@ -179,7 +179,7 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
     sub: 'Maniküre & Pediküre auf höchstem Niveau für Ihre Hände und Füße.',
     cta: 'JETZT BUCHEN',
     ctaLink: '',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAb0Xk8wJSTpOUGnUD4StyAC2X_a5HESgSsYNy02I50YB_F081P4wFEpLLa3HWYmPBVpi2nDPPOAy0_8C2Qdpfl2a9dZ-vx5kuLRWfWCnLSNk3pf7GP-8KlvRZUjHoayjhKxkAEfyVMfcA6MG2jqqpmCCqbmIqrxvAVImnfhZxf_0DcCu_hTAoRnkq3Dan1OvZbY3PTrpL-he-a5fk5zE2Pkg4ranUUJlJT3SVH73E1zMstR68y86JSpWTYQXQxapywC4Mypwk7ZMux',
+    image: '/images/hero-4.png',
   },
 ];
 
@@ -193,7 +193,7 @@ export const INIT_PROMO_BANNERS: PromoBanner[] = [
     label: 'EXKLUSIVES ANGEBOT', title: 'Winter Glow\nKombi-Paket',
     desc: 'Erhalten Sie 20 % Rabatt auf unsere exklusive Kombination aus Gesichtshydrierung und Maniküre. Gültig bis Ende der Saison.',
     ctaPrimary: 'ANGEBOT SICHERN', ctaSecondary: 'DETAILS ANSEHEN',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD9Jgcgz1lnxvUeFEc6mJMhe2fEQ_S7p7HqKt66Xz-k9ENiAAqtl5TMcgoL8KLRf78R0-wppwEv-4FLWZqaQ-5eJphTdHeXT8VwSjV2KqVi_XldRkOSaQSereWSQNPe2HOnDACmji6f22QeEcZUQSqoZHT7oiyLRNYYPsb69N6HuRaI0SUP0BrdNcAW08nJmomDxLZadSl9ZKoER-eetlH2O2cNrFikoJfTnvg0pKM_AvPxwDxBPA6NpLhfP0TI-YyWHtuvNutTlkHk',
+    image: '/images/promo-winter-glow.png',
   },
 ];
 
@@ -262,7 +262,7 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
     label: 'Signature Treatment',
     h1: 'Laser-Haarentfernung',
     heroDesc: 'Erleben Sie modernste Technologie für dauerhaft glatte Haut. Schmerzarm, hocheffektiv und perfekt auf Ihren Hauttyp abgestimmt.',
-    heroImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA3IvtG-coL1R-rxRRkCnvRhXTeCycUg1nJq-MJ9OwNUG_hyq5EKihhgBnZ6-I8FAXVro5Kaa5XCJjLSIsa6Xb7xroT8mf9NdJM89YISQMXd0yIQ_HlT9Ex29xuoiRwoTc0hr0Yn3r8_n9K0e5RlFX-CeRmNZdVeFcpCDBQ0OB8n0Y6aBnvXrJX1wH1cWYO97zGEQPOmnnZE13-I2ZEY81xSze4Uv-GEDoHwfTQnB2_t-NNQGEPkoA5XgHE4w9KWM4CAJG-EdG8Cy_z',
+    heroImage: '/images/laser-hair-removal.png',
     infoTitle: 'Die Zukunft der Hautpflege',
     infoParagraphs: [
       'Unsere Laser-Haarentfernung nutzt die innovative Diodenlaser-Technologie, um Haarwurzeln gezielt und nachhaltig zu deaktivieren. Im Gegensatz zu herkömmlichen Methoden ist unser Verfahren besonders hautschonend und auch für sensible Bereiche geeignet.',
@@ -275,14 +275,14 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
       'Hautbildverfeinerung und Reduktion von Pigmentflecken',
       'Langfristige Zeitersparnis und reduzierter Wasserverbrauch',
     ],
-    campaign1: { label: 'Limited Edition Offer', title: 'Kombi-Paket Kampagne', body: 'Buchen Sie ein Paket aus 3 Behandlungszonen und erhalten Sie die günstigste Zone komplett kostenfrei. Gültig für alle Laser-Treatments in diesem Monat.', cta: 'JETZT SICHERN', icon: 'auto_awesome', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDpZoen6Z8-BkUl8prQYXf0Xd1Phn1Xdcuk_VZ-IofB9pCsDecKCUdvXaAoDYxIvL3Pd7MzIsqk1Qsa1ZfN8QNOHMUhZWC4pSKfwKd1kxuc1UmJnIvzSkftdtB_72BxCD3RsoYfSP9DCDgl7Hu2Txw7HLS7n783Lh-uDnPYuVXqfLwu3QW9RvZwYy-yu30PukyuMKxMBOWOlrxhxQXQMiIRW8nVG7y5oMjkK0lvir7cCDbsFPR1OXu3dQoZxS2tCiISP8GlPzFjtSct' },
-    campaign2: { label: 'Exklusives Treue-Special', title: 'Freunde-Werben-Programm', body: 'Empfehlen Sie uns weiter und erhalten Sie beide 20% Rabatt auf Ihre nächste Laser-Sitzung. Geteilte Schönheit ist doppelte Freude.', cta: 'MEHR ERFAHREN', icon: 'loyalty', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDYjBxY_5jgd1zV3S6f54auMKfGGrnf_nUDyMDjmdGw6dVJQPTKNZXlcxViHrvhn3b9sU8vdRuY0Xo9vEk7B573gKj1u-y7pJ2RLNt8eovCEdgIfX73mrjoHjaA3SDuEEJ1n6fW9cjPUQRG1MBg6BmBXeVpB0vp9OV9zMxedArRK3iI3ABfEbRu1rAjMaDK3q03AYuDoduRWP6uzj-vI2lXCRNfACkm5S1slmgz-wR_-8LhNNfmFX8spaZGMk9NBX6GBPzQ7BmFrvnB' },
+    campaign1: { label: 'Limited Edition Offer', title: 'Kombi-Paket Kampagne', body: 'Buchen Sie ein Paket aus 3 Behandlungszonen und erhalten Sie die günstigste Zone komplett kostenfrei. Gültig für alle Laser-Treatments in diesem Monat.', cta: 'JETZT SICHERN', icon: 'auto_awesome', image: '/images/campaign-generic-1.png' },
+    campaign2: { label: 'Exklusives Treue-Special', title: 'Freunde-Werben-Programm', body: 'Empfehlen Sie uns weiter und erhalten Sie beide 20% Rabatt auf Ihre nächste Laser-Sitzung. Geteilte Schönheit ist doppelte Freude.', cta: 'MEHR ERFAHREN', icon: 'loyalty', image: '/images/campaign-laser-2.png' },
   },
   gesicht: {
     label: 'Premium Skin Care',
     h1: 'Gesichtsästhetik',
     heroDesc: 'Individuelle Gesichtsbehandlungen auf höchstem Niveau. Von HydraFacial über Microneedling bis zu chemischen Peelings – für strahlendes, jugendliches Hautbild.',
-    heroImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDrgLWhl7EjgUAhqHCfTK1D52PmXPF9J-BJYYc_ojdoV_gy4UGXEjkgANF3wWYjHqy53LTIplM-oEpi7cxFjRPMtQ1bDsidV5LBX3bL8Sfb-RDP7uopJFXAFj30wN3qxWCSR6iuYoaAF86bhNElVdByUZ2wKcEt_5GPybU5jCI8h0_dZa6oLHxRSXbODo0jVVObxQw5TcoKOL-Xy3V_7f0RZxvB2a9aoXyvX-0QNPChRJ8wJT_7b5ipFi3L6aybwqTrlQZMuPLtmWRQ',
+    heroImage: '/images/gesichtsaesthetik.png',
     infoTitle: 'Wissenschaft trifft Schönheit',
     infoParagraphs: [
       'Unsere Gesichtsästhetik-Behandlungen vereinen medizinische Expertise mit ästhetischem Feingefühl. Jede Therapie beginnt mit einer präzisen Hautdiagnose – wir analysieren Feuchtigkeitsgehalt, Talgproduktion, Pigmentverteilung und Hautalterung, um das optimale Behandlungsprotokoll zu entwickeln.',
@@ -295,14 +295,14 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
       'Reduktion von Hyperpigmentierungen, Falten und unebenmäßiger Textur',
       'Langanhaltende Hydratation durch tief eindringende Wirkstoffkomplexe',
     ],
-    campaign1: { label: 'Seasonal Special', title: 'Frühlingsfrische Haut', body: 'Starten Sie mit strahlender Haut in den Frühling: Buchen Sie HydraFacial Deluxe und erhalten Sie ein Chemical Peeling Ihrer Wahl zum Sonderpreis. Gültig bis Ende März.', cta: 'JETZT SICHERN', icon: 'spa', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDpZoen6Z8-BkUl8prQYXf0Xd1Phn1Xdcuk_VZ-IofB9pCsDecKCUdvXaAoDYxIvL3Pd7MzIsqk1Qsa1ZfN8QNOHMUhZWC4pSKfwKd1kxuc1UmJnIvzSkftdtB_72BxCD3RsoYfSP9DCDgl7Hu2Txw7HLS7n783Lh-uDnPYuVXqfLwu3QW9RvZwYy-yu30PukyuMKxMBOWOlrxhxQXQMiIRW8nVG7y5oMjkK0lvir7cCDbsFPR1OXu3dQoZxS2tCiISP8GlPzFjtSct' },
-    campaign2: { label: 'Exklusives Membership', title: 'HydraFacial Membership', body: 'Werden Sie Teil unserer exklusiven Mitgliedergemeinschaft und genießen Sie monatliche HydraFacial-Behandlungen zu Vorzugspreisen. Dauerhaft strahlende Haut als Lifestyle.', cta: 'MEHR ERFAHREN', icon: 'diamond', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDrgLWhl7EjgUAhqHCfTK1D52PmXPF9J-BJYYc_ojdoV_gy4UGXEjkgANF3wWYjHqy53LTIplM-oEpi7cxFjRPMtQ1bDsidV5LBX3bL8Sfb-RDP7uopJFXAFj30wN3qxWCSR6iuYoaAF86bhNElVdByUZ2wKcEt_5GPybU5jCI8h0_dZa6oLHxRSXbODo0jVVObxQw5TcoKOL-Xy3V_7f0RZxvB2a9aoXyvX-0QNPChRJ8wJT_7b5ipFi3L6aybwqTrlQZMuPLtmWRQ' },
+    campaign1: { label: 'Seasonal Special', title: 'Frühlingsfrische Haut', body: 'Starten Sie mit strahlender Haut in den Frühling: Buchen Sie HydraFacial Deluxe und erhalten Sie ein Chemical Peeling Ihrer Wahl zum Sonderpreis. Gültig bis Ende März.', cta: 'JETZT SICHERN', icon: 'spa', image: '/images/campaign-generic-1.png' },
+    campaign2: { label: 'Exklusives Membership', title: 'HydraFacial Membership', body: 'Werden Sie Teil unserer exklusiven Mitgliedergemeinschaft und genießen Sie monatliche HydraFacial-Behandlungen zu Vorzugspreisen. Dauerhaft strahlende Haut als Lifestyle.', cta: 'MEHR ERFAHREN', icon: 'diamond', image: '/images/gesichtsaesthetik.png' },
   },
   body: {
     label: 'Body Sculpting',
     h1: 'Body Contouring',
     heroDesc: 'Modernste non-invasive Körperformung für definierte Konturen und straffere Haut. Kryolipolyse, RF-Lifting und Ultraschall-Kavitation auf premium Niveau.',
-    heroImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAS7VEqn3YLIpzxeNRbM1gcyi8MJr1qDdhCbgVl3FgIek9EyqNPv0_RSpzK4D8Fj_sjWdLM3pAfQAOR3aelWP54bwPTkASLYexbRvDWiWqoOKudhs8auDngKhBI3OapBF6Q5nwLH0MoCdYY77ZDOyrZ4Utsa0vpTToujP6rCNRlUYOJkmc6h4lIkPVLpiYi_z5U9a40yt2bqbxzsI4U_adkDSi5HdYRzHkCtDQUSdtlUs2B7TFDMBv6Br8-tRgx1sCaravafH3RZyOU',
+    heroImage: '/images/body-contouring.png',
     infoTitle: 'Körperformung ohne Skalpell',
     infoParagraphs: [
       'Unser Body Contouring-Angebot setzt auf die effektivsten nicht-chirurgischen Verfahren der modernen Körperästhetik. Die Kryolipolyse – auch bekannt als Fettgefrieren – reduziert hartnäckige Fettdepots durch kontrollierte Kühlung präzise und dauerhaft, ohne die umgebenden Gewebe zu beeinflussen.',
@@ -315,14 +315,14 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
       'Sichtbare Reduktion von Cellulite und Orangenhaut',
       'Keine Ausfallzeit – direkt wieder aktiv nach der Behandlung',
     ],
-    campaign1: { label: 'Summer Edition', title: 'Summer Ready Body', body: 'Bereiten Sie Ihren Körper auf die Strandsaison vor: Buchen Sie 2 Kryolipolyse-Zonen und erhalten Sie eine Ultraschall-Kavitation-Sitzung kostenfrei dazu. Limitiertes Angebot bis Mai.', cta: 'JETZT SICHERN', icon: 'self_improvement', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDpZoen6Z8-BkUl8prQYXf0Xd1Phn1Xdcuk_VZ-IofB9pCsDecKCUdvXaAoDYxIvL3Pd7MzIsqk1Qsa1ZfN8QNOHMUhZWC4pSKfwKd1kxuc1UmJnIvzSkftdtB_72BxCD3RsoYfSP9DCDgl7Hu2Txw7HLS7n783Lh-uDnPYuVXqfLwu3QW9RvZwYy-yu30PukyuMKxMBOWOlrxhxQXQMiIRW8nVG7y5oMjkK0lvir7cCDbsFPR1OXu3dQoZxS2tCiISP8GlPzFjtSct' },
-    campaign2: { label: 'Kombinationstherapie', title: 'Shape & Glow Kombi-Set', body: 'Maximale Ergebnisse durch intelligente Kombination: Body Contouring mit anschließender Hautstrafftung via RF-Lifting. Zwei Technologien, ein harmonisches Ergebnis.', cta: 'MEHR ERFAHREN', icon: 'fitness_center', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAS7VEqn3YLIpzxeNRbM1gcyi8MJr1qDdhCbgVl3FgIek9EyqNPv0_RSpzK4D8Fj_sjWdLM3pAfQAOR3aelWP54bwPTkASLYexbRvDWiWqoOKudhs8auDngKhBI3OapBF6Q5nwLH0MoCdYY77ZDOyrZ4Utsa0vpTToujP6rCNRlUYOJkmc6h4lIkPVLpiYi_z5U9a40yt2bqbxzsI4U_adkDSi5HdYRzHkCtDQUSdtlUs2B7TFDMBv6Br8-tRgx1sCaravafH3RZyOU' },
+    campaign1: { label: 'Summer Edition', title: 'Summer Ready Body', body: 'Bereiten Sie Ihren Körper auf die Strandsaison vor: Buchen Sie 2 Kryolipolyse-Zonen und erhalten Sie eine Ultraschall-Kavitation-Sitzung kostenfrei dazu. Limitiertes Angebot bis Mai.', cta: 'JETZT SICHERN', icon: 'self_improvement', image: '/images/campaign-generic-1.png' },
+    campaign2: { label: 'Kombinationstherapie', title: 'Shape & Glow Kombi-Set', body: 'Maximale Ergebnisse durch intelligente Kombination: Body Contouring mit anschließender Hautstrafftung via RF-Lifting. Zwei Technologien, ein harmonisches Ergebnis.', cta: 'MEHR ERFAHREN', icon: 'fitness_center', image: '/images/body-contouring.png' },
   },
   inject: {
     label: 'Aesthetic Medicine',
     h1: 'Injectables',
     heroDesc: 'Präzise ästhetische Medizin für natürliche Verjüngung. Botulinum Toxin, Hyaluronsäure und Profhilo – individuell dosiert für ein authentisches, ausgeruhtes Erscheinungsbild.',
-    heroImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB2R1r5IBHzprIEBLdeHT1f02OFMOX85Ol0fXFMTE8Mn9Nlc1lMes1BoOgj1lwKVSGR-dIFS-r-gyxMLZZESLXUcH_zS9UBq5T3z81zaxMXyfkXaTN50ZQOxmiM9kMWb4FbuKoODmgwAvE3ta_i60Ekgbw0pVcC1SjtZtC__ZxTNJSwkcNaB_h8XguwNKKEQmQHrBovNuCFUoWvqMpN2bzbrTH7ZN2a66uUpCi_65MRDuC8j05691WrlUa-ULD7rQ27qkKsnnnR_7Q7',
+    heroImage: '/images/injectables.png',
     infoTitle: 'Die Kunst der natürlichen Verjüngung',
     infoParagraphs: [
       'Injectables in Expertenhand bedeuten: kein starres, unnatürliches Ergebnis, sondern präzise Dosierung, die Ihre natürliche Ausstrahlung unterstreicht. Unser Behandlungskonzept beginnt mit einem ausführlichen Beratungsgespräch und einer detaillierten Gesichtsanalyse – um Ihre individuellen Wünsche und die anatomischen Gegebenheiten perfekt zu harmonisieren.',
@@ -335,14 +335,14 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
       'Verbesserung der Hautqualität, Festigkeit und Feuchtigkeit von innen',
       'Diskrete, schnelle Behandlung mit minimaler Ausfallzeit',
     ],
-    campaign1: { label: 'Signature Package', title: 'Natural Beauty First', body: 'Entdecken Sie unsere beliebteste Kombination: Botulinum Toxin für 3 Zonen kombiniert mit Hyaluronsäure Lippen-Augmentation. Inklusive kostenlosem Folgetermin nach 2 Wochen.', cta: 'JETZT SICHERN', icon: 'face_retouching_natural', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDpZoen6Z8-BkUl8prQYXf0Xd1Phn1Xdcuk_VZ-IofB9pCsDecKCUdvXaAoDYxIvL3Pd7MzIsqk1Qsa1ZfN8QNOHMUhZWC4pSKfwKd1kxuc1UmJnIvzSkftdtB_72BxCD3RsoYfSP9DCDgl7Hu2Txw7HLS7n783Lh-uDnPYuVXqfLwu3QW9RvZwYy-yu30PukyuMKxMBOWOlrxhxQXQMiIRW8nVG7y5oMjkK0lvir7cCDbsFPR1OXu3dQoZxS2tCiISP8GlPzFjtSct' },
-    campaign2: { label: 'Erstkunden-Angebot', title: 'Beratungs-Special', body: 'Ihr Weg zu mehr Ausstrahlung beginnt mit einem Gespräch: Kostenlose Erstberatung und 15% Rabatt auf Ihre erste Injectable-Behandlung. Diskret, professionell, natürlich.', cta: 'TERMIN VEREINBAREN', icon: 'health_and_beauty', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB2R1r5IBHzprIEBLdeHT1f02OFMOX85Ol0fXFMTE8Mn9Nlc1lMes1BoOgj1lwKVSGR-dIFS-r-gyxMLZZESLXUcH_zS9UBq5T3z81zaxMXyfkXaTN50ZQOxmiM9kMWb4FbuKoODmgwAvE3ta_i60Ekgbw0pVcC1SjtZtC__ZxTNJSwkcNaB_h8XguwNKKEQmQHrBovNuCFUoWvqMpN2bzbrTH7ZN2a66uUpCi_65MRDuC8j05691WrlUa-ULD7rQ27qkKsnnnR_7Q7' },
+    campaign1: { label: 'Signature Package', title: 'Natural Beauty First', body: 'Entdecken Sie unsere beliebteste Kombination: Botulinum Toxin für 3 Zonen kombiniert mit Hyaluronsäure Lippen-Augmentation. Inklusive kostenlosem Folgetermin nach 2 Wochen.', cta: 'JETZT SICHERN', icon: 'face_retouching_natural', image: '/images/campaign-generic-1.png' },
+    campaign2: { label: 'Erstkunden-Angebot', title: 'Beratungs-Special', body: 'Ihr Weg zu mehr Ausstrahlung beginnt mit einem Gespräch: Kostenlose Erstberatung und 15% Rabatt auf Ihre erste Injectable-Behandlung. Diskret, professionell, natürlich.', cta: 'TERMIN VEREINBAREN', icon: 'health_and_beauty', image: '/images/injectables.png' },
   },
   mani: {
     label: 'Esthetic Care',
     h1: 'Maniküre & Pediküre',
     heroDesc: 'Höchste Perfektion und luxuriöse Entspannung für Hände und Füße. Medizinische Sorgfalt trifft ästhetische Meisterschaft – für ein Erscheinungsbild, das überzeugt.',
-    heroImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAtJndxncsaGViuLmDZDBacgojv8siWTA93LPFPxNKQpEt2zcmQOehCknTGGJyu6i6UnkaiofOhED7An8f2QpALTSIozuiak5h3D6E_eJGWt9ZvHmvNcykq9-o53KhIoV6PlcBlXDxkJoMv-p60rCfkvezFpByYXAE-Nf2Yqu6Ce3WZ-puxUEYanR11hTB_J-X_htoKYgGVsUvScVZLae2VUaXdaKyQuFNuH1TxcUFPuaVWjKQRAg8BbvmnFqGiwILaxXwCVD4uJQFs',
+    heroImage: '/images/manikure-pedikure.png',
     infoTitle: 'Nail Art trifft Wellness',
     infoParagraphs: [
       'Unsere Maniküre- und Pediküre-Behandlungen verbinden medizinische Sorgfalt mit ästhetischer Meisterschaft. Jede Behandlung beginnt mit einem warmen Einweichbad und einer sorgfältigen Analyse des Nagelzustands – für ein Ergebnis, das Ihre Persönlichkeit unterstreicht.',
@@ -355,7 +355,7 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
       'Langanhaltende Shellac-Ergebnisse bis zu 4 Wochen ohne Absplittern',
       'Spa-Atmosphäre mit aromatischen Bädern und Handmassage',
     ],
-    campaign1: { label: 'Limited Edition', title: 'Velvet Touch Combo', body: 'Das ultimative Duo: Spa-Maniküre & Spa-Pediküre inkl. Shellac und einem Glas Champagner während der Behandlung. Normaler Einzelpreis: 180 € – jetzt 145 €.', cta: 'ANGEBOT SICHERN', icon: 'favorite', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD9Jgcgz1lnxvUeFEc6mJMhe2fEQ_S7p7HqKt66Xz-k9ENiAAqtl5TMcgoL8KLRf78R0-wppwEv-4FLWZqaQ-5eJphTdHeXT8VwSjV2KqVi_XldRkOSaQSereWSQNPe2HOnDACmji6f22QeEcZUQSqoZHT7oiyLRNYYPsb69N6HuRaI0SUP0BrdNcAW08nJmomDxLZadSl9ZKoER-eetlH2O2cNrFikoJfTnvg0pKM_AvPxwDxBPA6NpLhfP0TI-YyWHtuvNutTlkHk' },
-    campaign2: { label: 'Exklusives Membership', title: 'Nail Membership', body: 'Monatliche Shellac-Maniküre zum exklusiven Vorzugspreis. Als Mitglied profitieren Sie von Premium-Service, Prioritätsbuchung und 10% Rabatt auf alle Zusatzleistungen.', cta: 'MEHR ERFAHREN', icon: 'card_membership', image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAtJndxncsaGViuLmDZDBacgojv8siWTA93LPFPxNKQpEt2zcmQOehCknTGGJyu6i6UnkaiofOhED7An8f2QpALTSIozuiak5h3D6E_eJGWt9ZvHmvNcykq9-o53KhIoV6PlcBlXDxkJoMv-p60rCfkvezFpByYXAE-Nf2Yqu6Ce3WZ-puxUEYanR11hTB_J-X_htoKYgGVsUvScVZLae2VUaXdaKyQuFNuH1TxcUFPuaVWjKQRAg8BbvmnFqGiwILaxXwCVD4uJQFs' },
+    campaign1: { label: 'Limited Edition', title: 'Velvet Touch Combo', body: 'Das ultimative Duo: Spa-Maniküre & Spa-Pediküre inkl. Shellac und einem Glas Champagner während der Behandlung. Normaler Einzelpreis: 180 € – jetzt 145 €.', cta: 'ANGEBOT SICHERN', icon: 'favorite', image: '/images/promo-winter-glow.png' },
+    campaign2: { label: 'Exklusives Membership', title: 'Nail Membership', body: 'Monatliche Shellac-Maniküre zum exklusiven Vorzugspreis. Als Mitglied profitieren Sie von Premium-Service, Prioritätsbuchung und 10% Rabatt auf alle Zusatzleistungen.', cta: 'MEHR ERFAHREN', icon: 'card_membership', image: '/images/manikure-pedikure.png' },
   },
 };

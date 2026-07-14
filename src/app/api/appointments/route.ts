@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
 import { maybeSendConsentRequest } from '@/lib/consentRequest';
+import { getAdminSession } from '@/lib/supabase/authServer';
 
 export async function GET(request: Request) {
+  if (!(await getAdminSession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const supabase = supabaseServer();
   const { searchParams } = new URL(request.url);
   const from = searchParams.get('from');
@@ -38,6 +40,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  if (!(await getAdminSession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const supabase = supabaseServer();
   const body = await request.json();
 

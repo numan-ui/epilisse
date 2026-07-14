@@ -38,6 +38,7 @@ export default function KampanyalarPage() {
   const [draft, setDraft]           = useState(EMPTY_DRAFT);
   const [sending, setSending]       = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [error, setError]           = useState<string | null>(null);
 
   const loadCampaigns = useCallback(() => {
     setLoading(true);
@@ -62,6 +63,7 @@ export default function KampanyalarPage() {
     if (draft.targetType === 'customers' && draft.customerIds.length === 0) return;
 
     setSending(true);
+    setError(null);
     try {
       const createRes = await fetch('/api/campaigns', {
         method: 'POST',
@@ -76,11 +78,18 @@ export default function KampanyalarPage() {
         }),
       });
       const created = await createRes.json();
-      await fetch(`/api/campaigns/${created.id}/send`, { method: 'POST' });
+      if (!createRes.ok) throw new Error(created.error || 'Kampagne konnte nicht erstellt werden.');
+
+      const sendRes = await fetch(`/api/campaigns/${created.id}/send`, { method: 'POST' });
+      const sendResult = await sendRes.json();
+      if (!sendRes.ok) throw new Error(sendResult.error || 'Kampagne konnte nicht gesendet werden.');
+
       loadCampaigns();
       setDraft(EMPTY_DRAFT);
       setShowCompose(false);
       setConfirming(false);
+    } catch (err) {
+      setError((err as Error).message);
     } finally {
       setSending(false);
     }
@@ -88,9 +97,14 @@ export default function KampanyalarPage() {
 
   const continueSending = async (id: string) => {
     setSending(true);
+    setError(null);
     try {
-      await fetch(`/api/campaigns/${id}/send`, { method: 'POST' });
+      const res = await fetch(`/api/campaigns/${id}/send`, { method: 'POST' });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Kampagne konnte nicht gesendet werden.');
       loadCampaigns();
+    } catch (err) {
+      setError((err as Error).message);
     } finally {
       setSending(false);
     }
@@ -105,7 +119,7 @@ export default function KampanyalarPage() {
     <>
       <header className="h-20 border-b border-outline-variant/30 flex items-center justify-between px-8 bg-surface/80 backdrop-blur-md shrink-0">
         <div className="flex items-center gap-4">
-          <h2 className="font-headline-md text-headline-md text-on-surface">Kampanyalar</h2>
+          <h2 className="font-headline-md text-headline-md text-on-surface">Kampagnen</h2>
           <span className="text-outline-variant">|</span>
           <p className="font-body-sm text-secondary">{campaigns.length} Kampagnen gesamt</p>
         </div>
@@ -119,6 +133,9 @@ export default function KampanyalarPage() {
       </header>
 
       <div className="flex-1 overflow-y-auto p-8 space-y-3">
+        {error && !showCompose && (
+          <p className="font-body-sm text-error bg-error/10 px-3 py-2 mb-2">{error}</p>
+        )}
         {loading && <p className="text-center font-body-sm text-outline">Lädt…</p>}
         {!loading && campaigns.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 text-on-surface-variant opacity-50 gap-3">
@@ -288,6 +305,9 @@ export default function KampanyalarPage() {
                 <p className="font-body-sm text-on-surface-variant pt-3">
                   Diese Kampagne wird per E-Mail an <strong>{audienceSummary}</strong> gesendet. Dies kann nicht rückgängig gemacht werden.
                 </p>
+                {error && (
+                  <p className="font-body-sm text-error bg-error/10 px-3 py-2">{error}</p>
+                )}
                 <div className="flex gap-3">
                   <button
                     disabled={sending}
