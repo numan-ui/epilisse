@@ -44,6 +44,7 @@ export async function POST(request: Request) {
   const { data, error } = await supabase
     .from('campaigns')
     .insert({
+      name: body.name ?? null,
       title: body.title,
       message: body.message,
       discount_label: body.discountLabel ?? null,

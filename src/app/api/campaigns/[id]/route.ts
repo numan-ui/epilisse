@@ -19,6 +19,24 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   return NextResponse.json({ ...campaign, recipients: recipients ?? [] });
 }
 
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!(await getAdminSession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { id } = await params;
+  const supabase = supabaseServer();
+  const body = await request.json();
+
+  // Only the internal name label is editable after a campaign has gone out —
+  // title/message/audience are historical record of what was actually sent.
+  const { data, error } = await supabase
+    .from('campaigns')
+    .update({ name: body.name ?? null })
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
+}
+
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!(await getAdminSession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const { id } = await params;

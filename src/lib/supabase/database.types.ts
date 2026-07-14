@@ -135,16 +135,16 @@ export interface Database {
       };
       campaigns: {
         Row: {
-          id: string; title: string; message: string; discount_label: string | null;
+          id: string; name: string | null; title: string; message: string; discount_label: string | null;
           target_type: CampaignTargetType; target_category_id: string | null;
           status: CampaignStatus; created_at: string; sent_at: string | null;
         };
         Insert: {
-          id?: string; title: string; message: string; discount_label?: string | null;
+          id?: string; name?: string | null; title: string; message: string; discount_label?: string | null;
           target_type: CampaignTargetType; target_category_id?: string | null;
           status?: CampaignStatus;
         };
-        Update: Partial<{ status: CampaignStatus; sent_at: string | null }>;
+        Update: Partial<{ name: string | null; status: CampaignStatus; sent_at: string | null }>;
         Relationships: [
           {
             foreignKeyName: 'campaigns_target_category_id_fkey';

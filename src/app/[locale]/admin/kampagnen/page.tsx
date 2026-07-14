@@ -1,11 +1,14 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { CustomerPicker, type PickableCustomer } from '@/components/admin/CustomerPicker';
 
 type TargetType = 'all' | 'category' | 'customers';
 
 type Campaign = {
   id: string;
+  name: string | null;
   title: string;
   message: string;
   discount_label: string | null;
@@ -21,6 +24,7 @@ type Campaign = {
 type Category = { id: string; name: string };
 
 const EMPTY_DRAFT = {
+  name: '',
   title: '',
   message: '',
   discountLabel: '',
@@ -30,6 +34,9 @@ const EMPTY_DRAFT = {
 };
 
 export default function KampanyalarPage() {
+  const params = useParams();
+  const locale = (params?.locale as string) || 'de';
+
   const [campaigns, setCampaigns]   = useState<Campaign[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [customers, setCustomers]   = useState<PickableCustomer[]>([]);
@@ -39,6 +46,8 @@ export default function KampanyalarPage() {
   const [sending, setSending]       = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [error, setError]           = useState<string | null>(null);
+  const [query, setQuery]           = useState('');
+  const [yearFilter, setYearFilter] = useState<string>('all');
 
   const loadCampaigns = useCallback(() => {
     setLoading(true);
@@ -69,6 +78,7 @@ export default function KampanyalarPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          name: draft.name || null,
           title: draft.title,
           message: draft.message,
           discountLabel: draft.discountLabel || null,
@@ -94,6 +104,20 @@ export default function KampanyalarPage() {
       setSending(false);
     }
   };
+
+  const years = useMemo(
+    () => [...new Set(campaigns.map(c => new Date(c.created_at).getFullYear().toString()))].sort().reverse(),
+    [campaigns]
+  );
+
+  const filteredCampaigns = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return campaigns.filter((c) => {
+      if (yearFilter !== 'all' && new Date(c.created_at).getFullYear().toString() !== yearFilter) return false;
+      if (!q) return true;
+      return (c.name ?? '').toLowerCase().includes(q) || c.title.toLowerCase().includes(q);
+    });
+  }, [campaigns, query, yearFilter]);
 
   const continueSending = async (id: string) => {
     setSending(true);
@@ -132,10 +156,33 @@ export default function KampanyalarPage() {
         </button>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-8 space-y-3">
+      <div className="flex-1 overflow-y-auto p-8 space-y-4">
         {error && !showCompose && (
-          <p className="font-body-sm text-error bg-error/10 px-3 py-2 mb-2">{error}</p>
+          <p className="font-body-sm text-error bg-error/10 px-3 py-2">{error}</p>
         )}
+
+        {campaigns.length > 0 && (
+          <div className="flex items-center gap-3 flex-wrap">
+            <input
+              type="text"
+              placeholder="Kampagne suchen (Name oder Betreff)…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="flex-1 min-w-[220px] border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+            />
+            {years.length > 1 && (
+              <select
+                value={yearFilter}
+                onChange={(e) => setYearFilter(e.target.value)}
+                className="border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+              >
+                <option value="all">Alle Jahre</option>
+                {years.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+            )}
+          </div>
+        )}
+
         {loading && <p className="text-center font-body-sm text-outline">Lädt…</p>}
         {!loading && campaigns.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 text-on-surface-variant opacity-50 gap-3">
@@ -143,49 +190,65 @@ export default function KampanyalarPage() {
             <p className="font-body-sm">Noch keine Kampagnen gesendet.</p>
           </div>
         )}
-        {campaigns.map((c) => (
-          <div key={c.id} className="bg-surface-container-lowest border border-outline-variant p-5 space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 flex-wrap">
-                {c.discount_label && (
-                  <span className="font-label-caps text-[10px] text-primary bg-primary/10 px-2 py-0.5">{c.discount_label}</span>
-                )}
-                <h4 className="font-headline-sm text-[15px] text-on-surface">{c.title}</h4>
-              </div>
-              <span className={`font-label-caps text-[10px] px-2 py-0.5 ${
-                c.status === 'sent' ? 'bg-primary/10 text-primary' : 'bg-surface-container-high text-outline'
-              }`}>
-                {c.status === 'sent' ? 'Gesendet' : c.status === 'sending' ? 'Tageslimit erreicht' : 'Entwurf'}
-              </span>
-            </div>
-            <p className="font-body-sm text-on-surface-variant">{c.message}</p>
-            <div className="flex items-center gap-4 pt-1 font-label-caps text-[10px] text-outline">
-              <span>{audienceLabel(c)}</span>
-              {(c.status === 'sent' || c.status === 'sending') && (
-                <span>
-                  {c.recipientCounts.sent} gesendet
-                  {c.recipientCounts.failed > 0 ? `, ${c.recipientCounts.failed} fehlgeschlagen` : ''}
-                  {c.recipientCounts.pending > 0 ? `, ${c.recipientCounts.pending} ausstehend` : ''}
+        {!loading && campaigns.length > 0 && filteredCampaigns.length === 0 && (
+          <p className="text-center font-body-sm text-outline py-12">Keine Kampagnen gefunden.</p>
+        )}
+
+        <div className="space-y-3">
+          {filteredCampaigns.map((c) => (
+            <Link
+              key={c.id}
+              href={`/${locale}/admin/kampagnen/${c.id}`}
+              className="block bg-surface-container-lowest border border-outline-variant p-5 space-y-2 hover:border-primary/50 transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {c.discount_label && (
+                    <span className="font-label-caps text-[10px] text-primary bg-primary/10 px-2 py-0.5">{c.discount_label}</span>
+                  )}
+                  <h4 className="font-headline-sm text-[17px] text-primary font-semibold">{c.name || c.title}</h4>
+                </div>
+                <span className={`font-label-caps text-[10px] px-2 py-0.5 shrink-0 ${
+                  c.status === 'sent' ? 'bg-primary/10 text-primary' : 'bg-surface-container-high text-outline'
+                }`}>
+                  {c.status === 'sent' ? 'Gesendet' : c.status === 'sending' ? 'Tageslimit erreicht' : 'Entwurf'}
                 </span>
+              </div>
+              {c.name && (
+                <p className="font-label-caps text-[10px] text-outline uppercase tracking-wide">Betreff: {c.title}</p>
               )}
-              {c.sent_at && <span>{new Date(c.sent_at).toLocaleString('de-DE')}</span>}
-            </div>
-            {c.status === 'sending' && c.recipientCounts.pending > 0 && (
-              <div className="flex items-center justify-between bg-amber-50 border border-amber-200 px-3 py-2">
-                <span className="font-body-sm text-amber-700">
-                  Tägliches Mail-Limit erreicht — {c.recipientCounts.pending} Kundinnen warten noch.
-                </span>
-                <button
-                  onClick={() => continueSending(c.id)}
-                  disabled={sending}
-                  className="font-label-caps text-[10px] bg-primary text-on-primary px-3 py-1.5 hover:brightness-110 transition-all disabled:opacity-50"
-                >
-                  Fortsetzen
-                </button>
+              <p className="font-body-sm text-on-surface-variant line-clamp-2">{c.message}</p>
+              <div className="flex items-center gap-4 pt-1 font-label-caps text-[10px] text-outline">
+                <span>{audienceLabel(c)}</span>
+                {(c.status === 'sent' || c.status === 'sending') && (
+                  <span>
+                    {c.recipientCounts.sent} gesendet
+                    {c.recipientCounts.failed > 0 ? `, ${c.recipientCounts.failed} fehlgeschlagen` : ''}
+                    {c.recipientCounts.pending > 0 ? `, ${c.recipientCounts.pending} ausstehend` : ''}
+                  </span>
+                )}
+                {c.sent_at && <span>{new Date(c.sent_at).toLocaleString('de-DE')}</span>}
               </div>
-            )}
-          </div>
-        ))}
+              {c.status === 'sending' && c.recipientCounts.pending > 0 && (
+                <div
+                  className="flex items-center justify-between bg-amber-50 border border-amber-200 px-3 py-2"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                >
+                  <span className="font-body-sm text-amber-700">
+                    Tägliches Mail-Limit erreicht — {c.recipientCounts.pending} Kundinnen warten noch.
+                  </span>
+                  <button
+                    onClick={(e) => { e.preventDefault(); continueSending(c.id); }}
+                    disabled={sending}
+                    className="font-label-caps text-[10px] bg-primary text-on-primary px-3 py-1.5 hover:brightness-110 transition-all disabled:opacity-50"
+                  >
+                    Fortsetzen
+                  </button>
+                </div>
+              )}
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* ── Compose modal ────────────────────────────────────── */}
@@ -206,6 +269,17 @@ export default function KampanyalarPage() {
             </div>
 
             <div className="space-y-4">
+              <div>
+                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Kampagne Name</label>
+                <input
+                  type="text"
+                  placeholder="z.B. Sommerfest, Weihnachten Rabatt"
+                  value={draft.name}
+                  onChange={(e) => setDraft(p => ({ ...p, name: e.target.value }))}
+                  className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                />
+              </div>
+
               <div>
                 <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Zielgruppe</label>
                 <div className="flex gap-1">
@@ -263,7 +337,7 @@ export default function KampanyalarPage() {
               </div>
 
               <div>
-                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Titel</label>
+                <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Titel (E-Mail-Betreff)</label>
                 <input
                   type="text"
                   placeholder="z.B. 10% auf alle Laser-Behandlungen"
