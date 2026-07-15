@@ -11,7 +11,7 @@ const ICON_OPTIONS = [
   'emoji_nature', 'flare', 'water_drop', 'volunteer_activism', 'colorize',
 ];
 
-const EMPTY_CAT: Omit<Category, 'id'> = { icon: 'auto_awesome', name: '', desc: '', visible: true, image: '' };
+const EMPTY_CAT: Omit<Category, 'id'> = { icon: 'auto_awesome', name: '', desc: '', visible: true, image: '', kicker: 'BEHANDLUNG' };
 
 export default function BehandlungenPage() {
   const params = useParams();
@@ -141,6 +141,14 @@ export default function BehandlungenPage() {
                 placeholder="Kurzbeschreibung (optional)"
                 value={newCat.desc}
                 onChange={e => setNewCat(p => ({ ...p, desc: e.target.value }))}
+                onKeyDown={e => e.key === 'Enter' && handleAdd()}
+              />
+
+              <input
+                className="w-full bg-transparent border-b border-outline-variant/50 focus:border-primary focus:outline-none font-label-caps text-[11px] uppercase tracking-widest text-on-surface placeholder:text-outline py-1 transition-colors"
+                placeholder="Kicker-Label (z. B. TECHNOLOGIE)"
+                value={newCat.kicker}
+                onChange={e => setNewCat(p => ({ ...p, kicker: e.target.value }))}
                 onKeyDown={e => e.key === 'Enter' && handleAdd()}
               />
 

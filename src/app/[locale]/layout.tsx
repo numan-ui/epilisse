@@ -10,19 +10,23 @@ import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 import { SITE_URL, buildMetadata } from "@/lib/seo";
 import "../globals.css";
 
+/* display: "optional" — avoids the visible fallback→real-font size-adjust "pop" that "swap"
+   causes on Playfair Display (the fallback's size-adjust never matches this typeface's metrics
+   exactly). With "optional" the browser shows either the real font (if it loads in ~100ms,
+   e.g. already cached) or sticks with the fallback for that page load — no mid-render swap. */
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
   variable: "--font-playfair-display",
-  display: "swap",
+  display: "optional",
 });
 
 const manrope = Manrope({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-manrope",
-  display: "swap",
+  display: "optional",
 });
 
 export async function generateMetadata({

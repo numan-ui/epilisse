@@ -3,14 +3,14 @@ export type ImagePosition = 'top' | 'center' | 'bottom';
 
 export type Service  = { id: string; name: string; price: string; duration: string; active: boolean };
 export type Campaign = { id: string; label: string; title: string; desc: string; price: string; oldPrice?: string; cta: string; icon: string; image: string; imagePosition?: ImagePosition; active: boolean };
-export type Category = { id: string; icon: string; name: string; desc: string; visible: boolean; image: string };
+export type Category = { id: string; icon: string; name: string; desc: string; visible: boolean; image: string; kicker: string };
 
 export const CATEGORIES: Category[] = [
-  { id: 'laser',   icon: 'auto_awesome',    name: 'Laser-Haarentfernung', desc: 'Premium Diodenlaser-Technologie für seidig glatte Haut.',        visible: true,  image: '' },
-  { id: 'gesicht', icon: 'face',             name: 'Gesichtsästhetik',     desc: 'Exklusive Behandlungen für strahlende Hautgesundheit.',          visible: true,  image: '' },
-  { id: 'body',    icon: 'self_improvement', name: 'Body Contouring',      desc: 'Nicht-invasive Formung Ihrer Silhouette.',                      visible: true,  image: '' },
-  { id: 'inject',  icon: 'vaccines',         name: 'Injectables',          desc: 'Präzise Hyaluron- und Botox-Behandlungen.',                     visible: true,  image: '' },
-  { id: 'mani',    icon: 'spa',              name: 'Maniküre',             desc: 'Luxuriöse Nagelpflege und Handmassage.',                        visible: true,  image: '' },
+  { id: 'laser',   icon: 'auto_awesome',    name: 'Laser-Haarentfernung', desc: 'Premium Diodenlaser-Technologie für seidig glatte Haut.',        visible: true,  image: '', kicker: 'TECHNOLOGIE' },
+  { id: 'gesicht', icon: 'face',             name: 'Gesichtsästhetik',     desc: 'Exklusive Behandlungen für strahlende Hautgesundheit.',          visible: true,  image: '', kicker: 'GESICHTSPFLEGE' },
+  { id: 'body',    icon: 'self_improvement', name: 'Body Contouring',      desc: 'Nicht-invasive Formung Ihrer Silhouette.',                      visible: true,  image: '', kicker: 'BODY CARE' },
+  { id: 'inject',  icon: 'vaccines',         name: 'Injectables',          desc: 'Präzise Hyaluron- und Botox-Behandlungen.',                     visible: true,  image: '', kicker: 'ÄSTHETIK' },
+  { id: 'mani',    icon: 'spa',              name: 'Maniküre',             desc: 'Luxuriöse Nagelpflege und Handmassage.',                        visible: true,  image: '', kicker: 'NAGELPFLEGE' },
 ];
 
 const s = (id: string, name: string, price: string, duration: string, active = true): Service =>

@@ -56,13 +56,6 @@ const CORE_CAT_IMG: Record<string, string> = {
   inject: IMG.injectables,
   mani: IMG.mani,
 };
-const CORE_CAT_KICKER: Record<string, string> = {
-  laser: 'TECHNOLOGIE',
-  gesicht: 'GESICHTSPFLEGE',
-  body: 'BODY CARE',
-  inject: 'ÄSTHETIK',
-  mani: 'NAGELPFLEGE',
-};
 
 export default function HomePage() {
   const t = useTranslations();
@@ -104,6 +97,7 @@ export default function HomePage() {
   const customCats   = visibleCats.filter(c => !ORIG_IDS.includes(c.id));
   const isVisible    = (id: string) => categories.find(c => c.id === id)?.visible !== false;
   const getCatName   = (id: string) => categories.find(c => c.id === id)?.name ?? '';
+  const getCatKicker = (id: string) => categories.find(c => c.id === id)?.kicker || 'BEHANDLUNG';
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideKey, setSlideKey] = useState(0);
@@ -414,7 +408,7 @@ export default function HomePage() {
               </div>
               <div className="p-6">
                 <span className="font-label-caps text-[10px] text-primary tracking-widest block mb-2">
-                  {CORE_CAT_KICKER[id]}
+                  {getCatKicker(id)}
                 </span>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{getCatName(id)}</h3>
                 <p className="font-body-sm text-body-sm text-secondary">{getCatDesc(id)}</p>
@@ -445,7 +439,7 @@ export default function HomePage() {
                   )}
                 </div>
                 <div className="p-6">
-                  <span className="font-label-caps text-[10px] text-primary tracking-widest block mb-2">BEHANDLUNG</span>
+                  <span className="font-label-caps text-[10px] text-primary tracking-widest block mb-2">{cat.kicker || 'BEHANDLUNG'}</span>
                   <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{cat.name}</h3>
                   <p className="font-body-sm text-body-sm text-secondary">{cat.desc}</p>
                 </div>
@@ -728,15 +722,13 @@ export default function HomePage() {
             </h4>
             <ul className="flex flex-col gap-4 font-body-sm text-body-sm text-secondary">
               {[
-                t("services.laser"),
-                t("services.facial"),
-                t("services.body"),
-                t("services.mani"),
+                ...CORE_CAT_ORDER.filter(isVisible).map(id => ({ key: id, name: getCatName(id), href: CORE_CAT_HREF[id] })),
+                ...customCats.map(cat => ({ key: cat.id, name: cat.name, href: `/${FRONTEND_SLUG[cat.id] ?? cat.id}` })),
               ].map((item) => (
-                <li key={item}>
-                  <a href="#behandlungen" className="hover:text-primary transition-colors">
-                    {item}
-                  </a>
+                <li key={item.key}>
+                  <Link href={item.href} className="hover:text-primary transition-colors">
+                    {item.name}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -768,10 +760,10 @@ export default function HomePage() {
             </h4>
             <ul className="flex flex-col gap-4 font-body-sm text-body-sm text-secondary">
               {[
-                { key: "footer.impressum", href: "#" },
+                { key: "footer.impressum", href: `/${locale}/impressum` },
                 { key: "footer.datenschutz", href: `/${locale}/datenschutz` },
-                { key: "footer.agb", href: "#" },
-                { key: "footer.karriere", href: "#" },
+                { key: "footer.agb", href: `/${locale}/agb` },
+                { key: "footer.karriere", href: `/${locale}/karriere` },
               ].map((item) => (
                 <li key={item.key}>
                   <a href={item.href} className="hover:text-primary transition-colors">

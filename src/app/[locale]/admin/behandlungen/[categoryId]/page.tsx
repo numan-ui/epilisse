@@ -526,6 +526,14 @@ export default function CategoryDetailPage() {
                   onChange={e => updateCategory(catId, 'desc', e.target.value)}
                 />
               </div>
+              <div>
+                <label className="font-label-caps text-[9px] text-outline uppercase tracking-wider block mb-1">Kicker-Label (kleine Zeile über dem Namen auf der Karte)</label>
+                <input
+                  className="w-full bg-transparent border-b border-outline-variant/50 focus:border-primary focus:outline-none font-label-caps text-[11px] uppercase tracking-widest text-on-surface py-1 transition-colors"
+                  value={category.kicker}
+                  onChange={e => updateCategory(catId, 'kicker', e.target.value)}
+                />
+              </div>
             </section>
 
             {/* Category image (used for the tile on the landing page) */}

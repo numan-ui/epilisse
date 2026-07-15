@@ -16,7 +16,7 @@ function mergeCategories(stored: Category[]): Category[] {
       const def = CATEGORIES.find(d => d.id === c.id);
       if (!def) return c; // custom, admin-created category — no default to fall back to
       // image is intentionally not force-defaulted here: empty means "use the built-in photo", a valid state (see usage site fallback)
-      return { id: c.id, icon: str(c.icon, def.icon), name: str(c.name, def.name), desc: str(c.desc, def.desc), visible: c.visible, image: c.image ?? '' };
+      return { id: c.id, icon: str(c.icon, def.icon), name: str(c.name, def.name), desc: str(c.desc, def.desc), visible: c.visible, image: c.image ?? '', kicker: str(c.kicker, def.kicker) };
     });
 }
 
