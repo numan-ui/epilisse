@@ -46,9 +46,9 @@
     "ctaSecondary": "DETAILS ANSEHEN"
   },
   "about": {
-    "sectionLabel": "ÜBER EPILISSE",
+    "sectionLabel": "ÜBER {name}",
     "title": "Münchens Adresse für Premium-Ästhetik",
-    "desc": "Willkommen im EPILISSE Studio – Ihrem exklusiven Kosmetikstudio im Herzen von München. Wir vereinen modernste Behandlungsmethoden mit einem tiefen Verständnis für individuelle Schönheit.",
+    "desc": "Willkommen im {name} Studio – Ihrem exklusiven Kosmetikstudio im Herzen von München. Wir vereinen modernste Behandlungsmethoden mit einem tiefen Verständnis für individuelle Schönheit.",
     "value1Title": "Qualität",
     "value1Desc": "Ausschließlich zertifizierte Technologien und medizinische Wirkstoffe auf klinischem Niveau.",
     "value2Title": "Diskretion",
@@ -84,7 +84,7 @@
     "datenschutz": "Datenschutz",
     "agb": "AGB",
     "karriere": "Karriere",
-    "copyright": "© 2025 EPILISSE – Luxury Beauty Care Munich.",
+    "copyright": "© 2025 {name} – Luxury Beauty Care Munich.",
     "badge1": "MADE IN MUNICH",
     "badge2": "SECURE PAYMENT"
   }

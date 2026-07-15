@@ -2,11 +2,13 @@
 import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/browser';
+import { useAdminSettings } from '@/hooks/useAdminSettings';
 
 export default function AdminLoginPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'de';
   const router = useRouter();
+  const settings = useAdminSettings();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -55,7 +57,7 @@ export default function AdminLoginPage() {
       <form onSubmit={handleSubmit} className="w-full max-w-sm bg-surface-container-lowest border border-outline-variant/30 lux-shadow p-10">
         <div className="text-center mb-9">
           <div className="font-display-lg text-[30px] tracking-wide epilisse-logo inline-block mb-3">
-            EPILISSE
+            {settings.name}
           </div>
           <p className="font-label-caps text-[11px] text-secondary tracking-[0.2em] uppercase">Admin-Bereich</p>
         </div>
@@ -105,7 +107,7 @@ export default function AdminLoginPage() {
         </button>
 
         <p className="text-center font-body-sm text-body-sm text-secondary/70 mt-6">
-          Nur für autorisierte Mitarbeiter von EPILISSE.
+          Nur für autorisierte Mitarbeiter von {settings.name}.
         </p>
       </form>
     </div>

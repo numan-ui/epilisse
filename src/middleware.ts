@@ -9,10 +9,10 @@ export default async function middleware(request: NextRequest) {
   const { response, user, role } = await updateSession(request);
 
   const path = request.nextUrl.pathname;
-  const isAdminPath = /^\/(de|en|tr)\/admin(\/|$)/.test(path);
-  const isLoginPath = /^\/(de|en|tr)\/admin\/login(\/|$)/.test(path);
-  const isTeamPath = /^\/(de|en|tr)\/admin\/team(\/|$)/.test(path);
-  const locale = path.match(/^\/(de|en|tr)\//)?.[1] ?? "de";
+  const isAdminPath = /^\/(de|en)\/admin(\/|$)/.test(path);
+  const isLoginPath = /^\/(de|en)\/admin\/login(\/|$)/.test(path);
+  const isTeamPath = /^\/(de|en)\/admin\/team(\/|$)/.test(path);
+  const locale = path.match(/^\/(de|en)\//)?.[1] ?? "de";
 
   if (isAdminPath && !isLoginPath && !user) {
     return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url));

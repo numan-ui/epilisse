@@ -4,6 +4,7 @@ import { useParams, usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AdminDataProvider } from './behandlungen/AdminDataContext';
 import { supabaseBrowser } from '@/lib/supabase/browser';
+import { useAdminSettings } from '@/hooks/useAdminSettings';
 
 const NAV_ITEMS = [
   { href: '/admin', icon: 'dashboard', label: 'Dashboard' },
@@ -22,6 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [role, setRole] = useState<'super_admin' | 'admin' | null>(null);
   const [email, setEmail] = useState<string>('');
+  const settings = useAdminSettings();
 
   const isLoginPage = pathname.startsWith(`/${locale}/admin/login`);
 
@@ -57,7 +59,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="fixed inset-0 flex bg-surface text-on-surface">
       <aside className="w-[280px] h-full bg-surface-container-low border-r border-outline-variant flex flex-col shrink-0">
         <div className="p-8 pb-6">
-          <h1 className="font-headline-sm text-headline-sm text-primary tracking-wide font-bold uppercase">EPILISSE Admin</h1>
+          <h1 className="font-headline-sm text-headline-sm text-primary tracking-wide font-bold uppercase">{settings.name} Admin</h1>
           <p className="font-label-caps text-[10px] text-outline mt-1 tracking-[0.2em] uppercase">MUNICH STUDIO</p>
         </div>
 

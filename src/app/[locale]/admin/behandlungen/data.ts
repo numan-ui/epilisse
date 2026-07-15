@@ -93,7 +93,7 @@ export type SiteSettings = {
 };
 
 export const INIT_SETTINGS: SiteSettings = {
-  name: 'EPILISSE Beauty Studio',
+  name: 'EPILISSE',
   tagline: 'Luxury Beauty Care Munich',
   address: 'Berlepschstraße 2, 81373 München-Sendling',
   phone: '+49 89 000000',

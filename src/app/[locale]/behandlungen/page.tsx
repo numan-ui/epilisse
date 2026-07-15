@@ -27,7 +27,7 @@ const IMG: Record<string, string> = {
 
 export default function BehandlungenPage() {
   const params = useParams();
-  const locale = (params?.locale as "de" | "en" | "tr") || "de";
+  const locale = (params?.locale as "de" | "en") || "de";
   const [menuOpen, setMenuOpen] = useState(false);
 
   const settings = useAdminSettings();
@@ -53,7 +53,7 @@ export default function BehandlungenPage() {
       <nav className="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 glass-nav bg-surface/95 border-b border-outline-variant/30 lux-shadow">
         <div className="flex items-center gap-8">
           <Link href="/" className="font-display-lg text-[26px] tracking-wide font-bold text-primary">
-            EPILISSE
+            {settings.name}
           </Link>
           <div className="hidden md:flex gap-8">
             {NAV_LINKS.map((item) => (
@@ -175,7 +175,7 @@ export default function BehandlungenPage() {
       <footer className="bg-surface-container-highest border-t border-outline-variant w-full px-margin-mobile md:px-margin-desktop py-12">
         <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <Link href="/" className="font-display-lg text-headline-md tracking-widest text-primary">
-            EPILISSE
+            {settings.name}
           </Link>
           <span className="font-body-sm text-body-sm text-secondary">
             {settings.address}

@@ -147,7 +147,7 @@ export default function HomePage() {
       <nav className="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 glass-nav bg-surface/95 border-b border-outline-variant/30 lux-shadow">
         {/* Logo */}
         <a href="#" className="font-display-lg text-[26px] tracking-wide epilisse-logo">
-          EPILISSE
+          {settings.name}
         </a>
 
         {/* Desktop nav links */}
@@ -174,7 +174,7 @@ export default function HomePage() {
               <span key={loc.code} className="flex items-center">
                 <Link
                   href="/"
-                  locale={loc.code as "de" | "en" | "tr"}
+                  locale={loc.code as "de" | "en"}
                   className={`px-1 transition-colors duration-200 ${
                     locale === loc.code ? "text-primary font-semibold" : "hover:text-primary"
                   }`}
@@ -538,13 +538,13 @@ export default function HomePage() {
           {/* Left: text */}
           <div>
             <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-3">
-              {lc.aboutSectionLabel || t("about.sectionLabel")}
+              {lc.aboutSectionLabel || t("about.sectionLabel", { name: settings.name })}
             </span>
             <h2 className="font-display-lg text-headline-lg font-semibold text-on-surface mb-6 leading-tight">
               {lc.aboutTitle || t("about.title")}
             </h2>
             <p className="font-body-lg text-body-lg text-secondary mb-10">
-              {lc.aboutDesc || t("about.desc")}
+              {lc.aboutDesc || t("about.desc", { name: settings.name })}
             </p>
 
             {/* Values */}
@@ -699,7 +699,7 @@ export default function HomePage() {
           {/* Brand col */}
           <div className="flex flex-col gap-6">
             <div className="font-display-lg text-headline-md tracking-widest text-primary">
-              EPILISSE
+              {settings.name}
             </div>
             <p className="font-body-sm text-body-sm text-secondary max-w-xs">
               {lc.footerTagline || t("footer.tagline")}
@@ -787,7 +787,7 @@ export default function HomePage() {
         {/* Bottom bar */}
         <div className="max-w-[1440px] mx-auto border-t border-outline-variant/30 pt-8 mt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <span className="font-body-sm text-body-sm text-secondary">
-            {lc.footerCopyright || t("footer.copyright")}
+            {lc.footerCopyright || t("footer.copyright", { name: settings.name })}
           </span>
           <div className="flex gap-8 items-center">
             <span className="font-label-caps text-[10px] text-secondary/60 tracking-widest">

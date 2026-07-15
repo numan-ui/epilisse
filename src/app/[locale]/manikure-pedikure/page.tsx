@@ -4,6 +4,7 @@ import { useAdminServices } from "@/hooks/useAdminServices";
 import { useAdminPageContent } from "@/hooks/useAdminPageContent";
 import { useAdminCampaigns, resolveCampaigns } from "@/hooks/useAdminCampaigns";
 import { useAdminCategories } from "@/hooks/useAdminCategories";
+import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { useParams } from "next/navigation";
 
 const FALLBACK_PRICING = [
@@ -23,7 +24,9 @@ export default function ManiPediPage() {
   const pageContent  = useAdminPageContent('mani');
   const adminCamps   = useAdminCampaigns('mani');
   const categories   = useAdminCategories();
-  const pricingItems = useAdminServices('mani', FALLBACK_PRICING);
+  const settings     = useAdminSettings();
+  const pricingItems = useAdminServices('mani', FALLBACK_PRICING)
+    .map(item => ({ ...item, name: item.name.replace(/^EPILISSE /, `${settings.name} `) }));
   return (
     <ServicePageTemplate
       locale={locale}

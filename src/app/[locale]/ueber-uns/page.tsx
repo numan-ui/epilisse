@@ -21,7 +21,7 @@ const FALLBACK_ABOUT_IMAGE =
 export default function UeberUnsPage() {
   const t = useTranslations();
   const params = useParams();
-  const locale = (params?.locale as "de" | "en" | "tr") || "de";
+  const locale = (params?.locale as "de" | "en") || "de";
   const [menuOpen, setMenuOpen] = useState(false);
 
   const settings = useAdminSettings();
@@ -47,7 +47,7 @@ export default function UeberUnsPage() {
       <nav className="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 glass-nav bg-surface/95 border-b border-outline-variant/30 lux-shadow">
         <div className="flex items-center gap-8">
           <Link href="/" className="font-display-lg text-[26px] tracking-wide font-bold text-primary">
-            EPILISSE
+            {settings.name}
           </Link>
           <div className="hidden md:flex gap-8">
             {NAV_LINKS.map((item) => (
@@ -121,13 +121,13 @@ export default function UeberUnsPage() {
           {/* Left: text */}
           <div>
             <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-3">
-              {lc.aboutSectionLabel || t("about.sectionLabel")}
+              {lc.aboutSectionLabel || t("about.sectionLabel", { name: settings.name })}
             </span>
             <h1 className="font-display-lg text-headline-lg font-semibold text-on-surface mb-6 leading-tight">
               {lc.aboutTitle || t("about.title")}
             </h1>
             <p className="font-body-lg text-body-lg text-secondary mb-10">
-              {lc.aboutDesc || t("about.desc")}
+              {lc.aboutDesc || t("about.desc", { name: settings.name })}
             </p>
 
             {/* Values */}
@@ -160,7 +160,7 @@ export default function UeberUnsPage() {
           <div className="relative overflow-hidden rounded-xl aspect-[4/5]">
             <SmartImage
               src={aboutImg}
-              alt="EPILISSE Studio München"
+              alt={`${settings.name} Studio München`}
               className="object-cover"
               sizes="(min-width: 768px) 50vw, 100vw"
             />
@@ -243,7 +243,7 @@ export default function UeberUnsPage() {
       <footer className="bg-surface-container-highest border-t border-outline-variant w-full px-margin-mobile md:px-margin-desktop py-12">
         <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <Link href="/" className="font-display-lg text-headline-md tracking-widest text-primary">
-            EPILISSE
+            {settings.name}
           </Link>
           <span className="font-body-sm text-body-sm text-secondary">
             {settings.address}

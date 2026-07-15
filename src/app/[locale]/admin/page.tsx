@@ -1,4 +1,5 @@
 'use client';
+import { useAdminSettings } from '@/hooks/useAdminSettings';
 
 const KPI_CARDS = [
   { label: 'Heute', value: '12 Termine', icon: 'trending_up', sub: '+15% vs. Gestern' },
@@ -10,6 +11,7 @@ const KPI_CARDS = [
 const CALENDAR_DAYS = Array.from({ length: 30 }, (_, i) => i + 1);
 
 export default function AdminDashboardPage() {
+  const settings = useAdminSettings();
   return (
     <>
       {/* Top App Bar */}
@@ -120,7 +122,7 @@ export default function AdminDashboardPage() {
 
       {/* Footer */}
       <footer className="h-12 border-t border-outline-variant flex items-center justify-between px-8 bg-surface-container-highest text-secondary font-label-caps text-[11px] shrink-0">
-        <p>© 2026 EPILISSE – Luxury Beauty Care Munich | Admin Console v1.0</p>
+        <p>© 2026 {settings.name} – Luxury Beauty Care Munich | Admin Console v1.0</p>
         <div className="flex gap-4">
           <a href="#" className="hover:text-primary transition-colors">Support</a>
           <a href="#" className="hover:text-primary transition-colors">Impressum</a>
