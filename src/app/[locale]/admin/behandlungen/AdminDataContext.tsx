@@ -72,6 +72,7 @@ interface AdminDataCtx {
   updateHeroSlide: (id: string, field: keyof HeroSlide, value: string | number) => void;
   addHeroSlide: () => void;
   removeHeroSlide: (id: string) => void;
+  reorderHeroSlide: (id: string, position: number) => void;
   updatePromoBanner: (id: string, field: keyof PromoBanner, value: string) => void;
   addPromoBanner: () => void;
   removePromoBanner: (id: string) => void;
@@ -336,6 +337,19 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       ls.write(LS_HERO, next); return next;
     }), []);
 
+  /** Moves a slide to 1-indexed `position`, shifting the others — everyone else keeps their relative order. */
+  const reorderHeroSlide = useCallback((id: string, position: number) =>
+    setHeroSlides(prev => {
+      const from = prev.findIndex(s => s.id === id);
+      if (from === -1) return prev;
+      const to = Math.max(0, Math.min(prev.length - 1, position - 1));
+      if (to === from) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      ls.write(LS_HERO, next); return next;
+    }), []);
+
   /* ── Promo banners (Kombi-Angebot) ────────────────── */
   const updatePromoBanner = useCallback((id: string, field: keyof PromoBanner, value: string) =>
     setPromoBanners(prev => {
@@ -406,7 +420,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       updatePageField, updatePageParagraph, updatePageBenefit, addPageBenefit, removePageBenefit, updatePageBanner,
       addCategory, updateCategory, deleteCategory,
       updateSetting, updateSettingHours, updateLandingField,
-      updateHeroSlide, addHeroSlide, removeHeroSlide,
+      updateHeroSlide, addHeroSlide, removeHeroSlide, reorderHeroSlide,
       updatePromoBanner, addPromoBanner, removePromoBanner,
       updateAboutValue, addAboutValue, removeAboutValue,
       updateReview, addReview, removeReview,

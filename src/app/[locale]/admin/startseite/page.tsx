@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAdminData } from '../behandlungen/AdminDataContext';
 import { HERO_SLIDE_LIMIT, PROMO_BANNER_LIMIT, ABOUT_VALUE_LIMIT, REVIEW_LIMIT, FRONTEND_SLUG, type LandingContent } from '../behandlungen/data';
@@ -17,6 +17,57 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <label className="font-label-caps text-[10px] text-outline uppercase tracking-wider block">{label}</label>
       {children}
     </div>
+  );
+}
+
+/** Manual "move to position N" input — typing 1 on the 4th slide moves it to the top,
+    everyone else keeps their relative order. Uncontrolled-ish: keeps its own draft text while
+    typing so the live position (which changes as `position` prop updates) doesn't fight the
+    user's keystrokes, and only commits (reordering the slide) on blur/Enter. */
+function PositionInput({ position, max, onCommit }: { position: number; max: number; onCommit: (pos: number) => void }) {
+  const [draft, setDraft] = useState(String(position));
+  useEffect(() => setDraft(String(position)), [position]);
+  const commit = () => {
+    const n = Math.max(1, Math.min(max, Number(draft) || position));
+    setDraft(String(n));
+    if (n !== position) onCommit(n);
+  };
+  return (
+    <input
+      type="number"
+      min={1}
+      max={max}
+      value={draft}
+      onChange={e => setDraft(e.target.value)}
+      onBlur={commit}
+      onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+      className="w-14 border border-outline-variant/60 px-2 py-1 text-[12px] text-center text-on-surface bg-white focus:border-primary focus:outline-none transition-colors font-body-md"
+      title="Position (verschiebt den Slide, andere rücken nach)"
+    />
+  );
+}
+
+/** Same draft/commit pattern as PositionInput: lets the user freely type/clear digits without
+    every keystroke being clamped back to a "corrected" value mid-edit. Clamps only on blur. */
+function DurationInput({ value, onCommit }: { value: number; onCommit: (v: number) => void }) {
+  const [draft, setDraft] = useState(String(value));
+  useEffect(() => setDraft(String(value)), [value]);
+  const commit = () => {
+    const n = Math.max(3, Math.min(60, Number(draft) || value));
+    setDraft(String(n));
+    if (n !== value) onCommit(n);
+  };
+  return (
+    <input
+      type="number"
+      min={3}
+      max={60}
+      className={INPUT_CLS}
+      value={draft}
+      onChange={e => setDraft(e.target.value)}
+      onBlur={commit}
+      onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+    />
   );
 }
 
@@ -64,7 +115,7 @@ export default function StartseitePage() {
   const locale = (params?.locale as string) || 'de';
   const {
     landingContent: lc, updateLandingField,
-    heroSlides, updateHeroSlide, addHeroSlide, removeHeroSlide,
+    heroSlides, updateHeroSlide, addHeroSlide, removeHeroSlide, reorderHeroSlide,
     promoBanners, updatePromoBanner, addPromoBanner, removePromoBanner,
     aboutValues, updateAboutValue, addAboutValue, removeAboutValue,
     reviews, updateReview, addReview, removeReview,
@@ -174,7 +225,14 @@ export default function StartseitePage() {
               {heroSlides.map((slide, i) => (
                 <div key={slide.id} className="bg-surface-container-lowest border border-outline-variant p-6 space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-label-caps text-[10px] text-primary">SLIDE {i + 1}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-label-caps text-[10px] text-primary">SLIDE</span>
+                      <PositionInput
+                        position={i + 1}
+                        max={heroSlides.length}
+                        onCommit={pos => reorderHeroSlide(slide.id, pos)}
+                      />
+                    </div>
                     {heroSlides.length > 1 && (
                       <button
                         onClick={() => removeHeroSlide(slide.id)}
@@ -209,13 +267,9 @@ export default function StartseitePage() {
                       />
                     </Field>
                     <Field label="Anzeigedauer (Sekunden)">
-                      <input
-                        type="number"
-                        min={3}
-                        max={60}
-                        className={INPUT_CLS}
+                      <DurationInput
                         value={slide.duration}
-                        onChange={e => updateHeroSlide(slide.id, 'duration', Math.max(3, Math.min(60, Number(e.target.value) || 8)))}
+                        onCommit={v => updateHeroSlide(slide.id, 'duration', v)}
                       />
                     </Field>
                   </div>

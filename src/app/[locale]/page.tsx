@@ -284,18 +284,23 @@ export default function HomePage() {
             {/* Dark overlay */}
             <div className={`absolute inset-0 ${OVERLAYS[i % OVERLAYS.length]} z-10`} />
 
-            {/* Background image — Ken Burns zoom (img) + cursor parallax (wrapper) for depth */}
+            {/* Background image — Ken Burns zoom (img) + cursor parallax (wrapper) for depth.
+                Gradient behind the image covers the gap before it paints (otherwise the dark
+                overlay above sits on transparent/white and reads as a flat gray box), and only
+                the currently-visible slide gets `priority` so it isn't competing for bandwidth
+                with off-screen slides' images. */}
             {slide.image ? (
               <div
                 className="absolute -inset-16"
-                style={
-                  i === currentSlide
+                style={{
+                  background: 'linear-gradient(135deg,#3a3226 0%,#1a1712 100%)',
+                  ...(i === currentSlide
                     ? {
                         transform: `translate3d(${heroParallax.x}px, ${heroParallax.y}px, 0)`,
                         transition: "transform 0.6s ease-out",
                       }
-                    : undefined
-                }
+                    : undefined),
+                }}
               >
                 <SmartImage
                   src={slide.image}
@@ -303,7 +308,7 @@ export default function HomePage() {
                   className={`brand-photo object-cover ${i === currentSlide ? "kenburns" : ""}`}
                   style={i === currentSlide ? { animationDuration: `${(slide.duration || 10) + 2}s` } : undefined}
                   sizes="100vw"
-                  priority
+                  priority={i === currentSlide}
                 />
               </div>
             ) : (
