@@ -39,6 +39,18 @@ export default function SmartImage({
     );
   }
 
+  // Admin-uploaded images are base64 data URLs (FileReader.readAsDataURL), which land here since
+  // they don't start with "/". Unlike next/image's `fill`, a bare <img> has no intrinsic sizing —
+  // without explicit absolute/inset/w-full/h-full it renders at its natural pixel size instead of
+  // filling the parent box, leaving the rest of the box showing whatever is behind it.
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} alt={alt} className={className} style={style} onError={onError} />;
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={`absolute inset-0 w-full h-full ${className ?? ""}`}
+      style={style}
+      onError={onError}
+    />
+  );
 }
