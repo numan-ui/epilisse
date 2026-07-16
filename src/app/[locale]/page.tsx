@@ -14,6 +14,7 @@ import { useAdminPromoBanners } from "@/hooks/useAdminPromoBanners";
 import { useAdminAboutValues } from "@/hooks/useAdminAboutValues";
 import { useBookingModal } from "@/context/BookingModalContext";
 import SmartImage from "@/components/SmartImage";
+import GoldDustEffect from "@/components/GoldDustEffect";
 
 /* ── Image constants (Stitch AI – replace with real salon photos) ── */
 const IMG = {
@@ -314,6 +315,9 @@ export default function HomePage() {
             ) : (
               <div className="w-full h-full" style={{ background: 'linear-gradient(135deg,#3a3226 0%,#1a1712 100%)' }} />
             )}
+
+            {/* Gold dust cursor trail — decorative, first slide only */}
+            {i === 0 && <GoldDustEffect active={i === currentSlide} />}
 
             {/* Content */}
             <div className="absolute inset-0 z-20 flex flex-col justify-center items-start px-margin-mobile md:px-margin-desktop">
