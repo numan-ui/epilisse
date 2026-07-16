@@ -53,15 +53,16 @@ function DurationInput({ value, onCommit }: { value: number; onCommit: (v: numbe
   const [draft, setDraft] = useState(String(value));
   useEffect(() => setDraft(String(value)), [value]);
   const commit = () => {
-    const n = Math.max(3, Math.min(60, Number(draft) || value));
+    // No upper limit — only a floor of 1s so a cleared/invalid field can't produce a
+    // zero/negative duration (setTimeout would fire immediately, spinning the slider).
+    const n = Math.max(1, Number(draft) || value);
     setDraft(String(n));
     if (n !== value) onCommit(n);
   };
   return (
     <input
       type="number"
-      min={3}
-      max={60}
+      min={1}
       className={INPUT_CLS}
       value={draft}
       onChange={e => setDraft(e.target.value)}

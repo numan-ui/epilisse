@@ -14,17 +14,21 @@ import "../globals.css";
    causes on Playfair Display (the fallback's size-adjust never matches this typeface's metrics
    exactly). With "optional" the browser shows either the real font (if it loads in ~100ms,
    e.g. already cached) or sticks with the fallback for that page load — no mid-render swap. */
+/* Only "normal" style and only the weights actually used anywhere in the app (verified via
+   grep for `italic` and `font-light` — neither is used) — every extra weight/style is a
+   separate font file the browser has to fetch before it can stop showing the fallback, which
+   widens the visible-swap window on slow connections. */
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  style: ["normal"],
   variable: "--font-playfair-display",
   display: "optional",
 });
 
 const manrope = Manrope({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-manrope",
   display: "optional",
 });
