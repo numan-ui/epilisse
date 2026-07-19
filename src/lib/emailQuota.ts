@@ -6,7 +6,7 @@ import type { Database } from '@/lib/supabase/database.types';
 // over the limit after reminders already used part of it that day.
 export const DAILY_EMAIL_LIMIT = 100;
 
-export type EmailKind = 'follow_up' | 'appointment_reminder' | 'campaign' | 'appointment_confirmation' | 'consent_request';
+export type EmailKind = 'follow_up' | 'appointment_reminder' | 'campaign' | 'appointment_confirmation' | 'consent_request' | 'admin_password_reset';
 
 export async function getRemainingEmailQuota(supabase: SupabaseClient<Database>): Promise<number> {
   const todayStart = new Date();

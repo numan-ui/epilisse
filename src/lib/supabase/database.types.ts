@@ -190,11 +190,11 @@ export interface Database {
       };
       email_sends: {
         Row: {
-          id: string; kind: 'follow_up' | 'appointment_reminder' | 'campaign' | 'appointment_confirmation' | 'consent_request';
+          id: string; kind: 'follow_up' | 'appointment_reminder' | 'campaign' | 'appointment_confirmation' | 'consent_request' | 'admin_password_reset';
           customer_id: string | null; recipient: string | null; sent_at: string;
         };
         Insert: {
-          id?: string; kind: 'follow_up' | 'appointment_reminder' | 'campaign' | 'appointment_confirmation' | 'consent_request';
+          id?: string; kind: 'follow_up' | 'appointment_reminder' | 'campaign' | 'appointment_confirmation' | 'consent_request' | 'admin_password_reset';
           customer_id?: string | null; recipient?: string | null; sent_at?: string;
         };
         Update: never;
@@ -253,6 +253,12 @@ export interface Database {
             referencedColumns: ['id'];
           },
         ];
+      };
+      rate_limit_attempts: {
+        Row: { id: string; action: string; ip: string; created_at: string };
+        Insert: { id?: string; action: string; ip: string; created_at?: string };
+        Update: never;
+        Relationships: [];
       };
     };
     Views: Record<string, never>;

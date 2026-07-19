@@ -4,7 +4,9 @@ import crypto from 'crypto';
 // confirm/withdraw consent without a login system. Signed with an HMAC so the
 // customerId in the URL can't be swapped to view/edit someone else's consent.
 function secret() {
-  return process.env.CONSENT_TOKEN_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || 'dev-only-fallback-secret';
+  const value = process.env.CONSENT_TOKEN_SECRET;
+  if (!value) throw new Error('Missing CONSENT_TOKEN_SECRET env var');
+  return value;
 }
 
 export function signConsentToken(customerId: string): string {

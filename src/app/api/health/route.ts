@@ -10,6 +10,7 @@ export async function GET() {
     if (error) throw error;
     return NextResponse.json({ ok: true });
   } catch (err) {
-    return NextResponse.json({ ok: false, error: (err as Error).message }, { status: 500 });
+    console.error('health check failed:', err);
+    return NextResponse.json({ ok: false }, { status: 500 });
   }
 }

@@ -14,18 +14,31 @@ export async function GET(request: Request) {
   }
 
   const supabase = supabaseServer();
-  const filters: string[] = [];
-  if (email) filters.push(`email.ilike.${email}`);
-  if (phone) filters.push(`phone.eq.${phone}`);
 
-  const { data, error } = await supabase
-    .from('customers')
-    .select('consent_datenschutz_at, consent_behandlung_at, consent_marketing_at')
-    .or(filters.join(','))
-    .limit(1)
-    .maybeSingle();
+  // Two bound queries instead of a hand-built .or() filter string — the old
+  // version interpolated raw user input into PostgREST filter syntax, letting
+  // commas/wildcards in email/phone inject extra filter clauses.
+  let data = null;
+  if (email) {
+    const { data: byEmail } = await supabase
+      .from('customers')
+      .select('consent_datenschutz_at, consent_behandlung_at, consent_marketing_at')
+      .ilike('email', email)
+      .limit(1)
+      .maybeSingle();
+    data = byEmail;
+  }
+  if (!data && phone) {
+    const { data: byPhone } = await supabase
+      .from('customers')
+      .select('consent_datenschutz_at, consent_behandlung_at, consent_marketing_at')
+      .eq('phone', phone)
+      .limit(1)
+      .maybeSingle();
+    data = byPhone;
+  }
 
-  if (error || !data) return NextResponse.json({ found: false });
+  if (!data) return NextResponse.json({ found: false });
 
   return NextResponse.json({
     found: true,

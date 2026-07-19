@@ -5,6 +5,7 @@ import { consentConfirmedEmail, sendEmail, getSiteUrl, CONSENT_BCC_EMAIL } from 
 import { signConsentToken } from '@/lib/consentToken';
 import { getRemainingEmailQuota, logEmailSent } from '@/lib/emailQuota';
 import { logConsentEvent } from '@/lib/consentLog';
+import { checkBookingRateLimit, getClientIp } from '@/lib/rateLimit';
 
 interface BookingService {
   name: string;
@@ -25,16 +26,37 @@ interface BookingBody {
   consentMarketing?: boolean;
 }
 
+const MAX_SERVICES_PER_BOOKING = 20;
+const MAX_PRICE = 2000;
+const MAX_DURATION_MIN = 480;
+
 export async function POST(request: Request) {
   const body: BookingBody = await request.json();
+
+  const supabase = supabaseServer();
+  const ip = getClientIp(request);
+  if (!(await checkBookingRateLimit(supabase, ip))) {
+    return NextResponse.json({ error: 'Zu viele Buchungsversuche. Bitte versuchen Sie es später erneut.' }, { status: 429 });
+  }
 
   if (!body.name?.trim() || !body.email?.trim() || !body.phone?.trim()) {
     return NextResponse.json({ error: 'Name, E-Mail und Telefon sind erforderlich.' }, { status: 400 });
   }
-  if (!body.categoryId || !Array.isArray(body.services) || body.services.length === 0) {
+  if (body.name.length > 200 || body.email.length > 320 || body.phone.length > 50 || (body.notes?.length ?? 0) > 2000) {
+    return NextResponse.json({ error: 'Eingabe zu lang.' }, { status: 400 });
+  }
+  if (!body.categoryId || !Array.isArray(body.services) || body.services.length === 0 || body.services.length > MAX_SERVICES_PER_BOOKING) {
     return NextResponse.json({ error: 'Bitte mindestens einen Service auswählen.' }, { status: 400 });
   }
-  if (!body.startsAt) {
+  const hasInvalidService = body.services.some((svc) => {
+    const priceValid = svc.price === null || (Number.isFinite(svc.price) && svc.price >= 0 && svc.price <= MAX_PRICE);
+    const durationValid = Number.isFinite(svc.durationMin) && svc.durationMin > 0 && svc.durationMin <= MAX_DURATION_MIN;
+    return !svc.name?.trim() || !priceValid || !durationValid;
+  });
+  if (hasInvalidService) {
+    return NextResponse.json({ error: 'Ungültige Service-Angaben.' }, { status: 400 });
+  }
+  if (!body.startsAt || Number.isNaN(new Date(body.startsAt).getTime())) {
     return NextResponse.json({ error: 'Bitte Datum und Uhrzeit auswählen.' }, { status: 400 });
   }
   // Behandlungseinwilligung is only legally relevant for Laser-Haarentfernung —
@@ -43,8 +65,6 @@ export async function POST(request: Request) {
   if (!body.consentDatenschutz || (requiresBehandlung && !body.consentBehandlung)) {
     return NextResponse.json({ error: 'Zustimmung zu Datenschutz und Behandlung erforderlich.' }, { status: 400 });
   }
-
-  const supabase = supabaseServer();
 
   const totalDurationMin = body.services.reduce((sum, svc) => sum + svc.durationMin, 0);
   const startsAtDate = new Date(body.startsAt);
