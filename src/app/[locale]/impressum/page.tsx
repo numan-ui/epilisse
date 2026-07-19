@@ -11,7 +11,7 @@ export default function ImpressumPage() {
           <h2 className="font-headline-sm text-headline-sm text-on-surface mb-2">Angaben gemäß § 5 TMG</h2>
           <p>
             EPILISSE<br />
-            ADRESSE PLACEHOLDER, München, Deutschland
+            Berlepschstraße 2, 81373 München, Deutschland
           </p>
         </section>
 
@@ -34,7 +34,7 @@ export default function ImpressumPage() {
           <h2 className="font-headline-sm text-headline-sm text-on-surface mb-2">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
           <p>
             EPILISSE<br />
-            ADRESSE PLACEHOLDER, München, Deutschland
+            Berlepschstraße 2, 81373 München, Deutschland
           </p>
         </section>
 
@@ -42,7 +42,9 @@ export default function ImpressumPage() {
           <h2 className="font-headline-sm text-headline-sm text-on-surface mb-2">Streitschlichtung</h2>
           <p>
             Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:{" "}
-            https://ec.europa.eu/consumers/odr/. Wir sind nicht verpflichtet und nicht bereit, an einem
+            <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+              https://ec.europa.eu/consumers/odr/
+            </a>. Wir sind nicht verpflichtet und nicht bereit, an einem
             Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
           </p>
         </section>
