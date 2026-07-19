@@ -185,7 +185,7 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => booking.open()}
-            className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-95 hover:scale-100 duration-200"
+            className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-100 hover:scale-105 duration-200"
           >
             {lc.navCta || t("nav.cta")}
           </button>
@@ -508,7 +508,7 @@ export default function HomePage() {
 
               {/* Image */}
               <div className="hidden md:block w-[380px] h-[400px] relative overflow-hidden flex-shrink-0">
-                <div className="absolute inset-0 shadow-2xl" style={{ background: 'linear-gradient(135deg,#f6f3f2,#e5e2dc)' }} />
+                <div className="absolute inset-0 shadow-2xl" style={{ background: 'linear-gradient(135deg, var(--color-surface-container-low), var(--color-secondary-container))' }} />
                 {banner.image && (
                   <SmartImage
                     src={banner.image}

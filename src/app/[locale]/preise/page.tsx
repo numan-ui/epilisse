@@ -136,7 +136,7 @@ export default function PreisePage() {
           <button
             type="button"
             onClick={() => booking.open()}
-            className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-95 hover:scale-100 duration-200"
+            className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-100 hover:scale-105 duration-200"
           >
             {bookingCta}
           </button>

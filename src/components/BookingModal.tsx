@@ -293,7 +293,7 @@ export default function BookingModal() {
                 >
                   <span
                     className="material-symbols-outlined text-primary text-[28px] category-icon-glow"
-                    style={{ animationDelay: `${0.6 + i * 4.8}s` }}
+                    style={{ animationDelay: `${0.3 + i * 0.15}s` }}
                   >
                     {c.icon}
                   </span>

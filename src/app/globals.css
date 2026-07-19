@@ -138,7 +138,7 @@
 }
 
 .border-subtle {
-  border-color: #e5e1d8;
+  border-color: var(--color-outline-variant);
 }
 
 @keyframes progress {
