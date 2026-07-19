@@ -478,7 +478,7 @@ export default function HomePage() {
             <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between z-20 px-8 md:px-24">
               {/* Text */}
               <div className="text-center md:text-left max-w-xl py-12 md:py-16">
-                <span className="font-label-caps text-label-caps text-primary tracking-[0.3em] mb-4 block">
+                <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] mb-4 block">
                   {banner.label}
                 </span>
                 <h2 className="font-display-lg text-display-lg font-bold text-on-surface mb-6 leading-tight whitespace-pre-line">
@@ -602,7 +602,7 @@ export default function HomePage() {
         >
           <div className="flex items-center gap-3 mb-4">
             <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-            <span className="font-label-caps text-label-caps text-primary tracking-[0.3em]">
+            <span className="font-label-caps text-label-caps text-primary tracking-[0.2em]">
               {lc.contactSectionLabel || t("contact.sectionLabel")}
             </span>
             <span className="w-16 h-[2px] bg-primary" />

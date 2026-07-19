@@ -10,10 +10,14 @@ import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 import { SITE_URL, buildMetadata } from "@/lib/seo";
 import "../globals.css";
 
-/* display: "optional" — avoids the visible fallback→real-font size-adjust "pop" that "swap"
-   causes on Playfair Display (the fallback's size-adjust never matches this typeface's metrics
-   exactly). With "optional" the browser shows either the real font (if it loads in ~100ms,
-   e.g. already cached) or sticks with the fallback for that page load — no mid-render swap. */
+/* display: "block" — "optional" and "swap" were both tried and rejected (see memory:
+   project_text_shrink_unresolved_2026-07-16). Root cause: "optional" lets each page load
+   independently decide fallback-vs-real-font, and Playfair Display's fallback face doesn't
+   visually match its metrics closely — so consecutive refreshes could alternate between two
+   different-looking renders, read by the user as text "shrinking" on refresh. "block" removes
+   the fallback path entirely (brief invisible text, then the real font, every load) so there's
+   only ever one appearance. Self-hosted fonts (next/font downloads at build time), so the
+   invisible window is a few hundred ms at most. */
 /* Only "normal" style and only the weights actually used anywhere in the app (verified via
    grep for `italic` and `font-light` — neither is used) — every extra weight/style is a
    separate font file the browser has to fetch before it can stop showing the fallback, which
@@ -23,14 +27,14 @@ const playfairDisplay = Playfair_Display({
   weight: ["400", "500", "600", "700"],
   style: ["normal"],
   variable: "--font-playfair-display",
-  display: "optional",
+  display: "block",
 });
 
 const manrope = Manrope({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-manrope",
-  display: "optional",
+  display: "block",
 });
 
 export async function generateMetadata({

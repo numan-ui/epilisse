@@ -100,7 +100,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
       {/* ── NAVBAR ───────────────────────────────────────────────────────── */}
       <nav className="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 glass-nav bg-surface/95 border-b border-outline-variant/30 lux-shadow">
         <div className="flex items-center gap-8">
-          <Link href="/" className="font-display-lg text-[26px] tracking-wide font-bold text-primary">
+          <Link href="/" className="font-display-lg text-[26px] tracking-wide epilisse-logo">
             {settings.name}
           </Link>
           <div className="hidden md:flex gap-8">
@@ -182,7 +182,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
           </div>
           <div className="relative z-10 h-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop flex flex-col justify-end pb-20 md:pb-24">
             <div className="max-w-2xl text-white">
-              <span className="font-label-caps text-label-caps tracking-[0.3em] uppercase mb-4 block text-white/80">
+              <span className="font-label-caps text-label-caps tracking-[0.2em] uppercase mb-4 block text-white/80">
                 {data.label}
               </span>
               <h1 className="font-display-lg text-display-lg mb-6 leading-none">{data.h1}</h1>
@@ -294,7 +294,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
                   <div className="absolute top-0 right-0 p-10 opacity-10">
                     <span className="material-symbols-outlined text-[180px]">{banner.icon}</span>
                   </div>
-                  <span className={`font-label-caps text-label-caps tracking-[0.4em] mb-4 ${dark ? "" : "text-primary"}`}>
+                  <span className={`font-label-caps text-label-caps tracking-[0.2em] mb-4 ${dark ? "" : "text-primary"}`}>
                     {banner.label}
                   </span>
                   <h2 className={`font-headline-lg text-display-lg mb-6 leading-tight ${dark ? "text-on-primary-container" : ""}`}>
@@ -365,7 +365,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
                   className="bg-surface-container-low border border-outline-variant/40 p-8 flex flex-col items-start lux-shadow hover:border-primary/50 transition-all"
                 >
                   <span className="material-symbols-outlined text-primary text-[32px] mb-4">{offer.icon}</span>
-                  <span className="font-label-caps text-label-caps tracking-[0.3em] text-primary mb-2">{offer.label}</span>
+                  <span className="font-label-caps text-label-caps tracking-[0.2em] text-primary mb-2">{offer.label}</span>
                   <h4 className="font-headline-sm text-headline-sm text-on-surface mb-3">{offer.title}</h4>
                   <p className="font-body-sm text-secondary mb-6 flex-1">{offer.body}</p>
                   {offer.price && (
@@ -420,10 +420,15 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
         </div>
         <div className="flex flex-col gap-3">
           <h4 className="font-headline-sm text-headline-sm text-primary mb-2">Rechtliches</h4>
-          {["Impressum", "Datenschutz", "AGB", "Widerruf"].map((item) => (
-            <a key={item} href="#" className="font-body-sm text-secondary hover:text-primary transition-colors">
-              {item}
-            </a>
+          {[
+            { label: "Impressum", href: "/impressum" },
+            { label: "Datenschutz", href: "/datenschutz" },
+            { label: "AGB", href: "/agb" },
+            { label: "Karriere", href: "/karriere" },
+          ].map((item) => (
+            <Link key={item.href} href={item.href} className="font-body-sm text-secondary hover:text-primary transition-colors">
+              {item.label}
+            </Link>
           ))}
         </div>
         <div className="flex flex-col gap-3">

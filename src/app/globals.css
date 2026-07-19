@@ -115,6 +115,18 @@
   --radius-full: 0.75rem;
 }
 
+/* ── Selection & focus states ─────────────────────────────── */
+::selection {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
 /* ── Custom Utilities ─────────────────────────────────────── */
 .glass-nav {
   backdrop-filter: blur(12px);

@@ -97,7 +97,7 @@ export default function PreisePage() {
       {/* ── NAVBAR ───────────────────────────────────────────────────────── */}
       <nav className="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 glass-nav bg-surface/95 border-b border-outline-variant/30 lux-shadow">
         <div className="flex items-center gap-8">
-          <Link href="/" className="font-display-lg text-[26px] tracking-wide font-bold text-primary">
+          <Link href="/" className="font-display-lg text-[26px] tracking-wide epilisse-logo">
             {settings.name}
           </Link>
           <div className="hidden md:flex gap-8">
