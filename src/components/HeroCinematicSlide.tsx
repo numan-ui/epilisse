@@ -28,9 +28,10 @@ type Props = {
 
 const DESKTOP_QUERY = '(min-width: 1024px)';
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
-/** Scroll the hero holds while the four beats play out. Tuned for the ~10s
- *  placeholder clip; a longer master will want this raised proportionally. */
-const SCRUB_DISTANCE = 3000;
+/** Scroll the hero holds while the four beats play out. Tuned to the 20s
+ *  master clip at ~650px of scroll per second of footage — deliberate enough
+ *  that a single trackpad flick can't blow through the whole reveal. */
+const SCRUB_DISTANCE = 13000;
 
 /** Copy beats, locked to the video's transformation — statue → awakening →
  *  half-and-half → fully alive. Kept short so they read during a scroll. */
@@ -71,7 +72,6 @@ export default function HeroCinematicSlide({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [phase, setPhase] = useState(0);
   const [nearTop, setNearTop] = useState(true); // scroll hint shows only at the very start
-  const [soundOn, setSoundOn] = useState(false);
   const [motionOk, setMotionOk] = useState(true);
 
   const doneRef = useRef(onDone);
@@ -90,13 +90,6 @@ export default function HeroCinematicSlide({
     const mq = window.matchMedia(REDUCED_MOTION_QUERY);
     mq.addEventListener('change', check);
     return () => mq.removeEventListener('change', check);
-  }, []);
-
-  const toggleSound = useCallback(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.muted = !v.muted;
-    setSoundOn(!v.muted);
   }, []);
 
   useGSAP(
@@ -124,7 +117,7 @@ export default function HeroCinematicSlide({
               trigger: section,
               start: 'top top',
               end: `+=${SCRUB_DISTANCE}`,
-              scrub: 0.6,
+              scrub: 1,
               pin: section,
               anticipatePin: 1,
               onUpdate: (self) => {
@@ -261,19 +254,6 @@ export default function HeroCinematicSlide({
           }}
         />
 
-        {motionOk && (
-          <button
-            type="button"
-            data-testid="hero-scrub-video-sound"
-            onClick={toggleSound}
-            aria-label={soundOn ? 'Ton stummschalten' : 'Ton einschalten'}
-            className="absolute bottom-5 right-5 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition hover:bg-black/60"
-          >
-            <span className="material-symbols-outlined text-[18px]">
-              {soundOn ? 'volume_up' : 'volume_off'}
-            </span>
-          </button>
-        )}
       </div>
     </div>
   );
