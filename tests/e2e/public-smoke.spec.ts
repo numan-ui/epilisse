@@ -24,8 +24,11 @@ test.describe('Landing page', () => {
   test('hero slider advances when a slide dot is clicked', async ({ page }) => {
     await page.goto('/de');
     // All slides stay mounted (only `opacity` toggles), so scope to the
-    // currently-active slide container rather than `h1.first()`.
-    const activeSlideHeadline = () => page.locator('section.relative.h-\\[921px\\] > div.opacity-100 h1');
+    // currently-active slide container rather than `h1.first()`. Slide 1's
+    // desktop cinematic adds its own <h1>, so take the first within the
+    // active slide.
+    const activeSlideHeadline = () =>
+      page.locator('section.relative.h-\\[921px\\] > div.opacity-100 h1').first();
 
     const firstHeadline = await activeSlideHeadline().innerText();
 

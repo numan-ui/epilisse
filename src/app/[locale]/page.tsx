@@ -15,6 +15,7 @@ import { useAdminAboutValues } from "@/hooks/useAdminAboutValues";
 import { useBookingModal } from "@/context/BookingModalContext";
 import SmartImage from "@/components/SmartImage";
 import GoldDustEffect from "@/components/GoldDustEffect";
+import HeroCinematicSlide from "@/components/HeroCinematicSlide";
 
 /* ── Image constants (Stitch AI – replace with real salon photos) ── */
 const IMG = {
@@ -104,6 +105,10 @@ export default function HomePage() {
   const [slideKey, setSlideKey] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [heroParallax, setHeroParallax] = useState({ x: 0, y: 0 });
+  /* Slide 1's desktop cinematic pins the hero while it plays; hold the story
+     slider's auto-advance until it signals it's done (fires immediately on
+     mobile / reduced motion). */
+  const [cinematicDone, setCinematicDone] = useState(false);
 
   const handleHeroMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -118,10 +123,12 @@ export default function HomePage() {
   }, [heroSlides.length]);
 
   useEffect(() => {
+    // Don't advance off slide 1 until its cinematic reveal has finished.
+    if (currentSlide === 0 && !cinematicDone) return;
     const durationMs = (heroSlides[currentSlide]?.duration || 10) * 1000;
     const timer = setTimeout(nextSlide, durationMs);
     return () => clearTimeout(timer);
-  }, [currentSlide, heroSlides, nextSlide]);
+  }, [currentSlide, heroSlides, nextSlide, cinematicDone]);
 
   const goToSlide = (idx: number) => {
     setCurrentSlide(idx);
@@ -282,8 +289,9 @@ export default function HomePage() {
               i === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
           >
-            {/* Dark overlay */}
-            <div className={`absolute inset-0 ${OVERLAYS[i % OVERLAYS.length]} z-10`} />
+            {/* Dark overlay — on slide 1 the desktop split layout supplies its own
+                contrast (left panel), so skip the full-bleed dim there. */}
+            <div className={`absolute inset-0 ${OVERLAYS[i % OVERLAYS.length]} z-10 ${i === 0 ? "lg:hidden" : ""}`} />
 
             {/* Background image — Ken Burns zoom (img) + cursor parallax (wrapper) for depth.
                 Gradient behind the image covers the gap before it paints (otherwise the dark
@@ -319,8 +327,26 @@ export default function HomePage() {
             {/* Gold dust cursor trail — decorative, first slide only */}
             {i === 0 && <GoldDustEffect active={i === currentSlide} />}
 
-            {/* Content */}
-            <div className="absolute inset-0 z-20 flex flex-col justify-center items-start px-margin-mobile md:px-margin-desktop">
+            {/* Slide 1, desktop only: split cinematic hero — copy on the left
+                advancing through four beats, scroll-scrubbed transformation
+                video on the right. Sits above the mobile photo background,
+                which it fully covers on lg. */}
+            {i === 0 && (
+              <HeroCinematicSlide
+                src="/videos/beauty-scrub.mp4"
+                poster={slide.image}
+                cta={slide.cta}
+                active={i === currentSlide}
+                onCtaClick={() => booking.open()}
+                onDone={() => setCinematicDone(true)}
+              />
+            )}
+
+            {/* Content — slide 1 hides this on lg (the cinematic supplies its
+                own copy) and keeps it on mobile. The wrapper spans the slide
+                but must not swallow clicks; only the CTA re-enables pointer
+                events. */}
+            <div className={`pointer-events-none absolute inset-0 z-20 flex flex-col justify-center items-start px-margin-mobile md:px-margin-desktop ${i === 0 ? "lg:hidden" : ""}`}>
               <motion.h1
                 key={`h-${slideKey}`}
                 initial={{ opacity: 0, y: 24 }}
@@ -346,7 +372,7 @@ export default function HomePage() {
                 animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
                 onClick={() => booking.open()}
-                className="bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-all"
+                className="pointer-events-auto bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-all"
               >
                 {slide.cta}
               </motion.button>
