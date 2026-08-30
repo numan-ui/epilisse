@@ -255,23 +255,29 @@ export default function HeroCinematicSlide({
         )}
       </AnimatePresence>
 
-      {/* Right — the scrubbed video */}
+      {/* Right — the scrubbed video, held in a fixed 4:5 box so the whole
+          bust reads identically on every viewport (the clip is 4:5, so the
+          box crops nothing). */}
       <div className="relative overflow-hidden">
         <div
           className="absolute inset-0"
           style={{ background: 'linear-gradient(135deg,#3a3226 0%,#161310 100%)' }}
         />
-        <video
-          ref={videoRef}
-          data-testid="hero-scrub-video-el"
-          className="absolute inset-x-0 bottom-0 top-[104px] object-contain object-top"
-          poster={poster}
-          muted
-          playsInline
-          preload="auto"
-        >
-          <source src={src} type="video/mp4" />
-        </video>
+        <div className="absolute inset-x-0 bottom-0 top-[104px] flex items-center justify-center">
+          <div className="relative h-full max-h-[860px] aspect-[4/5]">
+            <video
+              ref={videoRef}
+              data-testid="hero-scrub-video-el"
+              className="absolute inset-0 h-full w-full object-cover"
+              poster={poster}
+              muted
+              playsInline
+              preload="auto"
+            >
+              <source src={src} type="video/mp4" />
+            </video>
+          </div>
+        </div>
 
         {/* Soften the seam into the left panel. */}
         <div
