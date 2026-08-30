@@ -265,7 +265,7 @@ export default function HeroCinematicSlide({
           ref={videoRef}
           data-testid="hero-scrub-video-el"
           className="absolute inset-0 h-full w-full scale-[1.02] object-cover"
-          style={{ objectPosition: 'center 22%' }}
+          style={{ objectPosition: 'center 30%' }}
           poster={poster}
           muted
           playsInline
