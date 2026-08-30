@@ -174,10 +174,11 @@ export default function HeroCinematicSlide({
       data-testid="hero-scrub-video"
       className="absolute inset-0 z-[5] hidden lg:grid lg:grid-cols-[52%_48%]"
     >
-      {/* Left — the advancing copy, over a dark panel */}
+      {/* Left — the advancing copy, over a dark panel. Same gradient stops as
+          the right side so the two halves read as one surface at the seam. */}
       <div
         className="relative flex flex-col justify-center px-margin-desktop py-28"
-        style={{ background: 'linear-gradient(135deg,#3a3226 0%,#161310 100%)' }}
+        style={{ background: 'linear-gradient(160deg,#2c261d 0%,#161310 100%)' }}
       >
         <AnimatePresence mode="wait">
           <motion.h1
@@ -255,30 +256,25 @@ export default function HeroCinematicSlide({
         )}
       </AnimatePresence>
 
-      {/* Right — the scrubbed video, held in a fixed 4:5 box so the whole
-          bust reads identically on every viewport (the clip is 4:5, so the
-          box crops nothing). */}
+      {/* Right — the scrubbed video, full-bleed. The 4:5 master covers this
+          ~3:4 column with only a sliver of crop, biased low so the crown is
+          always safe. */}
       <div className="relative overflow-hidden">
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(135deg,#3a3226 0%,#161310 100%)' }}
+          style={{ background: 'linear-gradient(160deg,#2c261d 0%,#161310 100%)' }}
         />
-        <div className="absolute inset-x-0 bottom-0 top-[104px] flex items-center justify-center">
-          <div className="relative h-full max-h-[860px] aspect-[4/5] overflow-hidden">
-            <video
-              ref={videoRef}
-              data-testid="hero-scrub-video-el"
-              className="absolute inset-0 h-full w-full object-cover"
-              style={{ transform: 'translateY(5%)' }}
-              poster={poster}
-              muted
-              playsInline
-              preload="auto"
-            >
-              <source src={src} type="video/mp4" />
-            </video>
-          </div>
-        </div>
+        <video
+          ref={videoRef}
+          data-testid="hero-scrub-video-el"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: 'center 10%' }}
+          muted
+          playsInline
+          preload="auto"
+        >
+          <source src={src} type="video/mp4" />
+        </video>
 
         {/* Soften the seam into the left panel. */}
         <div
