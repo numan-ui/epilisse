@@ -43,17 +43,17 @@ const PHASES = [
   },
   {
     line: 'Schönheit erwacht.',
-    sub: 'Der erste Atemzug. Etwas beginnt sich zu regen.',
+    sub: 'Ein Moment für dich. Und deine Haut.',
     cta: 'hidden' as const,
   },
   {
     line: 'Zum Leben erweckt.',
-    sub: 'Aus Stein wird Haut, aus Stille wird Ausdruck.',
+    sub: 'Sichtbar frisch. Spürbar gepflegt.',
     cta: 'hidden' as const,
   },
   {
     line: 'Entfalte deine Schönheit.',
-    sub: 'Sichtbar, spürbar – ganz du.',
+    sub: 'Bei EPILISSE in München.',
     cta: 'full' as const,
   },
 ];
