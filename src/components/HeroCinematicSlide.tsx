@@ -264,11 +264,12 @@ export default function HeroCinematicSlide({
           style={{ background: 'linear-gradient(135deg,#3a3226 0%,#161310 100%)' }}
         />
         <div className="absolute inset-x-0 bottom-0 top-[104px] flex items-center justify-center">
-          <div className="relative h-full max-h-[860px] aspect-[4/5]">
+          <div className="relative h-full max-h-[860px] aspect-[4/5] overflow-hidden">
             <video
               ref={videoRef}
               data-testid="hero-scrub-video-el"
               className="absolute inset-0 h-full w-full object-cover"
+              style={{ transform: 'translateY(5%)' }}
               poster={poster}
               muted
               playsInline
