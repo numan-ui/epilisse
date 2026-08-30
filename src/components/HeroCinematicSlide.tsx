@@ -36,10 +36,26 @@ const SCRUB_DISTANCE = 13000;
 /** Copy beats, locked to the video's transformation — statue → awakening →
  *  half-and-half → fully alive. Kept short so they read during a scroll. */
 const PHASES = [
-  { line: 'Schönheit in ihrer reinsten Form.', cta: 'soft' as const },
-  { line: 'Schönheit erwacht.', cta: 'hidden' as const },
-  { line: 'Zum Leben erweckt.', cta: 'hidden' as const },
-  { line: 'Entfalte deine Schönheit.', cta: 'full' as const },
+  {
+    line: 'Schönheit in ihrer reinsten Form.',
+    sub: 'Roh, unberührt – und schon vollkommen.',
+    cta: 'soft' as const,
+  },
+  {
+    line: 'Schönheit erwacht.',
+    sub: 'Der erste Atemzug. Etwas beginnt sich zu regen.',
+    cta: 'hidden' as const,
+  },
+  {
+    line: 'Zum Leben erweckt.',
+    sub: 'Aus Stein wird Haut, aus Stille wird Ausdruck.',
+    cta: 'hidden' as const,
+  },
+  {
+    line: 'Entfalte deine Schönheit.',
+    sub: 'Sichtbar, spürbar – ganz du.',
+    cta: 'full' as const,
+  },
 ];
 /** Scroll-progress (0–1) at which each beat takes over. */
 const PHASE_AT = [0, 0.32, 0.6, 0.86];
@@ -176,10 +192,23 @@ export default function HeroCinematicSlide({
           </motion.h1>
         </AnimatePresence>
 
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={phase}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 0.85, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
+            className="mt-5 font-body-lg text-body-md text-white/80 max-w-md"
+          >
+            {PHASES[phase].sub}
+          </motion.p>
+        </AnimatePresence>
+
         <motion.p
-          animate={{ opacity: phase === PHASES.length - 1 ? 1 : 0.55 }}
+          animate={{ opacity: phase === PHASES.length - 1 ? 0.7 : 0.4 }}
           transition={{ duration: 0.6 }}
-          className="mt-5 font-body-lg text-body-md text-white/70"
+          className="mt-3 font-body-lg text-body-sm text-white/60"
         >
           {BRAND_LINE}
         </motion.p>
@@ -236,7 +265,7 @@ export default function HeroCinematicSlide({
           ref={videoRef}
           data-testid="hero-scrub-video-el"
           className="absolute inset-0 h-full w-full scale-[1.02] object-cover"
-          style={{ objectPosition: 'center 38%' }}
+          style={{ objectPosition: 'center 22%' }}
           poster={poster}
           muted
           playsInline
