@@ -173,13 +173,10 @@ export default function HeroCinematicSlide({
       ref={rootRef}
       data-testid="hero-scrub-video"
       className="absolute inset-0 z-[5] hidden lg:grid lg:grid-cols-[52%_48%]"
+      style={{ background: 'linear-gradient(180deg,#2c261d 0%,#161310 100%)' }}
     >
-      {/* Left — the advancing copy, over a dark panel. Same gradient stops as
-          the right side so the two halves read as one surface at the seam. */}
-      <div
-        className="relative flex flex-col justify-center px-margin-desktop py-28"
-        style={{ background: 'linear-gradient(160deg,#2c261d 0%,#161310 100%)' }}
-      >
+      {/* Left — the advancing copy, straight onto the shared backdrop. */}
+      <div className="relative flex flex-col justify-center px-margin-desktop py-28">
         <AnimatePresence mode="wait">
           <motion.h1
             key={phase}
@@ -256,35 +253,24 @@ export default function HeroCinematicSlide({
         )}
       </AnimatePresence>
 
-      {/* Right — the scrubbed video, full-bleed. The 4:5 master covers this
-          ~3:4 column with only a sliver of crop, biased low so the crown is
-          always safe. */}
+      {/* Right — the scrubbed video in a 4:5 box, vertically centred. The
+          master is 4:5 so the box crops nothing; the equal dark margin above
+          and below it reads as a frame, not a gap. */}
       <div className="relative overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{ background: 'linear-gradient(160deg,#2c261d 0%,#161310 100%)' }}
-        />
-        <video
-          ref={videoRef}
-          data-testid="hero-scrub-video-el"
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ objectPosition: 'center 10%' }}
-          muted
-          playsInline
-          preload="auto"
-        >
-          <source src={src} type="video/mp4" />
-        </video>
-
-        {/* Soften the seam into the left panel. */}
-        <div
-          className="pointer-events-none absolute inset-y-0 left-0 w-40"
-          style={{
-            background:
-              'linear-gradient(90deg,#161310 0%,rgba(22,19,16,0.6) 35%,rgba(22,19,16,0) 100%)',
-          }}
-        />
-
+        <div className="absolute inset-0 flex items-center justify-center p-6">
+          <div className="relative h-full w-full max-h-full max-w-full aspect-[4/5]">
+            <video
+              ref={videoRef}
+              data-testid="hero-scrub-video-el"
+              className="absolute inset-0 h-full w-full object-cover"
+              muted
+              playsInline
+              preload="auto"
+            >
+              <source src={src} type="video/mp4" />
+            </video>
+          </div>
+        </div>
       </div>
     </div>
   );
