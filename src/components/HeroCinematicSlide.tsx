@@ -257,7 +257,7 @@ export default function HeroCinematicSlide({
           master is 4:5 so the box crops nothing; the equal dark margin above
           and below it reads as a frame, not a gap. */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center p-6">
+        <div className="absolute inset-0 flex items-end justify-center">
           <video
             ref={videoRef}
             data-testid="hero-scrub-video-el"
