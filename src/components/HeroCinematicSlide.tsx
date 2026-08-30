@@ -258,18 +258,16 @@ export default function HeroCinematicSlide({
           and below it reads as a frame, not a gap. */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center p-6">
-          <div className="relative h-full w-full max-h-full max-w-full aspect-[4/5]">
-            <video
-              ref={videoRef}
-              data-testid="hero-scrub-video-el"
-              className="absolute inset-0 h-full w-full object-cover"
-              muted
-              playsInline
-              preload="auto"
-            >
-              <source src={src} type="video/mp4" />
-            </video>
-          </div>
+          <video
+            ref={videoRef}
+            data-testid="hero-scrub-video-el"
+            className="max-h-full max-w-full"
+            muted
+            playsInline
+            preload="auto"
+          >
+            <source src={src} type="video/mp4" />
+          </video>
         </div>
       </div>
     </div>
