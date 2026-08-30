@@ -226,7 +226,8 @@ export default function HeroCinematicSlide({
 
       </div>
 
-      {/* Scroll hint — centred on the seam; fades out after the first nudge */}
+      {/* Scroll hint — sits low on the dark left panel for contrast; a gold
+          bead falls down a hairline. Fades out after the first nudge. */}
       <AnimatePresence>
         {nearTop && motionOk && (
           <motion.div
@@ -234,21 +235,21 @@ export default function HeroCinematicSlide({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="pointer-events-none absolute bottom-9 left-[52%] z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-center"
+            className="pointer-events-none absolute bottom-10 left-[26%] z-10 flex -translate-x-1/2 flex-col items-center gap-3 text-center"
           >
-            <span className="font-label-caps text-[12px] font-semibold tracking-[0.24em] text-white">
-              SCROLLEN
+            <span className="font-label-caps text-[11px] font-semibold uppercase tracking-[0.32em] text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
+              Scrollen
             </span>
-            <span className="text-[11px] tracking-wide text-white/70">
+            <span className="text-[11px] tracking-wide text-white/60">
               Entdecke, was darunter liegt.
             </span>
-            <motion.span
-              animate={{ y: [0, 7, 0] }}
-              transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
-              className="material-symbols-outlined mt-1 text-[26px] text-white drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]"
-            >
-              arrow_downward
-            </motion.span>
+            <div className="relative mt-1 h-14 w-px overflow-hidden bg-white/15">
+              <motion.span
+                className="absolute left-1/2 top-0 block h-4 w-px -translate-x-1/2 bg-primary-fixed-dim shadow-[0_0_10px_2px_rgba(234,194,67,0.6)]"
+                animate={{ y: [-16, 56] }}
+                transition={{ repeat: Infinity, duration: 1.9, ease: 'easeIn' }}
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
