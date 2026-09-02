@@ -324,6 +324,21 @@ export default function HomePage() {
               <div className="w-full h-full" style={{ background: 'linear-gradient(135deg,#3a3226 0%,#1a1712 100%)' }} />
             )}
 
+            {/* Slide 1, mobile only: a fixed brand background (the marble
+                figure), sitting above the admin Ken-Burns photo. On lg the
+                desktop split hero covers this entirely. */}
+            {i === 0 && (
+              <div className="absolute inset-0 z-[1] lg:hidden">
+                <SmartImage
+                  src="/images/hero-mobile.webp"
+                  alt=""
+                  className="object-cover object-[50%_35%]"
+                  sizes="100vw"
+                  priority={i === currentSlide}
+                />
+              </div>
+            )}
+
             {/* Gold dust cursor trail — decorative, first slide only */}
             {i === 0 && <GoldDustEffect active={i === currentSlide} />}
 
