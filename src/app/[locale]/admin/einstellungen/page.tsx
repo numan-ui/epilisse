@@ -1,6 +1,7 @@
 'use client';
 import { useRef } from 'react';
 import { useAdminData } from '../behandlungen/AdminDataContext';
+import ThemeEditor from './ThemeEditor';
 
 const SECTIONS = ['Studio-Informationen', 'Öffnungszeiten', 'Online-Buchung', 'Social Media', 'Startseite Bilder', 'Follow-Up Erinnerungen', 'Darstellung'] as const;
 type Section = typeof SECTIONS[number];
@@ -407,6 +408,8 @@ export default function EinstellungenPage() {
                   </div>
                 </div>
               </div>
+
+              <ThemeEditor />
             </section>
           )}
         </div>

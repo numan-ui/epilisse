@@ -173,7 +173,10 @@ export default function HeroCinematicSlide({
       ref={rootRef}
       data-testid="hero-scrub-video"
       className="absolute inset-0 z-[5] hidden lg:grid lg:grid-cols-[52%_48%]"
-      style={{ background: 'linear-gradient(180deg,#2c261d 0%,#161310 100%)' }}
+      style={{
+        background:
+          'linear-gradient(180deg,var(--hero-panel-top) 0%,var(--hero-panel-bottom) 100%)',
+      }}
     >
       {/* Left — the advancing copy, straight onto the shared backdrop. */}
       <div className="relative flex flex-col justify-center px-margin-desktop py-28">
@@ -184,7 +187,7 @@ export default function HeroCinematicSlide({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="font-display-lg text-[36px] md:text-[42px] xl:text-[52px] font-bold leading-[1.1] tracking-[-0.015em] text-white max-w-lg"
+            className="font-display-lg text-[36px] md:text-[42px] xl:text-[52px] font-bold leading-[1.1] tracking-[-0.015em] text-[var(--hero-on-panel)] max-w-lg"
           >
             {PHASES[phase].line}
           </motion.h1>
@@ -197,7 +200,7 @@ export default function HeroCinematicSlide({
             animate={{ opacity: 0.85, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.45, ease: 'easeOut' }}
-            className="mt-5 font-body-lg text-body-md text-white/80 max-w-md"
+            className="mt-5 font-body-lg text-body-md text-[var(--hero-on-panel-muted)] max-w-md"
           >
             {PHASES[phase].sub}
           </motion.p>
@@ -206,7 +209,7 @@ export default function HeroCinematicSlide({
         <motion.p
           animate={{ opacity: phase === PHASES.length - 1 ? 0.7 : 0.4 }}
           transition={{ duration: 0.6 }}
-          className="mt-3 font-body-lg text-body-sm text-white/60"
+          className="mt-3 font-body-lg text-body-sm text-[var(--hero-on-panel-dim)]"
         >
           {BRAND_LINE}
         </motion.p>
@@ -237,15 +240,15 @@ export default function HeroCinematicSlide({
             transition={{ duration: 0.5, delay: 0.3 }}
             className="pointer-events-none absolute bottom-10 left-[26%] z-10 flex -translate-x-1/2 flex-col items-center gap-3 text-center"
           >
-            <span className="font-label-caps text-[11px] font-semibold uppercase tracking-[0.32em] text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
+            <span className="font-label-caps text-[11px] font-semibold uppercase tracking-[0.32em] text-[var(--hero-on-panel)] drop-shadow-[0_1px_6px_var(--hero-hint-shadow)]">
               Scrollen
             </span>
-            <span className="text-[11px] tracking-wide text-white/60">
+            <span className="text-[11px] tracking-wide text-[var(--hero-on-panel-dim)]">
               Entdecke, was darunter liegt.
             </span>
-            <div className="relative mt-1 h-14 w-px overflow-hidden bg-white/15">
+            <div className="relative mt-1 h-14 w-px overflow-hidden bg-[var(--hero-hint-line)]">
               <motion.span
-                className="absolute left-1/2 top-0 block h-4 w-px -translate-x-1/2 bg-primary-fixed-dim shadow-[0_0_10px_2px_rgba(234,194,67,0.6)]"
+                className="absolute left-1/2 top-0 block h-4 w-px -translate-x-1/2 bg-[var(--hero-bead)] shadow-[0_0_10px_2px_var(--hero-bead-glow)]"
                 animate={{ y: [-16, 56] }}
                 transition={{ repeat: Infinity, duration: 1.9, ease: 'easeIn' }}
               />

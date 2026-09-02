@@ -115,6 +115,27 @@
   --radius-full: 0.75rem;
 }
 
+/* ── Theme-overridable extras ─────────────────────────────────
+   Defaults match the "Gold Lux" preset. When the admin saves a custom theme
+   the locale layout injects an `html:root {}` block that overrides both these
+   and the `@theme` colours above. globals.css never needs to change for a
+   re-palette — only these var *references* below do. */
+:root {
+  /* Hero split-panel (HeroCinematicSlide) */
+  --hero-panel-top: #2c261d;
+  --hero-panel-bottom: #161310;
+  --hero-on-panel: #ffffff;
+  --hero-on-panel-muted: rgba(255, 255, 255, 0.82);
+  --hero-on-panel-dim: rgba(255, 255, 255, 0.6);
+  --hero-hint-line: rgba(255, 255, 255, 0.15);
+  --hero-hint-shadow: rgba(0, 0, 0, 0.6);
+  --hero-bead: var(--color-primary-fixed-dim);
+  --hero-bead-glow: rgba(234, 194, 67, 0.6);
+
+  /* Solid colour behind the decorative glow spots below */
+  --brand-glow: #c5a021;
+}
+
 /* ── Selection & focus states ─────────────────────────────── */
 ::selection {
   background-color: var(--color-primary-container);
@@ -171,8 +192,9 @@
 }
 
 .bento-card:hover {
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14), 0 0 0 1px rgba(197, 160, 33, 0.35);
-  border-color: rgba(197, 160, 33, 0.4);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14),
+    0 0 0 1px color-mix(in srgb, var(--brand-glow) 35%, transparent);
+  border-color: color-mix(in srgb, var(--brand-glow) 40%, transparent);
   transform: translateY(-4px);
 }
 
@@ -192,8 +214,12 @@
 
 /* ── Booking modal & Behandlungen page: category icons glow in sequence ── */
 @keyframes category-icon-glow {
-  0%, 100% { text-shadow: 0 0 0 rgba(197, 160, 33, 0); transform: scale(1); }
-  50%      { text-shadow: 0 0 14px rgba(197, 160, 33, 0.75), 0 0 5px rgba(197, 160, 33, 0.5); transform: scale(1.14); }
+  0%, 100% { text-shadow: 0 0 0 transparent; transform: scale(1); }
+  50% {
+    text-shadow: 0 0 14px color-mix(in srgb, var(--brand-glow) 75%, transparent),
+      0 0 5px color-mix(in srgb, var(--brand-glow) 50%, transparent);
+    transform: scale(1.14);
+  }
 }
 
 .category-icon-glow {
@@ -207,9 +233,9 @@
     90deg,
     #000000 0%,
     #000000 38%,
-    #9a6e1a 44%,
-    #f5d982 50%,
-    #9a6e1a 56%,
+    color-mix(in srgb, var(--color-primary) 80%, #000000) 44%,
+    var(--color-primary-fixed) 50%,
+    color-mix(in srgb, var(--color-primary) 80%, #000000) 56%,
     #000000 62%,
     #000000 100%
   );

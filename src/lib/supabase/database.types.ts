@@ -260,6 +260,24 @@ export interface Database {
         Update: never;
         Relationships: [];
       };
+      theme_settings: {
+        Row: {
+          id: number; brand: string; on_brand: string; brand_hover: string;
+          surface: string; card: string; body_text: string; accent: string;
+          hero_panel: string; updated_at: string;
+        };
+        Insert: {
+          id?: number; brand: string; on_brand: string; brand_hover: string;
+          surface: string; card: string; body_text: string; accent: string;
+          hero_panel: string; updated_at?: string;
+        };
+        Update: Partial<{
+          brand: string; on_brand: string; brand_hover: string; surface: string;
+          card: string; body_text: string; accent: string; hero_panel: string;
+          updated_at: string;
+        }>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
