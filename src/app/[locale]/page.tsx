@@ -192,7 +192,7 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => booking.open()}
-            className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-100 hover:scale-105 duration-200"
+            className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-100 hover:scale-105 duration-200 rounded-[var(--radius-cta)]"
           >
             {lc.navCta || t("nav.cta")}
           </button>
@@ -372,7 +372,7 @@ export default function HomePage() {
                 animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
                 onClick={() => booking.open()}
-                className="pointer-events-auto bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-all"
+                className="pointer-events-auto bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-all rounded-[var(--radius-cta)]"
               >
                 {slide.cta}
               </motion.button>
@@ -517,14 +517,14 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() => booking.open()}
-                    className="bg-primary text-on-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all text-center"
+                    className="bg-primary text-on-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all text-center rounded-[var(--radius-cta)]"
                   >
                     {banner.ctaPrimary}
                   </button>
                   {banner.ctaSecondary && (
                     <a
                       href="#behandlungen"
-                      className="border border-primary text-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary/5 transition-all text-center"
+                      className="border border-primary text-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary/5 transition-all text-center rounded-[var(--radius-cta)]"
                     >
                       {banner.ctaSecondary}
                     </a>
@@ -694,7 +694,7 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => booking.open()}
-            className="bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all text-center lux-shadow"
+            className="bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all text-center lux-shadow rounded-[var(--radius-cta)]"
           >
             {t("contact.ctaCalendar")}
           </button>
@@ -702,7 +702,7 @@ export default function HomePage() {
             href={WA_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 border border-primary text-primary px-10 py-5 font-label-caps text-label-caps tracking-widest hover:bg-primary/5 transition-all"
+            className="flex items-center justify-center gap-2 border border-primary text-primary px-10 py-5 font-label-caps text-label-caps tracking-widest hover:bg-primary/5 transition-all rounded-[var(--radius-cta)]"
           >
             <span className="material-symbols-outlined text-sm">chat</span>
             {t("contact.ctaWhatsapp")}
@@ -711,7 +711,7 @@ export default function HomePage() {
             href={MAPS_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 border border-outline-variant text-secondary px-10 py-5 font-label-caps text-label-caps tracking-widest hover:border-primary hover:text-primary transition-all"
+            className="flex items-center justify-center gap-2 border border-outline-variant text-secondary px-10 py-5 font-label-caps text-label-caps tracking-widest hover:border-primary hover:text-primary transition-all rounded-[var(--radius-cta)]"
           >
             <span className="material-symbols-outlined text-sm">map</span>
             {t("contact.ctaMaps")}

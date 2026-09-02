@@ -136,7 +136,7 @@ export default function PreisePage() {
           <button
             type="button"
             onClick={() => booking.open()}
-            className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-100 hover:scale-105 duration-200"
+            className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-100 hover:scale-105 duration-200 rounded-[var(--radius-cta)]"
           >
             {bookingCta}
           </button>
@@ -236,7 +236,7 @@ export default function PreisePage() {
           <button
             type="button"
             onClick={() => booking.open()}
-            className="bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all lux-shadow"
+            className="bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all lux-shadow rounded-[var(--radius-cta)]"
           >
             {bookingCta}
           </button>

@@ -8,6 +8,10 @@ import { BookingModalProvider } from "@/context/BookingModalContext";
 import BookingModal from "@/components/BookingModal";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 import { SITE_URL, buildMetadata } from "@/lib/seo";
+import { getServerTheme } from "@/lib/theme/server";
+import { deriveTokens } from "@/lib/theme/derive";
+import { themeVarsToCss } from "@/lib/theme/css";
+import { GOLD_LUX, sameTheme } from "@/lib/theme/presets";
 import "../globals.css";
 
 /* display: "block" — "optional" and "swap" were both tried and rejected (see memory:
@@ -80,6 +84,15 @@ export default async function LocaleLayout({
 
   const messages = await getMessages();
 
+  // Site theme. While the saved theme matches the Gold Lux preset the site
+  // renders straight from globals.css @theme; only a customised theme injects
+  // an override block (html:root, so it beats @theme's :root regardless of
+  // stylesheet order).
+  const theme = await getServerTheme();
+  const themeCss = sameTheme(theme, GOLD_LUX)
+    ? null
+    : themeVarsToCss(deriveTokens(theme).vars);
+
   return (
     <html
       lang={locale}
@@ -87,6 +100,12 @@ export default async function LocaleLayout({
       className={`scroll-smooth ${playfairDisplay.variable} ${manrope.variable}`}
     >
       <head>
+        {themeCss && (
+          <style
+            id="theme-vars"
+            dangerouslySetInnerHTML={{ __html: themeCss }}
+          />
+        )}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

@@ -320,7 +320,7 @@ export default function BookingModal() {
             <button
               disabled={selectedServiceIds.size === 0}
               onClick={() => setStep('details')}
-              className="w-full mt-6 bg-primary text-on-primary py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full mt-6 bg-primary text-on-primary py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all disabled:opacity-40 disabled:cursor-not-allowed rounded-[var(--radius-cta)]"
             >
               Weiter ({selectedServiceIds.size} ausgewählt)
             </button>
@@ -485,7 +485,7 @@ export default function BookingModal() {
             <button
               onClick={handleSubmit}
               disabled={submitting || !time || dayClosed || !consentDatenschutz || (requiresBehandlung && !consentBehandlung)}
-              className="w-full bg-primary text-on-primary py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all disabled:opacity-60"
+              className="w-full bg-primary text-on-primary py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all disabled:opacity-60 rounded-[var(--radius-cta)]"
             >
               {submitting ? 'Wird gesendet…' : 'Termin anfragen'}
             </button>
@@ -501,7 +501,7 @@ export default function BookingModal() {
             </p>
             <button
               onClick={close}
-              className="mt-4 bg-primary text-on-primary px-8 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all"
+              className="mt-4 bg-primary text-on-primary px-8 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all rounded-[var(--radius-cta)]"
             >
               Schließen
             </button>
