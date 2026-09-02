@@ -134,6 +134,10 @@
 
   /* Solid colour behind the decorative glow spots below */
   --brand-glow: #c5a021;
+
+  /* Corner radius for public CTA buttons (Termin buchen, WhatsApp, …).
+     One knob for the whole site — bump this, not each button. */
+  --radius-cta: 8px;
 }
 
 /* ── Selection & focus states ─────────────────────────────── */

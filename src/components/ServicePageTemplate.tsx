@@ -136,7 +136,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
           <button
             type="button"
             onClick={() => booking.open(categoryId)}
-            className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all"
+            className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all rounded-[var(--radius-cta)]"
           >
             {bookingCta}
           </button>
@@ -259,7 +259,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
               <button
                 type="button"
                 onClick={() => booking.open(categoryId)}
-                className="inline-block bg-primary text-on-primary px-10 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all"
+                className="inline-block bg-primary text-on-primary px-10 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all rounded-[var(--radius-cta)]"
               >
                 {bookingCta}
               </button>
@@ -322,7 +322,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
                     <button
                       type="button"
                       onClick={() => booking.open(categoryId)}
-                      className={`inline-block px-10 py-4 font-label-caps text-label-caps tracking-widest transition-all ${
+                      className={`inline-block px-10 py-4 font-label-caps text-label-caps tracking-widest transition-all rounded-[var(--radius-cta)] ${
                         dark
                           ? "bg-on-primary-container text-primary-container hover:opacity-90"
                           : "bg-primary text-on-primary hover:bg-primary-container"
@@ -379,7 +379,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
                   <button
                     type="button"
                     onClick={() => booking.open(categoryId)}
-                    className="w-full bg-primary text-on-primary py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all"
+                    className="w-full bg-primary text-on-primary py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all rounded-[var(--radius-cta)]"
                   >
                     {offer.cta}
                   </button>

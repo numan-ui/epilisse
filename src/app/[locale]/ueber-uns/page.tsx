@@ -85,7 +85,7 @@ export default function UeberUnsPage() {
           <button
             type="button"
             onClick={() => booking.open()}
-            className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-100 hover:scale-105 duration-200"
+            className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-100 hover:scale-105 duration-200 rounded-[var(--radius-cta)]"
           >
             {bookingCta}
           </button>
@@ -231,7 +231,7 @@ export default function UeberUnsPage() {
             href={settings.treatwellUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-primary text-on-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all lux-shadow"
+            className="inline-flex items-center gap-2 bg-primary text-on-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all lux-shadow rounded-[var(--radius-cta)]"
           >
             <span className="material-symbols-outlined text-lg">star</span>
             {t("reviews.cta")}

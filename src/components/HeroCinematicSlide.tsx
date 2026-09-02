@@ -221,7 +221,7 @@ export default function HeroCinematicSlide({
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: ctaMode === 'full' ? 1 : 0.75, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mt-10 w-fit bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-colors"
+            className="mt-10 w-fit bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-colors rounded-[var(--radius-cta)]"
           >
             {cta}
           </motion.button>
@@ -229,30 +229,54 @@ export default function HeroCinematicSlide({
 
       </div>
 
-      {/* Scroll hint — sits low on the dark left panel for contrast; a gold
-          bead falls down a hairline. Fades out after the first nudge. */}
+      {/* Scroll hint — centred on the split line between the copy and the
+          video, so it reads as "keep going down". A minimal capsule with a
+          travelling bead + a pulsing chevron; the whole group bobs. Fades out
+          after the first nudge. */}
       <AnimatePresence>
         {nearTop && motionOk && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="pointer-events-none absolute bottom-10 left-[26%] z-10 flex -translate-x-1/2 flex-col items-center gap-3 text-center"
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="pointer-events-none absolute top-[44%] left-[46%] z-30 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-3 text-center"
           >
-            <span className="font-label-caps text-[11px] font-semibold uppercase tracking-[0.32em] text-[var(--hero-on-panel)] drop-shadow-[0_1px_6px_var(--hero-hint-shadow)]">
+            <span className="font-label-caps text-[11px] font-semibold uppercase tracking-[0.34em] text-[var(--hero-on-panel)] drop-shadow-[0_1px_6px_var(--hero-hint-shadow)]">
               Scrollen
             </span>
-            <span className="text-[11px] tracking-wide text-[var(--hero-on-panel-dim)]">
+            <span className="max-w-[18ch] text-[11px] leading-snug tracking-wide text-[var(--hero-on-panel-dim)]">
               Entdecke, was darunter liegt.
             </span>
-            <div className="relative mt-1 h-14 w-px overflow-hidden bg-[var(--hero-hint-line)]">
-              <motion.span
-                className="absolute left-1/2 top-0 block h-4 w-px -translate-x-1/2 bg-[var(--hero-bead)] shadow-[0_0_10px_2px_var(--hero-bead-glow)]"
-                animate={{ y: [-16, 56] }}
-                transition={{ repeat: Infinity, duration: 1.9, ease: 'easeIn' }}
-              />
-            </div>
+            <motion.div
+              animate={{ y: [0, 6, 0] }}
+              transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
+              className="mt-1 flex flex-col items-center gap-2"
+            >
+              <div className="relative h-11 w-[22px] overflow-hidden rounded-full border border-[var(--hero-hint-line)]">
+                <motion.span
+                  className="absolute left-1/2 top-2 block h-[7px] w-[3px] -translate-x-1/2 rounded-full bg-[var(--hero-bead)] shadow-[0_0_8px_2px_var(--hero-bead-glow)]"
+                  animate={{ y: [0, 16], opacity: [1, 0.15] }}
+                  transition={{ repeat: Infinity, duration: 1.7, ease: 'easeIn' }}
+                />
+              </div>
+              <svg
+                width="16"
+                height="9"
+                viewBox="0 0 16 9"
+                fill="none"
+                className="text-[var(--hero-bead)]"
+                aria-hidden="true"
+              >
+                <path
+                  d="M1 1l7 6 7-6"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
