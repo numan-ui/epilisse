@@ -119,21 +119,48 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     if (svcs) setServices(svcs);
     if (cmps) setCampaigns(cmps);
     if (pc)   setPageContent(pc);
-    if (cats && cats.length > 0) {
-      // Drop stale localStorage entries for built-in categories removed from code (e.g. a deleted default category).
-      const validCats = cats.filter(c => CATEGORIES.some(d => d.id === c.id) || c.id.startsWith('cat-'));
-      if (validCats.length > 0) {
-        setCategories(validCats);
-        if (validCats.length !== cats.length) ls.write(LS_CAT, validCats);
-      }
-    }
     if (set)  setSettings(prev => ({ ...prev, ...set, hours: set.hours ?? prev.hours }));
     if (lc)   setLandingContent(prev => ({ ...prev, ...lc }));
     if (hero && hero.length > 0) setHeroSlides(hero);
     if (promo && promo.length > 0) setPromoBanners(promo);
     if (about && about.length > 0) setAboutValues(about);
     if (revs  && revs.length > 0)  setReviews(revs);
-    setCategoriesLoaded(true);
+
+    // Drop stale localStorage entries for built-in categories removed from code (e.g. a deleted default category).
+    const validCats = cats ? cats.filter(c => CATEGORIES.some(d => d.id === c.id) || c.id.startsWith('cat-')) : [];
+    if (validCats.length > 0) {
+      setCategories(validCats);
+      if (validCats.length !== cats!.length) ls.write(LS_CAT, validCats);
+      setCategoriesLoaded(true);
+    } else {
+      // This browser has no (valid) local copy — could be a genuinely fresh
+      // admin, or just a device/profile/incognito tab that never saved one.
+      // The category list in `draft` is the real shared source of truth, so
+      // seed from there instead of the hardcoded CATEGORIES defaults: writing
+      // those 3 defaults into `draft` via the write-through below would wipe
+      // out every admin-created category for every visitor and every other
+      // browser (this was happening — reported as "database keeps resetting
+      // to 3 categories").
+      (async () => {
+        try {
+          const r = await fetch('/api/categories?content=draft');
+          if (!r.ok) return; // auth/network failure — leave categoriesLoaded false, see below
+          const res = (await r.json()) as { draft: Category[] | null };
+          if (res.draft && res.draft.length > 0) {
+            setCategories(res.draft);
+            ls.write(LS_CAT, res.draft);
+          }
+          // res.draft empty/null is a real signal (nothing published yet) — safe to proceed.
+          setCategoriesLoaded(true);
+        } catch {
+          // Network failure: we genuinely don't know what's in `draft`. Leave
+          // categoriesLoaded false rather than risk it — this disables the
+          // write-through for the rest of this session (no autosave of the
+          // category list) instead of risking overwriting the shared draft
+          // with the fresh-mount CATEGORIES defaults.
+        }
+      })();
+    }
   }, []);
 
   /* ── Categories draft write-through ───────────────────

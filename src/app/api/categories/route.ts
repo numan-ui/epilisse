@@ -3,8 +3,34 @@ import { supabaseServer } from '@/lib/supabase/server';
 import { getAdminSession } from '@/lib/supabase/authServer';
 import type { Category } from '@/app/[locale]/admin/behandlungen/data';
 
-/** Used by admin/termine + admin/kampagnen for category dropdowns — the CRM `categories` table (id/name), unrelated to draft/published content below. */
-export async function GET() {
+/**
+ * Default (no query param): used by admin/termine + admin/kampagnen for category
+ * dropdowns — the CRM `categories` table (id/name), unrelated to draft/published
+ * content below.
+ *
+ * `?content=draft`: admin only — returns the current `draft` column of
+ * `site_categories_content`, so a browser whose localStorage doesn't have the
+ * admin's edited category list yet (new device, cleared site data, incognito)
+ * can seed its editing state from the real shared draft instead of falling
+ * back to the hardcoded CATEGORIES defaults and then, via the debounced
+ * write-through in AdminDataContext, clobbering that shared draft with them.
+ */
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  if (searchParams.get('content') === 'draft') {
+    if (!(await getAdminSession())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const supabase = supabaseServer();
+    const { data, error } = await supabase
+      .from('site_categories_content')
+      .select('draft')
+      .eq('id', 1)
+      .maybeSingle();
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ draft: data?.draft ?? null });
+  }
+
   const supabase = supabaseServer();
   const { data, error } = await supabase.from('categories').select('id, name').order('name');
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
