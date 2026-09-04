@@ -38,6 +38,22 @@ export default function BehandlungenPage() {
     setPublishing(true);
     setPublishMsg(null);
     try {
+      // Flush the admin's current (localStorage-backed) list into `draft`
+      // ourselves first — AdminDataContext's write-through is debounced
+      // (~700ms), so without this, publishing right after an edit (e.g.
+      // uploading an image, then immediately hitting this button) could
+      // copy a stale pre-edit draft into `published`, silently reverting
+      // the just-made change on the live site.
+      const putRes = await fetch('/api/categories', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(categories),
+      });
+      if (!putRes.ok) {
+        const putBody = await putRes.json().catch(() => ({}));
+        throw new Error(putBody.error || 'Speichern fehlgeschlagen.');
+      }
+
       const res = await fetch('/api/categories', { method: 'POST' });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.error || 'Veröffentlichung fehlgeschlagen.');
