@@ -31,22 +31,6 @@ const FALLBACK_PRICING: Record<string, { name: string; duration: string; price: 
     { name: "Microneedling (Gesicht)", duration: "60 Min.", price: "€ 189,00" },
     { name: "Premium Glow Signature", duration: "90 Min.", price: "€ 299,00" },
   ],
-  body: [
-    { name: "Kryolipolyse (1 Zone)", duration: "60 Min.", price: "€ 199,00" },
-    { name: "Kryolipolyse (2 Zonen)", duration: "90 Min.", price: "€ 349,00" },
-    { name: "RF-Lifting (Gesicht & Hals)", duration: "45 Min.", price: "€ 149,00" },
-    { name: "Ultraschall-Kavitation", duration: "45 Min.", price: "€ 129,00" },
-    { name: "Vakuumtherapie Beine", duration: "60 Min.", price: "€ 119,00" },
-    { name: "Body Sculpting Premium Paket", duration: "150 Min.", price: "€ 599,00" },
-  ],
-  inject: [
-    { name: "Botulinum Toxin (1 Zone)", duration: "30 Min.", price: "€ 199,00" },
-    { name: "Botulinum Toxin (3 Zonen)", duration: "30 Min.", price: "€ 349,00" },
-    { name: "Hyaluronsäure Lippen", duration: "45 Min.", price: "€ 299,00" },
-    { name: "Hyaluronsäure Wangen & Kinn", duration: "45 Min.", price: "€ 399,00" },
-    { name: "Profhilo (2 Sitzungen)", duration: "je 30 Min.", price: "€ 699,00" },
-    { name: "Anti-Aging Full-Face Konzept", duration: "60 Min.", price: "€ 899,00" },
-  ],
   mani: [
     { name: "Klassische Maniküre", duration: "45 Min.", price: "€ 45,00" },
     { name: "EPILISSE Signature Shellac", duration: "75 Min.", price: "€ 65,00" },
@@ -80,13 +64,11 @@ export default function PreisePage() {
   // Rules of hooks: fixed set of categories, called unconditionally.
   const laser   = useAdminServices("laser", FALLBACK_PRICING.laser);
   const gesicht = useAdminServices("gesicht", FALLBACK_PRICING.gesicht);
-  const body    = useAdminServices("body", FALLBACK_PRICING.body);
-  const inject  = useAdminServices("inject", FALLBACK_PRICING.inject);
   const mani    = useAdminServices("mani", FALLBACK_PRICING.mani)
     .map(item => ({ ...item, name: item.name.replace(/^EPILISSE /, `${settings.name} `) }));
 
   const pricingByCat: Record<string, { name: string; duration: string; price: string }[]> = {
-    laser, gesicht, body, inject, mani,
+    laser, gesicht, mani,
   };
 
   const visibleCats = categories.filter(c => c.visible && pricingByCat[c.id]);

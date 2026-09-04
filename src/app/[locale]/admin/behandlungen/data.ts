@@ -8,8 +8,6 @@ export type Category = { id: string; icon: string; name: string; desc: string; v
 export const CATEGORIES: Category[] = [
   { id: 'laser',   icon: 'auto_awesome',    name: 'Laser-Haarentfernung', desc: 'Premium Diodenlaser-Technologie für seidig glatte Haut.',        visible: true,  image: '', kicker: 'TECHNOLOGIE' },
   { id: 'gesicht', icon: 'face',             name: 'Gesichtsästhetik',     desc: 'Exklusive Behandlungen für strahlende Hautgesundheit.',          visible: true,  image: '', kicker: 'GESICHTSPFLEGE' },
-  { id: 'body',    icon: 'self_improvement', name: 'Body Contouring',      desc: 'Nicht-invasive Formung Ihrer Silhouette.',                      visible: true,  image: '', kicker: 'BODY CARE' },
-  { id: 'inject',  icon: 'vaccines',         name: 'Injectables',          desc: 'Präzise Hyaluron- und Botox-Behandlungen.',                     visible: true,  image: '', kicker: 'ÄSTHETIK' },
   { id: 'mani',    icon: 'spa',              name: 'Maniküre',             desc: 'Luxuriöse Nagelpflege und Handmassage.',                        visible: true,  image: '', kicker: 'NAGELPFLEGE' },
 ];
 
@@ -31,20 +29,6 @@ export const INIT_SERVICES: Record<string, Service[]> = {
     s('g3', 'Microneedling',       '129.00', '75 min'),
     s('g4', 'Chemical Peeling',    '79.00',  '45 min', false),
     s('g5', 'Anti-Aging Maske',    '59.00',  '30 min'),
-  ],
-  body: [
-    s('b1', 'Kryolipolysis Bauch', '299.00', '120 min', false),
-    s('b2', 'RF-Lifting Beine',    '199.00', '90 min',  false),
-    s('b3', 'Kavitation Hüfte',    '149.00', '60 min',  false),
-    s('b4', 'Ultraschall-Lifting', '249.00', '90 min'),
-  ],
-  inject: [
-    s('i1', 'Botox Stirn',         '199.00', '30 min'),
-    s('i2', 'Hyaluron Lippen',     '249.00', '45 min'),
-    s('i3', 'Profhilo Gesicht',    '349.00', '60 min'),
-    s('i4', 'Botulin Krähenfüße',  '149.00', '20 min'),
-    s('i5', 'Hyaluron Nasolabial', '299.00', '45 min', false),
-    s('i6', 'Baby Botox',          '179.00', '30 min'),
   ],
   mani: [
     s('m1', 'Klassische Maniküre', '35.00', '45 min'),
@@ -71,10 +55,6 @@ export const INIT_CAMPAIGNS: Record<string, Campaign[]> = {
   ],
   gesicht: [
     c('cg1', 'BESTSELLER',    'HydraFacial Duo-Paket',      '2× HydraFacial Premium zum Sonderpreis.',         '249,00€', '298,00€', 'JETZT BUCHEN', 'spa'),
-  ],
-  body: [],
-  inject: [
-    c('ci1', 'NEUKUNDEN',     'Beauty-Starter-Set',         'Botox + Hyaluron Lippen-Kombi für Erstkundinnen.','299,00€', '448,00€', 'JETZT BUCHEN', 'diamond'),
   ],
   mani: [
     c('cm1', 'DUO DEAL',      'Mani & Pedi Paket',          'Gel-Maniküre + Spa-Pediküre zusammen.',           '99,00€',  '130,00€', 'JETZT BUCHEN', 'favorite'),
@@ -225,16 +205,12 @@ export const INIT_REVIEWS: Review[] = [
 export const FRONTEND_SLUG: Record<string, string> = {
   laser:   'laser-haarentfernung',
   gesicht: 'gesichtsaesthetik',
-  body:    'body-contouring',
-  inject:  'injectables',
   mani:    'manikure-pedikure',
 };
 
 export const PREVIEW_GRADIENT: Record<string, string> = {
   laser:   'linear-gradient(135deg,#fff8e7 0%,#f5e5a0 100%)',
   gesicht: 'linear-gradient(135deg,#fff0f5 0%,#fdd5e8 100%)',
-  body:    'linear-gradient(135deg,#f0f9ff 0%,#bae6fd 100%)',
-  inject:  'linear-gradient(135deg,#faf5ff 0%,#d8b4fe 100%)',
   mani:    'linear-gradient(135deg,#fff1f2 0%,#fecdd3 100%)',
 };
 
@@ -297,46 +273,6 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
     ],
     campaign1: { label: 'Seasonal Special', title: 'Frühlingsfrische Haut', body: 'Starten Sie mit strahlender Haut in den Frühling: Buchen Sie HydraFacial Deluxe und erhalten Sie ein Chemical Peeling Ihrer Wahl zum Sonderpreis. Gültig bis Ende März.', cta: 'JETZT SICHERN', icon: 'spa', image: '/images/campaign-generic-1.png' },
     campaign2: { label: 'Exklusives Membership', title: 'HydraFacial Membership', body: 'Werden Sie Teil unserer exklusiven Mitgliedergemeinschaft und genießen Sie monatliche HydraFacial-Behandlungen zu Vorzugspreisen. Dauerhaft strahlende Haut als Lifestyle.', cta: 'MEHR ERFAHREN', icon: 'diamond', image: '/images/gesichtsaesthetik.png' },
-  },
-  body: {
-    label: 'Body Sculpting',
-    h1: 'Body Contouring',
-    heroDesc: 'Modernste non-invasive Körperformung für definierte Konturen und straffere Haut. Kryolipolyse, RF-Lifting und Ultraschall-Kavitation auf premium Niveau.',
-    heroImage: '/images/body-contouring.png',
-    infoTitle: 'Körperformung ohne Skalpell',
-    infoParagraphs: [
-      'Unser Body Contouring-Angebot setzt auf die effektivsten nicht-chirurgischen Verfahren der modernen Körperästhetik. Die Kryolipolyse – auch bekannt als Fettgefrieren – reduziert hartnäckige Fettdepots durch kontrollierte Kühlung präzise und dauerhaft, ohne die umgebenden Gewebe zu beeinflussen.',
-      'Ergänzt durch hochfrequentes RF-Lifting, das Kollagenfasern tief in der Dermis stimuliert und sichtbar strafft, sowie Ultraschall-Kavitation zur gezielten Fettzellenauflösung – entwickeln wir für Sie ein individuelles Körperformungs-Protokoll, das messbare Ergebnisse liefert.',
-    ],
-    benefitsTitle: 'Wirkung & Vorteile',
-    benefits: [
-      'Dauerhafte Reduktion hartnäckiger Fettdepots ohne Operation',
-      'Spürbare Haustraffung und Verbesserung der Hautelastizität',
-      'Sichtbare Reduktion von Cellulite und Orangenhaut',
-      'Keine Ausfallzeit – direkt wieder aktiv nach der Behandlung',
-    ],
-    campaign1: { label: 'Summer Edition', title: 'Summer Ready Body', body: 'Bereiten Sie Ihren Körper auf die Strandsaison vor: Buchen Sie 2 Kryolipolyse-Zonen und erhalten Sie eine Ultraschall-Kavitation-Sitzung kostenfrei dazu. Limitiertes Angebot bis Mai.', cta: 'JETZT SICHERN', icon: 'self_improvement', image: '/images/campaign-generic-1.png' },
-    campaign2: { label: 'Kombinationstherapie', title: 'Shape & Glow Kombi-Set', body: 'Maximale Ergebnisse durch intelligente Kombination: Body Contouring mit anschließender Hautstrafftung via RF-Lifting. Zwei Technologien, ein harmonisches Ergebnis.', cta: 'MEHR ERFAHREN', icon: 'fitness_center', image: '/images/body-contouring.png' },
-  },
-  inject: {
-    label: 'Aesthetic Medicine',
-    h1: 'Injectables',
-    heroDesc: 'Präzise ästhetische Medizin für natürliche Verjüngung. Botulinum Toxin, Hyaluronsäure und Profhilo – individuell dosiert für ein authentisches, ausgeruhtes Erscheinungsbild.',
-    heroImage: '/images/injectables.png',
-    infoTitle: 'Die Kunst der natürlichen Verjüngung',
-    infoParagraphs: [
-      'Injectables in Expertenhand bedeuten: kein starres, unnatürliches Ergebnis, sondern präzise Dosierung, die Ihre natürliche Ausstrahlung unterstreicht. Unser Behandlungskonzept beginnt mit einem ausführlichen Beratungsgespräch und einer detaillierten Gesichtsanalyse – um Ihre individuellen Wünsche und die anatomischen Gegebenheiten perfekt zu harmonisieren.',
-      'Botulinum Toxin entspannt gezielt überaktive Mimik-Muskeln und mildert Falten auf sanfte, reversible Weise. Hyaluronsäure-Filler restaurieren verlorenes Volumen und definieren Konturen. Profhilo – das innovative Bioremodeling-Präparat – verbessert die Hautqualität von innen heraus und setzt neue Maßstäbe in der Anti-Aging-Medizin.',
-    ],
-    benefitsTitle: 'Wirkung & Vorteile',
-    benefits: [
-      'Sofort sichtbare Faltenreduktion bei natürlichem, ausgeruhtem Ergebnis',
-      'Volumenaufbau und Konturierung für ein harmonisches Gesichtsbild',
-      'Verbesserung der Hautqualität, Festigkeit und Feuchtigkeit von innen',
-      'Diskrete, schnelle Behandlung mit minimaler Ausfallzeit',
-    ],
-    campaign1: { label: 'Signature Package', title: 'Natural Beauty First', body: 'Entdecken Sie unsere beliebteste Kombination: Botulinum Toxin für 3 Zonen kombiniert mit Hyaluronsäure Lippen-Augmentation. Inklusive kostenlosem Folgetermin nach 2 Wochen.', cta: 'JETZT SICHERN', icon: 'face_retouching_natural', image: '/images/campaign-generic-1.png' },
-    campaign2: { label: 'Erstkunden-Angebot', title: 'Beratungs-Special', body: 'Ihr Weg zu mehr Ausstrahlung beginnt mit einem Gespräch: Kostenlose Erstberatung und 15% Rabatt auf Ihre erste Injectable-Behandlung. Diskret, professionell, natürlich.', cta: 'TERMIN VEREINBAREN', icon: 'health_and_beauty', image: '/images/injectables.png' },
   },
   mani: {
     label: 'Esthetic Care',

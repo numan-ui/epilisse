@@ -46,7 +46,7 @@ export default function OpengraphImage() {
             letterSpacing: 2,
           }}
         >
-          Laser-Haarentfernung · Gesichtsästhetik · Body Contouring
+          Laser-Haarentfernung · Gesichtsästhetik · Maniküre & Pediküre
         </div>
       </div>
     ),

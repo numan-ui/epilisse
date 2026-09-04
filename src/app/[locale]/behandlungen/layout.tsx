@@ -12,7 +12,7 @@ export async function generateMetadata({
     path: "/behandlungen",
     title: "Behandlungen im Überblick München | EPILISSE",
     description:
-      "Alle Behandlungen bei EPILISSE München: Laser-Haarentfernung, Gesichtsästhetik, Body Contouring, Injectables und Maniküre & Pediküre.",
+      "Alle Behandlungen bei EPILISSE München: Laser-Haarentfernung, Gesichtsästhetik und Maniküre & Pediküre.",
     keywords: [
       "Behandlungen München",
       "Kosmetikstudio Leistungen München",

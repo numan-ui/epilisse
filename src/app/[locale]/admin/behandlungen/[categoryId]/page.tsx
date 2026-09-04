@@ -705,7 +705,7 @@ export default function CategoryDetailPage() {
                               placeholder="z.B. Gesundheitliche Wirkung"
                             />
                           </Field>
-                          {pc.benefits.length < 6 && (
+                          {pc.benefits.length < 10 && (
                             <button
                               onClick={() => addPageBenefit(catId)}
                               className="flex items-center gap-1 text-primary font-label-caps text-[11px] border-b border-primary pb-0.5 hover:opacity-70 transition-opacity shrink-0 self-end mb-0.5"

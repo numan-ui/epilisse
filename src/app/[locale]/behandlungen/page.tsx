@@ -19,9 +19,6 @@ const IMG: Record<string, string> = {
     "/images/laser-hair-removal.png",
   gesicht:
     "/images/gesichtsaesthetik.png",
-  body: "/images/body-contouring.png",
-  inject:
-    "/images/injectables.png",
   mani: "/images/manikure-pedikure.png",
 };
 

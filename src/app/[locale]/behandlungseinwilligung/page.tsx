@@ -11,7 +11,7 @@ export default function BehandlungseinwilligungPage() {
         <section>
           <h2 className="font-headline-sm text-headline-sm text-on-surface mb-2">1. Zweck dieser Einwilligung</h2>
           <p>
-            Kosmetische Behandlungen wie Laser-Haarentfernung, Gesichtsästhetik, Body-Contouring oder Injectables
+            Kosmetische Behandlungen wie Laser-Haarentfernung oder Gesichtsästhetik
             greifen in Ihr Hautbild bzw. Ihren Körper ein und können Risiken bergen. Mit dieser Einwilligung
             bestätigen Sie, über Ablauf, mögliche Risiken und Nachsorge der von Ihnen gebuchten Behandlung informiert
             worden zu sein, und stimmen der Durchführung zu.

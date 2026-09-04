@@ -11,8 +11,6 @@ export const SEO_ROUTES = [
   "/ueber-uns",
   "/laser-haarentfernung",
   "/gesichtsaesthetik",
-  "/body-contouring",
-  "/injectables",
   "/manikure-pedikure",
   "/datenschutz",
 ];

@@ -56,7 +56,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   return (
-    <div className="fixed inset-0 flex bg-surface text-on-surface">
+    <div className="fixed inset-0 flex bg-surface text-on-surface" spellCheck={false}>
       <aside className="w-[280px] h-full bg-surface-container-low border-r border-outline-variant flex flex-col shrink-0">
         <div className="p-8 pb-6">
           <h1 className="font-headline-sm text-headline-sm text-primary tracking-wide font-bold uppercase">{settings.name} Admin</h1>

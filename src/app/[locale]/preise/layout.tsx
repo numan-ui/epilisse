@@ -12,7 +12,7 @@ export async function generateMetadata({
     path: "/preise",
     title: "Preise & Leistungen München | EPILISSE Kosmetikstudio",
     description:
-      "Transparente Preise für Laser-Haarentfernung, Gesichtsästhetik, Body Contouring, Injectables und Maniküre in München. Alle Leistungen im Überblick.",
+      "Transparente Preise für Laser-Haarentfernung, Gesichtsästhetik und Maniküre in München. Alle Leistungen im Überblick.",
     keywords: [
       "Kosmetikstudio Preise München",
       "Laser-Haarentfernung Preise München",

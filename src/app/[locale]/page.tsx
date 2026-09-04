@@ -23,9 +23,6 @@ const IMG = {
     "/images/laser-hair-removal.png",
   facial:
     "/images/gesichtsaesthetik.png",
-  body: "/images/body-contouring.png",
-  injectables:
-    "/images/injectables.png",
   mani: "/images/manikure-pedikure.png",
   about:
     "/images/about-studio.png",
@@ -40,22 +37,18 @@ const OVERLAYS = [
 ];
 
 /* ── Original fallback images (replaced by admin settings when set) ── */
-const ORIG_IDS = ['laser', 'gesicht', 'body', 'inject', 'mani'];
+const ORIG_IDS = ['laser', 'gesicht', 'mani'];
 
 /* ── Core category display order/links/fallback images for the equal-width services grid ── */
-const CORE_CAT_ORDER = ['laser', 'gesicht', 'body', 'inject', 'mani'] as const;
+const CORE_CAT_ORDER = ['laser', 'gesicht', 'mani'] as const;
 const CORE_CAT_HREF: Record<string, string> = {
   laser: '/laser-haarentfernung',
   gesicht: '/gesichtsaesthetik',
-  body: '/body-contouring',
-  inject: '/injectables',
   mani: '/manikure-pedikure',
 };
 const CORE_CAT_IMG: Record<string, string> = {
   laser: IMG.laser,
   gesicht: IMG.facial,
-  body: IMG.body,
-  inject: IMG.injectables,
   mani: IMG.mani,
 };
 

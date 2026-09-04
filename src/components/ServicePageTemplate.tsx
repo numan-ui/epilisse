@@ -405,8 +405,6 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
           {[
             { href: "/laser-haarentfernung", label: "Laser-Haarentfernung" },
             { href: "/gesichtsaesthetik", label: "Gesichtsästhetik" },
-            { href: "/body-contouring", label: "Body Contouring" },
-            { href: "/injectables", label: "Injectables" },
             { href: "/manikure-pedikure", label: "Manikür & Pedikür" },
           ].map((item) => (
             <Link
