@@ -42,6 +42,72 @@ const FALLBACK_PRICING: Record<string, { name: string; duration: string; price: 
   ],
 };
 
+type PricingItem = { name: string; duration: string; price: string };
+type Cat = ReturnType<typeof useAdminCategories>[number];
+
+/** One category's price table. A component (not a per-category hook call in
+ * the parent) so the category list can grow or shrink — including future
+ * admin-added categories — without breaking React's rules of hooks. */
+function PricingSection({ cat, fallback }: { cat: Cat; fallback: PricingItem[] }) {
+  const settings = useAdminSettings();
+  const items = useAdminServices(cat.id, fallback)
+    // A fallback/admin item name can carry the placeholder brand "EPILISSE" —
+    // swap in the real configured salon name wherever that shows up.
+    .map(item => ({ ...item, name: item.name.replace(/^EPILISSE /, `${settings.name} `) }));
+  if (items.length === 0) return null; // no priced services yet — nothing to show
+
+  return (
+    <div id={cat.id} className="scroll-mt-32">
+      <div className="flex items-center justify-between flex-wrap gap-4 mb-6 border-b border-outline-variant/30 pb-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <span className="material-symbols-outlined text-primary">{cat.icon}</span>
+          </div>
+          <div>
+            <h2 className="font-headline-lg text-headline-lg font-semibold text-on-surface">{cat.name}</h2>
+            <p className="font-body-sm text-body-sm text-secondary">{cat.desc}</p>
+          </div>
+        </div>
+        <Link
+          href={`/${FRONTEND_SLUG[cat.id] ?? cat.id}`}
+          className="font-label-caps text-label-caps text-primary hover:text-primary-container transition-colors flex items-center gap-1 flex-shrink-0"
+        >
+          Alle Details
+          <span className="material-symbols-outlined text-sm">arrow_forward</span>
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-0">
+        {items.map((item, i) => (
+          <div
+            key={i}
+            className="flex items-center justify-between py-6 border-b border-outline-variant hover:bg-surface/50 transition-colors px-4 group cursor-pointer"
+          >
+            <div className="flex flex-col">
+              <span className="font-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">
+                {item.name}
+              </span>
+              {item.duration && (
+                <span className="font-body-sm text-secondary">
+                  Behandlungsdauer: ca. {item.duration}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-4 md:gap-6 shrink-0 ml-4">
+              <span className="font-display-lg text-headline-md text-primary whitespace-nowrap">
+                {item.price}
+              </span>
+              <span className="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">
+                arrow_forward
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function PreisePage() {
   const params = useParams();
   const locale = (params?.locale as "de" | "en") || "de";
@@ -61,17 +127,10 @@ export default function PreisePage() {
     { href: "/#kontakt", label: lc.navKontakt || "Kontakt" },
   ];
 
-  // Rules of hooks: fixed set of categories, called unconditionally.
-  const laser   = useAdminServices("laser", FALLBACK_PRICING.laser);
-  const gesicht = useAdminServices("gesicht", FALLBACK_PRICING.gesicht);
-  const mani    = useAdminServices("mani", FALLBACK_PRICING.mani)
-    .map(item => ({ ...item, name: item.name.replace(/^EPILISSE /, `${settings.name} `) }));
-
-  const pricingByCat: Record<string, { name: string; duration: string; price: string }[]> = {
-    laser, gesicht, mani,
-  };
-
-  const visibleCats = categories.filter(c => c.visible && pricingByCat[c.id]);
+  // Every visible category gets its own price table — built-in (with a
+  // hardcoded fallback) or admin-created (no fallback; PricingSection just
+  // renders nothing until the admin adds priced services for it).
+  const visibleCats = categories.filter(c => c.visible);
 
   return (
     <div className="min-h-screen bg-surface text-on-surface font-body-md overflow-x-hidden">
@@ -164,54 +223,7 @@ export default function PreisePage() {
       {/* ── PRICE TABLES ─────────────────────────────────────────────────── */}
       <section className="pb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto space-y-16">
         {visibleCats.map((cat) => (
-          <div key={cat.id} id={cat.id} className="scroll-mt-32">
-            <div className="flex items-center justify-between flex-wrap gap-4 mb-6 border-b border-outline-variant/30 pb-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="material-symbols-outlined text-primary">{cat.icon}</span>
-                </div>
-                <div>
-                  <h2 className="font-headline-lg text-headline-lg font-semibold text-on-surface">{cat.name}</h2>
-                  <p className="font-body-sm text-body-sm text-secondary">{cat.desc}</p>
-                </div>
-              </div>
-              <Link
-                href={`/${FRONTEND_SLUG[cat.id] ?? cat.id}`}
-                className="font-label-caps text-label-caps text-primary hover:text-primary-container transition-colors flex items-center gap-1 flex-shrink-0"
-              >
-                Alle Details
-                <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-0">
-              {pricingByCat[cat.id].map((item, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between py-6 border-b border-outline-variant hover:bg-surface/50 transition-colors px-4 group cursor-pointer"
-                >
-                  <div className="flex flex-col">
-                    <span className="font-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">
-                      {item.name}
-                    </span>
-                    {item.duration && (
-                      <span className="font-body-sm text-secondary">
-                        Behandlungsdauer: ca. {item.duration}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-4 md:gap-6 shrink-0 ml-4">
-                    <span className="font-display-lg text-headline-md text-primary whitespace-nowrap">
-                      {item.price}
-                    </span>
-                    <span className="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">
-                      arrow_forward
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <PricingSection key={cat.id} cat={cat} fallback={FALLBACK_PRICING[cat.id] ?? []} />
         ))}
 
         <div className="text-center pt-8">

@@ -173,6 +173,11 @@ export default function HomePage() {
     setSlideKey((prev) => prev + 1);
   }, [heroSlides.length]);
 
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+    setSlideKey((prev) => prev + 1);
+  }, [heroSlides.length]);
+
   useEffect(() => {
     // Don't advance off slide 1 until its cinematic reveal has finished.
     if (currentSlide === 0 && !cinematicDone) return;
@@ -443,6 +448,25 @@ export default function HomePage() {
             </div>
           </div>
         ))}
+
+        {/* Tap zones (mobile) — Instagram Stories-style: tap the left half to
+            go back a slide, the right half to advance. Sits above the slide
+            content but below the CTA button (which re-enables its own
+            pointer-events) so it still works. */}
+        <button
+          type="button"
+          onClick={prevSlide}
+          className="absolute inset-y-0 left-0 z-[15] w-1/2 bg-transparent border-0 outline-none appearance-none md:hidden"
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+          aria-label="Vorheriger Slide"
+        />
+        <button
+          type="button"
+          onClick={nextSlide}
+          className="absolute inset-y-0 right-0 z-[15] w-1/2 bg-transparent border-0 outline-none appearance-none md:hidden"
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+          aria-label="Nächster Slide"
+        />
 
         {/* Manual slide nav dots (mobile) */}
         <div className="absolute bottom-8 left-0 w-full flex justify-center gap-2 z-30 md:hidden">
