@@ -251,3 +251,24 @@
   background-position: 0% center;
   animation: epilisse-shine 60s linear infinite;
 }
+
+/* ── Lenis smooth scroll (see src/components/SmoothScroll.tsx) ────────────
+   Only active once Lenis adds .lenis-smooth to <html>; under
+   prefers-reduced-motion SmoothScroll never initialises, so native scroll
+   is untouched. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}

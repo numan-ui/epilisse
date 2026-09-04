@@ -9,10 +9,6 @@ import { useGSAP } from '@gsap/react';
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 type Props = {
-  /** H.264 mp4 (dense-keyframe encode, for frame-accurate scrubbing). */
-  src: string;
-  /** Still shown before the video decodes / when motion is reduced. */
-  poster?: string;
   /** CTA label (from the admin hero slide). */
   cta: string;
   /** True while slide 1 is the visible slide. */
@@ -32,6 +28,23 @@ const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
  *  master clip at ~650px of scroll per second of footage — deliberate enough
  *  that a single trackpad flick can't blow through the whole reveal. */
 const SCRUB_DISTANCE = 13000;
+
+/* ── Frame sequence ──────────────────────────────────────────────────────
+   The reveal is a pre-extracted WebP frame sequence drawn to <canvas>,
+   indexed by scroll progress — no per-frame `video.currentTime` seek, so no
+   decoder stutter. Regenerate on a new master with:
+     ffmpeg -i public/videos/beauty-scrub.mp4 \
+       -vf "fps=10,scale=640:800:flags=lanczos" \
+       -c:v libwebp -quality 56 -compression_level 6 -preset picture \
+       public/hero-frames/f_%03d.webp
+   (10 fps × 20 s = 200 frames; bump FRAME_COUNT / aspect to match.) */
+const FRAME_COUNT = 200;
+const FRAME_ASPECT = '640 / 800';
+const frameSrc = (i: number) =>
+  `/hero-frames/f_${String(i + 1).padStart(3, '0')}.webp`;
+/** Static fallback for the loading gap and reduced-motion — frame 0 itself,
+ *  so it's never a mismatched photo, just the sequence's own opening beat. */
+const POSTER_SRC = frameSrc(0);
 
 /** Copy beats, locked to the video's transformation — statue → awakening →
  *  half-and-half → fully alive. Kept short so they read during a scroll. */
@@ -77,15 +90,17 @@ function phaseFor(progress: number) {
  * `onDone` straight away.
  */
 export default function HeroCinematicSlide({
-  src,
-  poster,
   cta,
   active,
   onCtaClick,
   onDone,
 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const framesRef = useRef<HTMLImageElement[]>([]);
+  const loadedRef = useRef<boolean[]>([]);
+  const curFrameRef = useRef(0);
+  const [firstReady, setFirstReady] = useState(false);
   const [phase, setPhase] = useState(0);
   const [nearTop, setNearTop] = useState(true); // scroll hint shows only at the very start
   const [motionOk, setMotionOk] = useState(true);
@@ -108,11 +123,101 @@ export default function HeroCinematicSlide({
     return () => mq.removeEventListener('change', check);
   }, []);
 
+  /** Paint frame `i` (or the nearest already-decoded frame) into the canvas. */
+  const draw = useCallback((i: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const imgs = framesRef.current;
+    const loaded = loadedRef.current;
+
+    let idx = Math.max(0, Math.min(FRAME_COUNT - 1, i));
+    if (!loaded[idx]) {
+      let lo = idx;
+      while (lo >= 0 && !loaded[lo]) lo--;
+      if (lo >= 0) idx = lo;
+      else {
+        let hi = idx;
+        while (hi < FRAME_COUNT && !loaded[hi]) hi++;
+        if (hi >= FRAME_COUNT) return;
+        idx = hi;
+      }
+    }
+    const img = imgs[idx];
+    const ctx = canvas.getContext('2d');
+    if (!img || !ctx) return;
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    curFrameRef.current = idx;
+    canvas.dataset.frame = String(idx); // observable scrub position (e2e)
+  }, []);
+
+  /* Preload the sequence: frame 0 first (reveals the canvas), then the rest
+     through a small concurrency pool so we don't fire 200 requests at once. */
+  useEffect(() => {
+    if (!active) return;
+    if (
+      window.matchMedia(REDUCED_MOTION_QUERY).matches ||
+      !window.matchMedia(DESKTOP_QUERY).matches
+    )
+      return;
+
+    const imgs: HTMLImageElement[] = [];
+    const loaded = new Array<boolean>(FRAME_COUNT).fill(false);
+    framesRef.current = imgs;
+    loadedRef.current = loaded;
+    let cancelled = false;
+
+    const loadOne = (i: number) =>
+      new Promise<void>((resolve) => {
+        const img = new Image();
+        img.decoding = 'async';
+        img.onload = () => {
+          loaded[i] = true;
+          if (!cancelled && i === 0) {
+            setFirstReady(true);
+            draw(0);
+          }
+          resolve();
+        };
+        img.onerror = () => resolve();
+        img.src = frameSrc(i);
+        imgs[i] = img;
+      });
+
+    (async () => {
+      await loadOne(0);
+      let next = 1;
+      const worker = async () => {
+        while (!cancelled && next < FRAME_COUNT) await loadOne(next++);
+      };
+      await Promise.all(Array.from({ length: 6 }, worker));
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [active, draw]);
+
+  /* Keep the canvas backing store matched to its displayed size (DPR-aware). */
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      draw(curFrameRef.current);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+    return () => window.removeEventListener('resize', resize);
+  }, [draw, firstReady]);
+
   useGSAP(
     () => {
       const root = rootRef.current;
-      const video = videoRef.current;
-      if (!root || !video || !active) return;
+      if (!root || !active) return;
 
       // Not eligible → show beat 1 as a still and let the slider proceed.
       if (
@@ -125,43 +230,44 @@ export default function HeroCinematicSlide({
 
       const section = root.closest('section') ?? root;
       let lastIdx = -1;
+      let lastNearTop = true;
+      const proxy = { f: 0 };
 
-      const build = () => {
-        gsap
-          .timeline({
-            scrollTrigger: {
-              trigger: section,
-              start: 'top top',
-              end: `+=${SCRUB_DISTANCE}`,
-              scrub: 1,
-              pin: section,
-              anticipatePin: 1,
-              onUpdate: (self) => {
-                const idx = phaseFor(self.progress);
-                if (idx !== lastIdx) {
-                  lastIdx = idx;
-                  setPhase(idx);
-                }
-                setNearTop(self.progress < 0.03);
-                if (self.progress > 0.95) fireDone();
-              },
-              onLeave: fireDone,
+      gsap
+        .timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: `+=${SCRUB_DISTANCE}`,
+            // A touch of catch-up lag smooths the frame stepping and eases
+            // hard flicks; still responsive enough to feel direct.
+            scrub: 1.5,
+            pin: section,
+            anticipatePin: 1,
+            onUpdate: (self) => {
+              const idx = phaseFor(self.progress);
+              if (idx !== lastIdx) {
+                lastIdx = idx;
+                setPhase(idx);
+              }
+              // Guard the state writes so a scroll tick that changes
+              // nothing doesn't push a React render.
+              const nt = self.progress < 0.03;
+              if (nt !== lastNearTop) {
+                lastNearTop = nt;
+                setNearTop(nt);
+              }
+              if (self.progress > 0.95) fireDone();
             },
-          })
-          .fromTo(
-            video,
-            { currentTime: 0 },
-            { currentTime: video.duration || 1, ease: 'none', duration: 1 },
-            0,
-          );
-      };
-
-      if (video.readyState >= 1 && video.duration) {
-        build();
-      } else {
-        video.addEventListener('loadedmetadata', build, { once: true });
-        return () => video.removeEventListener('loadedmetadata', build);
-      }
+            onLeave: fireDone,
+          },
+        })
+        .to(proxy, {
+          f: FRAME_COUNT - 1,
+          ease: 'none',
+          duration: 1,
+          onUpdate: () => draw(Math.round(proxy.f)),
+        });
     },
     { scope: rootRef, dependencies: [active], revertOnUpdate: true },
   );
@@ -178,33 +284,30 @@ export default function HeroCinematicSlide({
           'linear-gradient(180deg,var(--hero-panel-top) 0%,var(--hero-panel-bottom) 100%)',
       }}
     >
-      {/* Left — the advancing copy, straight onto the shared backdrop. */}
+      {/* Left — the advancing copy. Headline + subline live in ONE keyed
+          block, stacked in a single grid cell so the outgoing beat cross-
+          fades with the incoming one (they can't desync) and a brief
+          focus-pull blur hides sub-pixel jitter at the phase boundary. */}
       <div className="relative flex flex-col justify-center px-margin-desktop py-28">
-        <AnimatePresence mode="wait">
-          <motion.h1
-            key={phase}
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="font-display-lg text-[36px] md:text-[42px] xl:text-[52px] font-bold leading-[1.1] tracking-[-0.015em] text-[var(--hero-on-panel)] max-w-lg"
-          >
-            {PHASES[phase].line}
-          </motion.h1>
-        </AnimatePresence>
-
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={phase}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 0.85, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.45, ease: 'easeOut' }}
-            className="mt-5 font-body-lg text-body-md text-[var(--hero-on-panel-muted)] max-w-md"
-          >
-            {PHASES[phase].sub}
-          </motion.p>
-        </AnimatePresence>
+        <div className="grid max-w-lg">
+          <AnimatePresence>
+            <motion.div
+              key={phase}
+              initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -14, filter: 'blur(6px)' }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="[grid-area:1/1]"
+            >
+              <h1 className="font-display-lg text-[36px] md:text-[42px] xl:text-[52px] font-bold leading-[1.1] tracking-[-0.015em] text-[var(--hero-on-panel)]">
+                {PHASES[phase].line}
+              </h1>
+              <p className="mt-5 font-body-lg text-body-md text-[var(--hero-on-panel-muted)] max-w-md opacity-85">
+                {PHASES[phase].sub}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
         <motion.p
           animate={{ opacity: phase === PHASES.length - 1 ? 0.7 : 0.4 }}
@@ -214,18 +317,21 @@ export default function HeroCinematicSlide({
           {BRAND_LINE}
         </motion.p>
 
-        {ctaMode !== 'hidden' && (
-          <motion.button
-            type="button"
-            onClick={onCtaClick}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: ctaMode === 'full' ? 1 : 0.75, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mt-10 w-fit bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-colors rounded-[var(--radius-cta)]"
-          >
-            {cta}
-          </motion.button>
-        )}
+        {/* CTA stays mounted at every beat and just fades — mounting it only
+            on beats 1 & 4 made the whole column jump. */}
+        <motion.button
+          type="button"
+          onClick={onCtaClick}
+          animate={{
+            opacity: ctaMode === 'full' ? 1 : ctaMode === 'soft' ? 0.72 : 0,
+          }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          style={{ pointerEvents: ctaMode === 'hidden' ? 'none' : 'auto' }}
+          aria-hidden={ctaMode === 'hidden'}
+          className="mt-10 w-fit bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-colors rounded-[var(--radius-cta)]"
+        >
+          {cta}
+        </motion.button>
 
       </div>
 
@@ -281,21 +387,31 @@ export default function HeroCinematicSlide({
         )}
       </AnimatePresence>
 
-      {/* Right — the scrubbed video in a 4:5 box, vertically centred. The
+      {/* Right — the scrubbed frame sequence in a 4:5 box, bottom-aligned. The
           master is 4:5 so the box crops nothing; the equal dark margin above
-          and below it reads as a frame, not a gap. */}
+          and below it reads as a frame, not a gap. The poster still sits
+          underneath until the first frame decodes (and stays put for reduced
+          motion / when the sequence never loads). */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 flex items-end justify-center">
-          <video
-            ref={videoRef}
-            data-testid="hero-scrub-video-el"
-            className="max-h-full max-w-full"
-            muted
-            playsInline
-            preload="auto"
-          >
-            <source src={src} type="video/mp4" />
-          </video>
+          {/* eslint-disable-next-line @next/next/no-img-element -- transient decorative poster, swapped out once the canvas paints */}
+          <img
+            src={POSTER_SRC}
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            className={`absolute bottom-0 left-1/2 h-full w-auto max-w-full -translate-x-1/2 object-cover object-bottom transition-opacity duration-700 ${
+              firstReady ? 'opacity-0' : 'opacity-100'
+            }`}
+          />
+          <canvas
+            ref={canvasRef}
+            data-testid="hero-scrub-canvas"
+            className={`relative h-full w-auto max-w-full transition-opacity duration-700 ${
+              firstReady ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{ aspectRatio: FRAME_ASPECT }}
+          />
         </div>
       </div>
     </div>

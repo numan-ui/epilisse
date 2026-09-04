@@ -7,6 +7,7 @@ import { routing } from "@/i18n/routing";
 import { BookingModalProvider } from "@/context/BookingModalContext";
 import BookingModal from "@/components/BookingModal";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
+import SmoothScroll from "@/components/SmoothScroll";
 import { SITE_URL, buildMetadata } from "@/lib/seo";
 import { getServerTheme } from "@/lib/theme/server";
 import { deriveTokens } from "@/lib/theme/derive";
@@ -96,8 +97,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      data-scroll-behavior="smooth"
-      className={`scroll-smooth ${playfairDisplay.variable} ${manrope.variable}`}
+      className={`${playfairDisplay.variable} ${manrope.variable}`}
     >
       <head>
         {themeCss && (
@@ -119,6 +119,7 @@ export default async function LocaleLayout({
         <LocalBusinessSchema />
       </head>
       <body className="bg-surface text-on-surface font-body-md overflow-x-hidden">
+        <SmoothScroll />
         <NextIntlClientProvider messages={messages}>
           <BookingModalProvider>
             {children}

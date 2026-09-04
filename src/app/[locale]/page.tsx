@@ -52,6 +52,32 @@ const CORE_CAT_IMG: Record<string, string> = {
   mani: IMG.mani,
 };
 
+/* ── Services grid: adaptive bento span (desktop/lg only) ──────────────────
+ * Card 0 is always the featured/large tile — wide (col-span-4 of 6), same
+ * row height as the rest. Card 1 completes that first row (col-span-2).
+ * Everything after is laid out 3-per-row (col-span-2 each); if the very last
+ * row would be a lone orphan (1 or 2 cards), it's centred instead of left-
+ * stuck — that's the bug this replaces. Returns literal Tailwind classes
+ * only (no interpolation), so the JIT scanner can find them all statically.
+ */
+function gridSpanClass(i: number, n: number): string {
+  if (i === 0) return n === 1 ? 'lg:col-span-4 lg:col-start-2' : 'lg:col-span-4';
+  if (i === 1) return 'lg:col-span-2';
+
+  const rest = n - 2;
+  const remainder = rest % 3;
+  const j = i - 2; // 0-based among the cards after the featured row
+  const finalGroupStart = rest - remainder;
+
+  if (remainder !== 0 && j >= finalGroupStart) {
+    const posInGroup = j - finalGroupStart;
+    if (remainder === 1) return posInGroup === 0 ? 'lg:col-span-2 lg:col-start-3' : 'lg:col-span-2';
+    // remainder === 2
+    return posInGroup === 0 ? 'lg:col-span-2 lg:col-start-2' : 'lg:col-span-2';
+  }
+  return 'lg:col-span-2';
+}
+
 export default function HomePage() {
   const t = useTranslations();
   const params = useParams();
@@ -93,6 +119,38 @@ export default function HomePage() {
   const isVisible    = (id: string) => categories.find(c => c.id === id)?.visible !== false;
   const getCatName   = (id: string) => categories.find(c => c.id === id)?.name ?? '';
   const getCatKicker = (id: string) => categories.find(c => c.id === id)?.kicker || 'BEHANDLUNG';
+
+  /* ── Services grid cards: one flat ordered list, core cats then custom ── */
+  const gridCards = [
+    ...CORE_CAT_ORDER.filter(isVisible).map(id => ({
+      key: id,
+      href: CORE_CAT_HREF[id],
+      image: getCatImage(id) || CORE_CAT_IMG[id],
+      icon: undefined as string | undefined,
+      name: getCatName(id),
+      kicker: getCatKicker(id),
+      desc: getCatDesc(id),
+    })),
+    ...customCats.map(cat => ({
+      key: cat.id,
+      href: `/${FRONTEND_SLUG[cat.id] ?? cat.id}`,
+      image: cat.image,
+      icon: cat.icon as string | undefined,
+      name: cat.name,
+      kicker: cat.kicker || 'BEHANDLUNG',
+      desc: cat.desc,
+    })),
+  ];
+  // A count that already tiles evenly (one row of 3, a clean 2xN, ...) stays
+  // a plain uniform grid — no reason to blow up card 1. Only a count that
+  // would otherwise leave a lone orphan card (5, 7, 8, 10, 11, …) gets the
+  // featured/balanced bento treatment.
+  const uniformCols =
+    gridCards.length >= 3 && gridCards.length % 3 === 0
+      ? 3
+      : gridCards.length >= 2 && gridCards.length % 2 === 0
+        ? 2
+        : 0;
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideKey, setSlideKey] = useState(0);
@@ -203,7 +261,7 @@ export default function HomePage() {
 
       {/* Mobile menu overlay */}
       {menuOpen && (
-        <div className="fixed inset-0 z-40 bg-surface flex flex-col items-center justify-center gap-8">
+        <div className="fixed inset-0 z-40 bg-surface flex flex-col items-center justify-center gap-8" data-lenis-prevent>
           {[
             { href: "/behandlungen", label: lc.navBehandlungen || t("nav.behandlungen"), internal: true },
             { href: "/preise", label: lc.navPreise || t("nav.preise"), internal: true },
@@ -341,8 +399,6 @@ export default function HomePage() {
                 which it fully covers on lg. */}
             {i === 0 && (
               <HeroCinematicSlide
-                src="/videos/beauty-scrub.mp4"
-                poster={slide.image}
                 cta={slide.cta}
                 active={i === currentSlide}
                 onCtaClick={() => booking.open()}
@@ -427,68 +483,50 @@ export default function HomePage() {
           <div className="w-20 h-[2px] bg-primary-fixed-dim mx-auto" />
         </motion.div>
 
-        {/* Every visible category — core + custom — strictly uniform cards, 3 per row, identical geometry */}
+        {/* Every visible category — core + custom, one flat ordered list. A
+            count that tiles evenly (uniformCols) stays a plain equal-card
+            grid; otherwise card 0 becomes the featured/large tile so the
+            last row is never a lone orphan. */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.1 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter"
+          className={
+            uniformCols === 3
+              ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter"
+              : uniformCols === 2
+                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-gutter"
+                : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 lg:auto-rows-[380px] gap-gutter"
+          }
         >
-          {CORE_CAT_ORDER.filter(isVisible).map(id => (
+          {gridCards.map((card, i) => (
             <Link
-              key={id}
-              href={CORE_CAT_HREF[id]}
-              className="bento-card group bg-surface-container-lowest border border-outline-variant/30 cursor-pointer flex flex-col"
+              key={card.key}
+              href={card.href}
+              className={`bento-card group bg-surface-container-lowest border border-outline-variant/30 cursor-pointer flex flex-col ${uniformCols ? '' : gridSpanClass(i, gridCards.length)}`}
             >
-              <div className="relative overflow-hidden aspect-square">
-                <SmartImage
-                  src={getCatImage(id) || CORE_CAT_IMG[id]}
-                  alt={getCatName(id)}
-                  className="brand-photo object-cover group-hover:scale-105 transition-transform duration-700"
-                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                />
+              <div className={`relative overflow-hidden ${uniformCols ? 'aspect-square' : 'aspect-square lg:aspect-auto lg:flex-1'}`}>
+                {card.image ? (
+                  <SmartImage
+                    src={card.image}
+                    alt={card.name}
+                    className="brand-photo object-cover group-hover:scale-105 transition-transform duration-700"
+                    sizes="(min-width: 1024px) 50vw, (min-width: 640px) 50vw, 100vw"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#fff8e7 0%,#f5e5a0 100%)' }}>
+                    <span className="material-symbols-outlined text-[48px] text-primary/30">{card.icon}</span>
+                  </div>
+                )}
               </div>
               <div className="p-6">
-                <span className="font-label-caps text-[10px] text-primary tracking-widest block mb-2">
-                  {getCatKicker(id)}
-                </span>
-                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{getCatName(id)}</h3>
-                <p className="font-body-sm text-body-sm text-secondary">{getCatDesc(id)}</p>
+                <span className="font-label-caps text-[10px] text-primary tracking-widest block mb-2">{card.kicker}</span>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{card.name}</h3>
+                <p className="font-body-sm text-body-sm text-secondary">{card.desc}</p>
               </div>
             </Link>
           ))}
-
-          {customCats.map(cat => {
-            const slug = FRONTEND_SLUG[cat.id] ?? cat.id;
-            return (
-              <Link
-                key={cat.id}
-                href={`/${slug}`}
-                className="bento-card group bg-surface-container-lowest border border-outline-variant/30 cursor-pointer flex flex-col"
-              >
-                <div className="relative overflow-hidden aspect-square">
-                  {cat.image ? (
-                    <SmartImage
-                      src={cat.image}
-                      alt={cat.name}
-                      className="brand-photo object-cover group-hover:scale-105 transition-transform duration-700"
-                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#fff8e7 0%,#f5e5a0 100%)' }}>
-                      <span className="material-symbols-outlined text-[48px] text-primary/30">{cat.icon}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="p-6">
-                  <span className="font-label-caps text-[10px] text-primary tracking-widest block mb-2">{cat.kicker || 'BEHANDLUNG'}</span>
-                  <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{cat.name}</h3>
-                  <p className="font-body-sm text-body-sm text-secondary">{cat.desc}</p>
-                </div>
-              </Link>
-            );
-          })}
         </motion.div>
       </section>
 

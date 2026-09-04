@@ -265,6 +265,7 @@ export default function BookingModal() {
     <div
       className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
       onClick={close}
+      data-lenis-prevent
     >
       <div
         className="bg-surface w-full max-w-lg border border-outline-variant shadow-2xl p-8 max-h-[90vh] overflow-y-auto"

@@ -1,99 +1,91 @@
 import { test, expect } from '@playwright/test';
 
-// The first hero slide carries a contained portrait video card on its right.
-// Scroll position drives the playhead — the figure comes to life as you scroll
-// and rewinds as you scroll back — with the hero pinned briefly so the reveal
-// has room. Desktop only; phones get nothing, reduced-motion gets a still.
+// The first hero slide carries a contained portrait reveal on its right — a
+// pre-extracted WebP frame sequence painted to <canvas>, indexed by scroll
+// position: the figure comes to life as you scroll and rewinds as you scroll
+// back, with the hero pinned briefly so the reveal has room. Desktop only;
+// phones get nothing, reduced-motion gets the poster still.
 //
-// Desktop Chrome (1280x720) satisfies the >= lg gate.
+// Desktop Chrome (1280x720) satisfies the >= lg gate. Scrolling is Lenis-
+// smoothed site-wide, so the assertions poll for the frame index to settle
+// rather than reading it immediately after a scrollTo.
 
 const CARD = '[data-testid="hero-scrub-video"]';
-const VIDEO = '[data-testid="hero-scrub-video-el"]';
-const SOUND = '[data-testid="hero-scrub-video-sound"]';
+const CANVAS = '[data-testid="hero-scrub-canvas"]';
 
-const currentTime = (page: import('@playwright/test').Page) =>
-  page.locator(VIDEO).evaluate((v: HTMLVideoElement) => v.currentTime);
+const frame = (page: import('@playwright/test').Page) =>
+  page
+    .locator(CANVAS)
+    .evaluate((c: HTMLCanvasElement) => Number(c.dataset.frame ?? 'NaN'));
 
-async function waitForMetadata(page: import('@playwright/test').Page) {
+async function waitForFirstFrame(page: import('@playwright/test').Page) {
   await page.waitForFunction(() => {
-    const v = document.querySelector(
-      '[data-testid="hero-scrub-video-el"]',
-    ) as HTMLVideoElement | null;
-    return !!v && v.readyState >= 1 && v.duration > 0;
+    const c = document.querySelector(
+      '[data-testid="hero-scrub-canvas"]',
+    ) as HTMLCanvasElement | null;
+    return !!c && c.dataset.frame != null;
   });
 }
 
-test.describe('hero scrub video — desktop', () => {
-  test('renders a muted card on the first slide', async ({ page }) => {
+test.describe('hero scrub — desktop', () => {
+  test('renders the reveal canvas on the first slide', async ({ page }) => {
     await page.goto('/de');
     await expect(page.locator(CARD)).toBeVisible();
-    expect(
-      await page.locator(VIDEO).evaluate((v: HTMLVideoElement) => v.muted),
-    ).toBe(true);
+    await expect(page.locator(CANVAS)).toBeVisible();
+    await waitForFirstFrame(page);
+    expect(await frame(page)).toBe(0);
   });
 
-  test('scrolling drives the playhead forward, scrolling back rewinds it', async ({
+  test('scrolling drives the frame forward, scrolling back rewinds it', async ({
     page,
   }) => {
     await page.goto('/de');
-    await waitForMetadata(page);
+    await waitForFirstFrame(page);
+    expect(await frame(page)).toBe(0);
 
-    const start = await currentTime(page);
+    await page.evaluate(() => window.scrollTo(0, 6000));
+    await expect.poll(() => frame(page), { timeout: 5000 }).toBeGreaterThan(20);
+    const forward = await frame(page);
 
-    await page.evaluate(() => window.scrollTo(0, 900));
-    await page.waitForTimeout(1800); // scrub catch-up
-    const forward = await currentTime(page);
-    expect(forward).toBeGreaterThan(start + 0.2);
-
-    await page.evaluate(() => window.scrollTo(0, 100));
-    await page.waitForTimeout(1800);
-    const back = await currentTime(page);
-    expect(back).toBeLessThan(forward);
+    await page.evaluate(() => window.scrollTo(0, 500));
+    await expect
+      .poll(() => frame(page), { timeout: 5000 })
+      .toBeLessThan(forward - 5);
   });
 
-  test('the left copy advances through beats as the video scrubs', async ({
+  test('the left copy advances through beats as the reveal scrubs', async ({
     page,
   }) => {
     await page.goto('/de');
-    await waitForMetadata(page);
+    await waitForFirstFrame(page);
 
     await expect(page.locator(CARD)).toContainText('reinsten Form');
 
-    await page.evaluate(() => window.scrollTo(0, 1900));
-    await page.waitForTimeout(1600);
-    await expect(page.locator(CARD)).toContainText(/erwacht|erweckt|Entfalte/i);
-  });
-
-  test('the sound toggle unmutes the video', async ({ page }) => {
-    await page.goto('/de');
-    await expect(page.locator(SOUND)).toBeVisible();
-    await page.locator(SOUND).click();
-    expect(
-      await page.locator(VIDEO).evaluate((v: HTMLVideoElement) => v.muted),
-    ).toBe(false);
+    await page.evaluate(() => window.scrollTo(0, 9000));
+    await expect(page.locator(CARD)).toContainText(/erwacht|erweckt|Entfalte/i, {
+      timeout: 5000,
+    });
   });
 });
 
-test.describe('hero scrub video — reduced motion', () => {
-  test('card shows a still, never scrubs, offers no sound control', async ({
-    page,
-  }) => {
+test.describe('hero scrub — reduced motion', () => {
+  test('shows the poster still and never scrubs', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/de');
 
     await expect(page.locator(CARD)).toBeVisible();
-    await expect(page.locator(SOUND)).toHaveCount(0);
 
-    await page.evaluate(() => window.scrollTo(0, 900));
-    await page.waitForTimeout(1500);
-    expect(await currentTime(page)).toBe(0);
+    await page.evaluate(() => window.scrollTo(0, 6000));
+    await page.waitForTimeout(1200);
+    // draw() is never wired under reduced motion → no frame index is ever set.
+    expect(await frame(page)).toBeNaN();
   });
 });
 
-test.describe('hero scrub video — not on mobile', () => {
+test.describe('hero scrub — not on mobile', () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
-  test('video is hidden on a phone viewport, story slider still renders', async ({
+  test('reveal is hidden on a phone viewport, story slider still renders', async ({
     page,
   }) => {
     await page.goto('/de');
