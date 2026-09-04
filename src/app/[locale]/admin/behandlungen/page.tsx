@@ -22,6 +22,8 @@ export default function BehandlungenPage() {
   const [newCat, setNewCat]   = useState<Omit<Category, 'id'>>(EMPTY_CAT);
   const [iconPickerOpen, setIconPickerOpen] = useState(false);
   const [templateId, setTemplateId] = useState<string>('');
+  const [publishing, setPublishing] = useState(false);
+  const [publishMsg, setPublishMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   const handleAdd = () => {
     if (!newCat.name.trim()) return;
@@ -32,6 +34,21 @@ export default function BehandlungenPage() {
     setIconPickerOpen(false);
   };
 
+  const handlePublish = async () => {
+    setPublishing(true);
+    setPublishMsg(null);
+    try {
+      const res = await fetch('/api/categories', { method: 'POST' });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || 'Veröffentlichung fehlgeschlagen.');
+      setPublishMsg({ ok: true, text: 'Kategorien sind jetzt live.' });
+    } catch (err) {
+      setPublishMsg({ ok: false, text: err instanceof Error ? err.message : 'Veröffentlichung fehlgeschlagen.' });
+    } finally {
+      setPublishing(false);
+    }
+  };
+
   return (
     <>
       <header className="h-20 border-b border-outline-variant/30 flex items-center justify-between px-8 bg-surface/80 backdrop-blur-md shrink-0">
@@ -40,9 +57,23 @@ export default function BehandlungenPage() {
           <span className="text-outline-variant">|</span>
           <p className="font-body-sm text-secondary">Kategorien &amp; Service-Verwaltung</p>
         </div>
-        <span className="font-label-caps text-[10px] bg-primary/10 text-primary px-3 py-1.5">
-          {categories.length} Kategorien
-        </span>
+        <div className="flex items-center gap-3">
+          {publishMsg && (
+            <span className={`font-body-sm text-[12px] ${publishMsg.ok ? 'text-primary' : 'text-error'}`}>
+              {publishMsg.text}
+            </span>
+          )}
+          <span className="font-label-caps text-[10px] bg-primary/10 text-primary px-3 py-1.5">
+            {categories.length} Kategorien
+          </span>
+          <button
+            onClick={handlePublish}
+            disabled={publishing}
+            className="font-label-caps text-[11px] uppercase tracking-widest bg-primary text-on-primary px-4 py-2 hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-[var(--radius-cta)]"
+          >
+            {publishing ? 'Wird veröffentlicht…' : 'Veröffentlichen'}
+          </button>
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto p-8">

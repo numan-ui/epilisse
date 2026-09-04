@@ -236,6 +236,7 @@ export default function BookingModal() {
           email: email.trim(),
           phone: phone.trim(),
           categoryId: selectedCategory,
+          categoryName: selectedCategoryName,
           services: chosen.map((s) => ({
             name: s.name,
             price: parseFloat(s.price) || null,

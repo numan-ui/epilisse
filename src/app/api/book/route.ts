@@ -18,6 +18,7 @@ interface BookingBody {
   email: string;
   phone: string;
   categoryId: string;
+  categoryName?: string;
   services: BookingService[];
   startsAt: string;
   notes?: string;
@@ -47,6 +48,28 @@ export async function POST(request: Request) {
   }
   if (!body.categoryId || !Array.isArray(body.services) || body.services.length === 0 || body.services.length > MAX_SERVICES_PER_BOOKING) {
     return NextResponse.json({ error: 'Bitte mindestens einen Service auswählen.' }, { status: 400 });
+  }
+
+  // Defensive FK guard: appointments.category_id references the CRM `categories`
+  // table, which today is only seeded with the built-in categories (see
+  // supabase/migrations/0001_init.sql) and — going forward — whatever's been
+  // "Veröffentlichen"-published (see src/app/api/categories/route.ts POST, which
+  // does the mirror-image upsert at publish time). A booking against an
+  // admin-created category that was never published (or published after this
+  // migration but before this request) would otherwise fail the appointments
+  // insert below — but only AFTER the customer record, consent log, and
+  // confirmation email have already gone out, leaving the customer holding a
+  // confirmation for a non-existent appointment. Upsert here, before any of
+  // that happens, so the insert can never FK-fail on a missing category.
+  // ignoreDuplicates: never overwrites an existing category's real name.
+  {
+    const { error: catError } = await supabase
+      .from('categories')
+      .upsert(
+        { id: body.categoryId, name: body.categoryName?.trim() || body.categoryId },
+        { onConflict: 'id', ignoreDuplicates: true },
+      );
+    if (catError) return NextResponse.json({ error: catError.message }, { status: 500 });
   }
   const hasInvalidService = body.services.some((svc) => {
     const priceValid = svc.price === null || (Number.isFinite(svc.price) && svc.price >= 0 && svc.price <= MAX_PRICE);

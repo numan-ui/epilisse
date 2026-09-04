@@ -91,6 +91,12 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [campaigns,   setCampaigns]   = useState<CampaignsMap>(defaultCampaigns);
   const [pageContent, setPageContent] = useState<PageContentMap>(defaultPageContent);
   const [categories,  setCategories]  = useState<Category[]>(CATEGORIES.map(c => ({ ...c })));
+  // Flips true once the localStorage-load effect below has run, together with (batched
+  // in the same commit as) whatever categories it loaded — see the draft write-through
+  // effect further down for why this can't be a plain ref (timing: a ref flips before
+  // the loaded categories value has actually committed, which would PUT fresh-mount
+  // defaults into `draft` and clobber a real admin's saved list).
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
   const [settings,    setSettings]    = useState<SiteSettings>({ ...INIT_SETTINGS, hours: INIT_SETTINGS.hours.map(h => ({ ...h })) });
   const [landingContent, setLandingContent] = useState<LandingContent>({ ...INIT_LANDING_CONTENT });
   const [heroSlides, setHeroSlides]   = useState<HeroSlide[]>(INIT_HERO_SLIDES.map(s => ({ ...s })));
@@ -126,7 +132,28 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     if (promo && promo.length > 0) setPromoBanners(promo);
     if (about && about.length > 0) setAboutValues(about);
     if (revs  && revs.length > 0)  setReviews(revs);
+    setCategoriesLoaded(true);
   }, []);
+
+  /* ── Categories draft write-through ───────────────────
+     The admin's category list stays localStorage-backed above for the
+     editing UX itself, but is also mirrored to Supabase `draft` (debounced)
+     so the public site — SSR-fed via getServerCategories — can reflect it
+     (locally with CONTENT_PREVIEW=1, and everywhere once "Veröffentlichen"
+     publishes). Guarded on categoriesLoaded so this never fires with the
+     fresh-mount CATEGORIES default before the localStorage value above has
+     actually loaded. */
+  useEffect(() => {
+    if (!categoriesLoaded) return;
+    const timer = setTimeout(() => {
+      fetch('/api/categories', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(categories),
+      }).catch(() => { /* best-effort — admin's localStorage copy remains the source of truth for the editing UI regardless */ });
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [categories, categoriesLoaded]);
 
   /* ── Services ────────────────────────────────────── */
   const updateService = useCallback((catId: string, id: string, field: keyof Service, value: string | boolean) =>

@@ -530,7 +530,11 @@ export default function HomePage() {
               href={card.href}
               className={`bento-card group bg-surface-container-lowest border border-outline-variant/30 cursor-pointer flex flex-col ${uniformCols ? '' : gridSpanClass(i, gridCards.length)}`}
             >
-              <div className={`relative overflow-hidden ${uniformCols ? 'aspect-square' : 'aspect-square lg:aspect-auto lg:flex-1'}`}>
+              {/* lg:min-h floors the image area against the text block below growing (a
+                  longer admin-entered name/description wrapping to more lines as the
+                  column narrows) — without it, flex-1 lets the fixed 380px row height
+                  squeeze the photo down to a sliver instead of shrinking to fit. */}
+              <div className={`relative overflow-hidden ${uniformCols ? 'aspect-square' : 'aspect-square lg:aspect-auto lg:flex-1 lg:min-h-[160px]'}`}>
                 {card.image ? (
                   <SmartImage
                     src={card.image}
@@ -546,8 +550,8 @@ export default function HomePage() {
               </div>
               <div className="p-6">
                 <span className="font-label-caps text-[10px] text-primary tracking-widest block mb-2">{card.kicker}</span>
-                <h3 className="font-headline-md text-headline-md text-on-surface mb-2">{card.name}</h3>
-                <p className="font-body-sm text-body-sm text-secondary">{card.desc}</p>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-2 line-clamp-2">{card.name}</h3>
+                <p className="font-body-sm text-body-sm text-secondary line-clamp-2">{card.desc}</p>
               </div>
             </Link>
           ))}

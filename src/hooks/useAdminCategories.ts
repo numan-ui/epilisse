@@ -1,44 +1,20 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { CATEGORIES, type Category } from '@/app/[locale]/admin/behandlungen/data';
+import { CATEGORIES } from '@/app/[locale]/admin/behandlungen/data';
+import { useCategoriesFromServer } from '@/context/CategoriesContext';
 
-const LS_CAT = 'epilisse_admin_categories';
-
-/** Empty string in an admin field means "not set" — fall back to the default rather than rendering blank. */
-const str = (v: string | undefined, fallback: string) => (v && v.trim() !== '') ? v : fallback;
-
-function mergeCategories(stored: Category[]): Category[] {
-  return stored
-    // Drop stale localStorage entries for built-in categories that no longer exist in code
-    // (e.g. a removed default category) — only keep current built-ins plus admin-created ('cat-') ones.
-    .filter(c => CATEGORIES.some(d => d.id === c.id) || c.id.startsWith('cat-'))
-    .map(c => {
-      const def = CATEGORIES.find(d => d.id === c.id);
-      if (!def) return c; // custom, admin-created category — no default to fall back to
-      // image is intentionally not force-defaulted here: empty means "use the built-in photo", a valid state (see usage site fallback)
-      return { id: c.id, icon: str(c.icon, def.icon), name: str(c.name, def.name), desc: str(c.desc, def.desc), visible: c.visible, image: c.image ?? '', kicker: str(c.kicker, def.kicker) };
-    });
-}
-
-export function useAdminCategories(): Category[] {
-  const [cats, setCats] = useState<Category[]>(CATEGORIES);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_CAT);
-      if (raw) {
-        const stored: Category[] = JSON.parse(raw);
-        if (stored.length > 0) {
-          const merged = mergeCategories(stored);
-          setCats(merged);
-          // Persist the cleanup here too — otherwise a stale built-in id (e.g. a
-          // removed default category) lingers until the admin page happens to be
-          // the first tab to load and rewrite it.
-          if (merged.length !== stored.length) localStorage.setItem(LS_CAT, JSON.stringify(merged));
-        }
-      }
-    } catch { /* ignore */ }
-  }, []);
-
-  return cats;
+/**
+ * The public-facing category list. Used to be localStorage-only (per-browser,
+ * never reached other visitors or production — see memory:
+ * project_categories_db_migration_2026-09-04). Now SSR-resolved from
+ * `site_categories_content` (draft/published, see getServerCategories) and
+ * handed down via CategoriesProvider in the locale layout — this hook just
+ * reads that context, so every existing caller keeps the same return shape
+ * with zero changes at the call site.
+ *
+ * Not used by the admin's own category editor — that stays localStorage-backed
+ * for the admin's live-editing UX, see AdminDataContext.tsx.
+ */
+export function useAdminCategories() {
+  const fromServer = useCategoriesFromServer();
+  return fromServer ?? CATEGORIES;
 }
