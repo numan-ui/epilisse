@@ -521,7 +521,7 @@ export default function HomePage() {
               ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter"
               : uniformCols === 2
                 ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-gutter"
-                : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 lg:auto-rows-[380px] gap-gutter"
+                : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 lg:auto-rows-[520px] gap-gutter"
           }
         >
           {gridCards.map((card, i) => (
