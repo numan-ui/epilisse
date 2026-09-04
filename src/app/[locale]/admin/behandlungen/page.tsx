@@ -16,7 +16,7 @@ const EMPTY_CAT: Omit<Category, 'id'> = { icon: 'auto_awesome', name: '', desc: 
 export default function BehandlungenPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'de';
-  const { services, campaigns, categories, addCategory } = useAdminData();
+  const { services, campaigns, categories, categoriesLoaded, addCategory } = useAdminData();
 
   const [addOpen, setAddOpen] = useState(false);
   const [newCat, setNewCat]   = useState<Omit<Category, 'id'>>(EMPTY_CAT);
@@ -79,12 +79,15 @@ export default function BehandlungenPage() {
               {publishMsg.text}
             </span>
           )}
-          <span className="font-label-caps text-[10px] bg-primary/10 text-primary px-3 py-1.5">
-            {categories.length} Kategorien
-          </span>
+          {categoriesLoaded && (
+            <span className="font-label-caps text-[10px] bg-primary/10 text-primary px-3 py-1.5">
+              {categories.length} Kategorien
+            </span>
+          )}
           <button
             onClick={handlePublish}
-            disabled={publishing}
+            disabled={publishing || !categoriesLoaded}
+            title={categoriesLoaded ? undefined : 'Kategorien werden geladen…'}
             className="font-label-caps text-[11px] uppercase tracking-widest bg-primary text-on-primary px-4 py-2 hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-[var(--radius-cta)]"
           >
             {publishing ? 'Wird veröffentlicht…' : 'Veröffentlichen'}
@@ -93,6 +96,22 @@ export default function BehandlungenPage() {
       </header>
 
       <div className="flex-1 overflow-y-auto p-8">
+        {/* categories starts each mount at the code CATEGORIES defaults, then swaps to
+            the admin's real localStorage list once the load effect runs (AdminDataContext).
+            Rendering the grid before that swap flashed 3 default cards on every page
+            load/navigation — indistinguishable from a real data loss (feedback 2026-09-04).
+            A skeleton until categoriesLoaded removes that flash entirely. */}
+        {!categoriesLoaded ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-5 flex flex-col gap-3 min-h-[130px] animate-pulse">
+                <div className="w-10 h-10 rounded-lg bg-outline-variant/40" />
+                <div className="h-4 w-2/3 bg-outline-variant/40 rounded" />
+                <div className="h-3 w-1/2 bg-outline-variant/30 rounded mt-auto" />
+              </div>
+            ))}
+          </div>
+        ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {categories.map((cat) => {
             const svcs          = services[cat.id]  ?? [];
@@ -233,6 +252,7 @@ export default function BehandlungenPage() {
             </div>
           )}
         </div>
+        )}
       </div>
     </>
   );

@@ -45,6 +45,7 @@ interface AdminDataCtx {
   campaigns: CampaignsMap;
   pageContent: PageContentMap;
   categories: Category[];
+  categoriesLoaded: boolean;
   settings: SiteSettings;
   landingContent: LandingContent;
   heroSlides: HeroSlide[];
@@ -441,7 +442,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
 
   return (
     <Ctx.Provider value={{
-      services, campaigns, pageContent, categories, settings, landingContent, heroSlides, promoBanners, aboutValues, reviews,
+      services, campaigns, pageContent, categories, categoriesLoaded, settings, landingContent, heroSlides, promoBanners, aboutValues, reviews,
       updateService, deleteService, addService,
       updateCampaign, deleteCampaign, addCampaign,
       updatePageField, updatePageParagraph, updatePageBenefit, addPageBenefit, removePageBenefit, updatePageBanner,
