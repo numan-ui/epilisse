@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { dbError } from '@/lib/apiError';
 import { getAdminSession } from '@/lib/supabase/authServer';
 
 export async function GET() {
@@ -9,7 +10,7 @@ export async function GET() {
     .from('category_follow_up_settings')
     .select('*, categories(name)')
     .order('category_id');
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('follow-up-settings', error, 500);
 
   const flattened = (data ?? []).map((row) => ({
     categoryId: row.category_id,
@@ -37,6 +38,6 @@ export async function PATCH(request: Request) {
     })
     .eq('category_id', body.categoryId);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('follow-up-settings', error, 500);
   return NextResponse.json({ ok: true });
 }

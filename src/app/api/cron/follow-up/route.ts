@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { dbError } from '@/lib/apiError';
 import { followUpEmail, sendEmail } from '@/lib/email/resend';
 import { getRemainingEmailQuota, logEmailSent } from '@/lib/emailQuota';
 
@@ -16,7 +17,7 @@ export async function GET(request: Request) {
     .from('category_follow_up_settings')
     .select('*, categories(name)')
     .eq('enabled', true);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('cron/follow-up', error, 500);
 
   let sent = 0;
   let skipped = 0;
@@ -30,7 +31,7 @@ export async function GET(request: Request) {
       p_category_id: setting.category_id,
     });
     if (rpcError) {
-      return NextResponse.json({ error: rpcError.message }, { status: 500 });
+      return dbError('cron/follow-up', rpcError, 500);
     }
 
     for (const candidate of candidates ?? []) {

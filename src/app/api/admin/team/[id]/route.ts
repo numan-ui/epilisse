@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { dbError } from '@/lib/apiError';
 import { getAdminSession } from '@/lib/supabase/authServer';
 import crypto from 'node:crypto';
 
@@ -33,14 +34,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (body.action === 'reset-password') {
     const password = genPassword();
     const { error } = await supabase.auth.admin.updateUserById(id, { password });
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error) return dbError('admin/team/[id]', error, 400);
     return NextResponse.json({ password });
   }
 
   if (body.action === 'set-role') {
     const role = body.role === 'super_admin' ? 'super_admin' : 'admin';
     const { error } = await supabase.auth.admin.updateUserById(id, { app_metadata: { role } });
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error) return dbError('admin/team/[id]', error, 400);
     return NextResponse.json({ ok: true });
   }
 
@@ -58,6 +59,6 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
 
   const supabase = adminClient();
   const { error } = await supabase.auth.admin.deleteUser(id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (error) return dbError('admin/team/[id]', error, 400);
   return NextResponse.json({ ok: true });
 }

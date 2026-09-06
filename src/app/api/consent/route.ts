@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { dbError } from '@/lib/apiError';
 import { verifyConsentToken } from '@/lib/consentToken';
 import { consentConfirmedEmail, sendEmail, getSiteUrl, CONSENT_BCC_EMAIL } from '@/lib/email/resend';
 import { getRemainingEmailQuota, logEmailSent } from '@/lib/emailQuota';
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
       updated_at: now,
     })
     .eq('id', customerId);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('consent', error, 500);
 
   if (!customer.consent_datenschutz_at) await logConsentEvent(supabase, customerId, 'datenschutz', 'granted', 'einwilligung_link');
   if (requiresBehandlung && behandlung && !customer.consent_behandlung_at) await logConsentEvent(supabase, customerId, 'behandlung', 'granted', 'einwilligung_link');

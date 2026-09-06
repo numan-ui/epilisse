@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { dbError } from '@/lib/apiError';
 import { getAdminSession } from '@/lib/supabase/authServer';
 
 export async function GET() {
@@ -10,12 +11,12 @@ export async function GET() {
     .from('campaigns')
     .select('*, target_category:target_category_id(name)')
     .order('created_at', { ascending: false });
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('campaigns', error, 500);
 
   const { data: recipients, error: recError } = await supabase
     .from('campaign_recipients')
     .select('campaign_id, status');
-  if (recError) return NextResponse.json({ error: recError.message }, { status: 500 });
+  if (recError) return dbError('campaigns', recError, 500);
 
   const counts = new Map<string, { total: number; sent: number; failed: number; pending: number }>();
   for (const r of recipients ?? []) {
@@ -54,14 +55,14 @@ export async function POST(request: Request) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('campaigns', error, 500);
 
   // For target_type='customers', materialize the recipient rows now so the
   // draft already shows the intended audience before sending.
   if (body.targetType === 'customers' && Array.isArray(body.customerIds) && body.customerIds.length > 0) {
     const rows = body.customerIds.map((customer_id: string) => ({ campaign_id: data.id, customer_id }));
     const { error: recError } = await supabase.from('campaign_recipients').insert(rows);
-    if (recError) return NextResponse.json({ error: recError.message }, { status: 500 });
+    if (recError) return dbError('campaigns', recError, 500);
   }
 
   return NextResponse.json(data, { status: 201 });

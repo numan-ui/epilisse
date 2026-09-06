@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { dbError } from '@/lib/apiError';
 import { getAdminSession } from '@/lib/supabase/authServer';
 
 export async function GET(request: Request) {
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
   if (to) query = query.lte('starts_at', to);
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('blocked-slots', error, 500);
 
   const flattened = (data ?? []).map((row) => ({
     id: row.id,
@@ -45,6 +46,6 @@ export async function POST(request: Request) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('blocked-slots', error, 500);
   return NextResponse.json(data, { status: 201 });
 }

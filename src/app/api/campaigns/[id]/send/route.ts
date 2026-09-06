@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { dbError } from '@/lib/apiError';
 import { campaignEmail, sendEmail } from '@/lib/email/resend';
 import { getRemainingEmailQuota, logEmailSent } from '@/lib/emailQuota';
 import { getAdminSession } from '@/lib/supabase/authServer';
@@ -14,7 +15,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   const supabase = supabaseServer();
 
   const { data: campaign, error } = await supabase.from('campaigns').select('*').eq('id', id).single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 404 });
+  if (error) return dbError('campaigns/[id]/send', error, 404);
   if (campaign.status === 'sent') {
     return NextResponse.json({ error: 'Kampagne wurde bereits gesendet.' }, { status: 400 });
   }
@@ -38,7 +39,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
       query = query.in('id', ids);
     }
     const { data: targetCustomers, error: targetError } = await query;
-    if (targetError) return NextResponse.json({ error: targetError.message }, { status: 500 });
+    if (targetError) return dbError('campaigns/[id]/send', targetError, 500);
 
     const rows = (targetCustomers ?? []).map((c) => ({ campaign_id: id, customer_id: c.id }));
     if (rows.length > 0) {
@@ -51,7 +52,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     .select('*, customers(email, consent_marketing_at)')
     .eq('campaign_id', id)
     .eq('status', 'pending');
-  if (recError) return NextResponse.json({ error: recError.message }, { status: 500 });
+  if (recError) return dbError('campaigns/[id]/send', recError, 500);
 
   const content = campaignEmail({
     title: campaign.title,

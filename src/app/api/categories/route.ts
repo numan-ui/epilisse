@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { dbError } from '@/lib/apiError';
 import { getAdminSession } from '@/lib/supabase/authServer';
 import type { Category } from '@/app/[locale]/admin/behandlungen/data';
 
@@ -27,13 +28,13 @@ export async function GET(request: Request) {
       .select('draft')
       .eq('id', 1)
       .maybeSingle();
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) return dbError('categories', error, 500);
     return NextResponse.json({ draft: data?.draft ?? null });
   }
 
   const supabase = supabaseServer();
   const { data, error } = await supabase.from('categories').select('id, name').order('name');
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('categories', error, 500);
   return NextResponse.json(data);
 }
 
@@ -66,7 +67,7 @@ export async function PUT(request: Request) {
     .from('site_categories_content')
     .update({ draft: body, updated_at: new Date().toISOString() })
     .eq('id', 1);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('categories', error, 500);
 
   return NextResponse.json({ ok: true });
 }
@@ -91,7 +92,7 @@ export async function POST() {
     .select('draft')
     .eq('id', 1)
     .maybeSingle();
-  if (readError) return NextResponse.json({ error: readError.message }, { status: 500 });
+  if (readError) return dbError('categories', readError, 500);
 
   const draft = (data?.draft as Category[] | null) ?? [];
   if (!isValidCategories(draft)) {
@@ -107,14 +108,14 @@ export async function POST() {
         draft.map((c) => ({ id: c.id, name: c.name })),
         { onConflict: 'id', ignoreDuplicates: true },
       );
-    if (crmError) return NextResponse.json({ error: crmError.message }, { status: 500 });
+    if (crmError) return dbError('categories', crmError, 500);
   }
 
   const { error } = await supabase
     .from('site_categories_content')
     .update({ published: draft, published_at: now, updated_at: now })
     .eq('id', 1);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('categories', error, 500);
 
   return NextResponse.json({ ok: true });
 }

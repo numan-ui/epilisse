@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
 import { computeSlots, getAppointmentsForDate, getBlockedSlotsForDate, getBusinessHoursForDate } from '@/lib/availability';
+import { checkAvailabilityRateLimit, getClientIp } from '@/lib/rateLimit';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -12,6 +13,11 @@ export async function GET(request: Request) {
   }
 
   const supabase = supabaseServer();
+
+  if (!(await checkAvailabilityRateLimit(supabase, getClientIp(request)))) {
+    return NextResponse.json({ error: 'Zu viele Anfragen. Bitte später erneut versuchen.' }, { status: 429 });
+  }
+
   const hours = await getBusinessHoursForDate(supabase, date);
   if (!hours) {
     return NextResponse.json({ error: 'Öffnungszeiten nicht gefunden.' }, { status: 500 });

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { dbError } from '@/lib/apiError';
 import { getAdminSession } from '@/lib/supabase/authServer';
 import crypto from 'node:crypto';
 
@@ -23,7 +24,7 @@ export async function GET() {
 
   const supabase = adminClient();
   const { data, error } = await supabase.auth.admin.listUsers();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('admin/team', error, 500);
 
   const team = data.users.map((u) => ({
     id: u.id,
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
     app_metadata: { role },
   });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (error) return dbError('admin/team', error, 400);
 
   return NextResponse.json({ id: data.user.id, email, role, password }, { status: 201 });
 }

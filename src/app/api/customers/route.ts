@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { dbError } from '@/lib/apiError';
 import { maybeSendConsentRequest } from '@/lib/consentRequest';
 import { getAdminSession } from '@/lib/supabase/authServer';
 
@@ -11,13 +12,13 @@ export async function GET() {
     .from('customers')
     .select('*')
     .order('name');
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('customers', error, 500);
 
   const { data: appointments, error: apptError } = await supabase
     .from('appointments')
     .select('customer_id, service_name, price, starts_at, status')
     .order('starts_at', { ascending: false });
-  if (apptError) return NextResponse.json({ error: apptError.message }, { status: 500 });
+  if (apptError) return dbError('customers', apptError, 500);
 
   const byCustomer = new Map<string, typeof appointments>();
   for (const a of appointments ?? []) {
@@ -81,7 +82,7 @@ export async function POST(request: Request) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('customers', error, 500);
 
   // Customers added directly by admin skip the public booking form's consent
   // checkboxes — send them a consent-request email so Datenschutz (mandatory)

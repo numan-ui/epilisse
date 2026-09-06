@@ -6,6 +6,7 @@ import { signConsentToken } from '@/lib/consentToken';
 import { getRemainingEmailQuota, logEmailSent } from '@/lib/emailQuota';
 import { logConsentEvent } from '@/lib/consentLog';
 import { checkBookingRateLimit, getClientIp } from '@/lib/rateLimit';
+import { dbError } from '@/lib/apiError';
 
 interface BookingService {
   name: string;
@@ -50,26 +51,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Bitte mindestens einen Service auswählen.' }, { status: 400 });
   }
 
-  // Defensive FK guard: appointments.category_id references the CRM `categories`
-  // table, which today is only seeded with the built-in categories (see
-  // supabase/migrations/0001_init.sql) and — going forward — whatever's been
-  // "Veröffentlichen"-published (see src/app/api/categories/route.ts POST, which
-  // does the mirror-image upsert at publish time). A booking against an
-  // admin-created category that was never published (or published after this
-  // migration but before this request) would otherwise fail the appointments
-  // insert below — but only AFTER the customer record, consent log, and
-  // confirmation email have already gone out, leaving the customer holding a
-  // confirmation for a non-existent appointment. Upsert here, before any of
-  // that happens, so the insert can never FK-fail on a missing category.
-  // ignoreDuplicates: never overwrites an existing category's real name.
+  // Validate categoryId against the CRM `categories` table (seeded with the
+  // built-ins + whatever's been "Veröffentlichen"-published — see
+  // src/app/api/categories/route.ts POST). appointments.category_id is an FK to
+  // this table, so an unknown id would otherwise FK-fail the appointments
+  // insert far below — but only AFTER the customer record, consent log, and
+  // confirmation email already went out. Reject early instead. We never insert
+  // from the request body: that let anyone add arbitrary rows that then render
+  // on the public homepage grid + /preise.
   {
-    const { error: catError } = await supabase
+    const { data: known, error: catError } = await supabase
       .from('categories')
-      .upsert(
-        { id: body.categoryId, name: body.categoryName?.trim() || body.categoryId },
-        { onConflict: 'id', ignoreDuplicates: true },
-      );
-    if (catError) return NextResponse.json({ error: catError.message }, { status: 500 });
+      .select('id')
+      .eq('id', body.categoryId)
+      .maybeSingle();
+    if (catError) return dbError('book', catError, 500);
+    if (!known) return NextResponse.json({ error: 'Ungültige Kategorie.' }, { status: 400 });
   }
   const hasInvalidService = body.services.some((svc) => {
     const priceValid = svc.price === null || (Number.isFinite(svc.price) && svc.price >= 0 && svc.price <= MAX_PRICE);
@@ -107,7 +104,7 @@ export async function POST(request: Request) {
     .select('id, consent_datenschutz_at, consent_behandlung_at, consent_marketing_at')
     .ilike('email', email)
     .maybeSingle();
-  if (findError) return NextResponse.json({ error: findError.message }, { status: 500 });
+  if (findError) return dbError('book', findError, 500);
 
   let customerId = existingCustomer?.id as string | undefined;
   const now = new Date().toISOString();
@@ -130,7 +127,7 @@ export async function POST(request: Request) {
       })
       .select('id')
       .single();
-    if (createError) return NextResponse.json({ error: createError.message }, { status: 500 });
+    if (createError) return dbError('book', createError, 500);
     customerId = created.id;
   } else if (existingCustomer) {
     isFirstConfirmation = !existingCustomer.consent_datenschutz_at || (requiresBehandlung && !existingCustomer.consent_behandlung_at);
@@ -183,7 +180,7 @@ export async function POST(request: Request) {
     .from('appointments')
     .insert(rows)
     .select();
-  if (apptError) return NextResponse.json({ error: apptError.message }, { status: 500 });
+  if (apptError) return dbError('book', apptError, 500);
 
   return NextResponse.json({ customerId, appointments }, { status: 201 });
 }

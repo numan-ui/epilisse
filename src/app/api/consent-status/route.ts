@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { checkConsentStatusRateLimit, getClientIp } from '@/lib/rateLimit';
 
 // Public, privacy-safe lookup used by the booking form: a returning customer
 // who already gave consent shouldn't be forced to re-tick the checkboxes.
@@ -14,6 +15,10 @@ export async function GET(request: Request) {
   }
 
   const supabase = supabaseServer();
+
+  if (!(await checkConsentStatusRateLimit(supabase, getClientIp(request)))) {
+    return NextResponse.json({ error: 'Zu viele Anfragen. Bitte später erneut versuchen.' }, { status: 429 });
+  }
 
   // Two bound queries instead of a hand-built .or() filter string — the old
   // version interpolated raw user input into PostgREST filter syntax, letting

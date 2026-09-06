@@ -32,3 +32,12 @@ export const checkBookingRateLimit = (supabase: SupabaseClient<Database>, ip: st
 
 export const checkPasswordResetRateLimit = (supabase: SupabaseClient<Database>, ip: string) =>
   checkRateLimit(supabase, 'admin_password_reset', ip, { windowMs: 15 * 60 * 1000, maxAttempts: 3 });
+
+// Public booking-form helpers. consent-status returns whether an email/phone
+// belongs to a salon customer, so it's an enumeration target — keep it tight.
+// availability is polled once per date the visitor previews; allow more.
+export const checkConsentStatusRateLimit = (supabase: SupabaseClient<Database>, ip: string) =>
+  checkRateLimit(supabase, 'consent_status', ip, { windowMs: 10 * 60 * 1000, maxAttempts: 20 });
+
+export const checkAvailabilityRateLimit = (supabase: SupabaseClient<Database>, ip: string) =>
+  checkRateLimit(supabase, 'availability', ip, { windowMs: 5 * 60 * 1000, maxAttempts: 80 });

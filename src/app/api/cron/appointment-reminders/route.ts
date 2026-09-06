@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { dbError } from '@/lib/apiError';
 import { appointmentReminderEmail, sendEmail, getSiteUrl } from '@/lib/email/resend';
 import { getRemainingEmailQuota, logEmailSent } from '@/lib/emailQuota';
 import { signConsentToken } from '@/lib/consentToken';
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
     .eq('reminder_sent', false)
     .gte('starts_at', dayStart)
     .lte('starts_at', dayEnd);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('cron/appointment-reminders', error, 500);
 
   let sent = 0;
   let skipped = 0;

@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { dbError } from '@/lib/apiError';
 import { getAdminSession } from '@/lib/supabase/authServer';
 
 export async function GET() {
   if (!(await getAdminSession())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const supabase = supabaseServer();
   const { data, error } = await supabase.from('business_hours').select('*').order('weekday');
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('business-hours', error, 500);
 
   const flattened = (data ?? []).map((row) => ({
     weekday: row.weekday,
@@ -37,6 +38,6 @@ export async function PATCH(request: Request) {
 
   const { error } = await supabase.from('business_hours').update(update).eq('weekday', body.weekday);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('business-hours', error, 500);
   return NextResponse.json({ ok: true });
 }

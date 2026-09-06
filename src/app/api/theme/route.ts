@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { dbError } from '@/lib/apiError';
 import { getAdminSession } from '@/lib/supabase/authServer';
 import type { Database } from '@/lib/supabase/database.types';
 import { isValidHex } from '@/lib/theme/color';
@@ -71,7 +72,7 @@ export async function PUT(request: Request) {
 
   const supabase = supabaseServer();
   const { error } = await supabase.from('theme_settings').update(update).eq('id', 1);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('theme', error, 500);
 
   return NextResponse.json({ ok: true });
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
+import { dbError } from '@/lib/apiError';
 import { maybeSendConsentRequest } from '@/lib/consentRequest';
 import { getAdminSession } from '@/lib/supabase/authServer';
 
@@ -19,7 +20,7 @@ export async function GET(request: Request) {
   if (to) query = query.lte('starts_at', to);
 
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('appointments', error, 500);
 
   const flattened = (data ?? []).map((a) => ({
     id: a.id,
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbError('appointments', error, 500);
 
   // Admin can create a customer with just a name (no email/phone required), then
   // add an email later and book them — that first appointment is when we need to
