@@ -169,7 +169,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
       <main className="mt-[73px]">
 
         {/* ── HERO ─────────────────────────────────────────────────────── */}
-        <section className="relative w-full h-[620px] md:h-[716px] overflow-hidden">
+        <section className="relative w-full h-[440px] md:h-[620px] overflow-hidden">
           <div className="absolute inset-0 z-0">
             <SmartImage
               src={data.heroImage}
@@ -180,7 +180,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
             />
             <div className="absolute inset-0 bg-black/25" />
           </div>
-          <div className="relative z-10 h-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop flex flex-col justify-end pb-20 md:pb-24">
+          <div className="relative z-10 h-full max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop flex flex-col justify-end pb-10 md:pb-16">
             <div className="max-w-2xl text-white">
               <span className="font-label-caps text-label-caps tracking-[0.2em] uppercase mb-4 block text-white/80">
                 {data.label}
