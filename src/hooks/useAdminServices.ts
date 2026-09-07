@@ -1,10 +1,8 @@
 'use client';
-import { useState, useEffect } from 'react';
 import type { PricingItem } from '@/components/ServicePageTemplate';
+import { useSiteContent } from '@/context/SiteContentContext';
 
-const LS_SVC = 'epilisse_admin_services';
-
-type RawService = { id: string; name: string; price: string; duration: string; active: boolean };
+type RawService = { id: string; name: string; price: string; duration: string; active: boolean; oldPrice?: string };
 
 function formatPrice(raw: string): string {
   const n = parseFloat(raw);
@@ -17,27 +15,28 @@ function formatDuration(raw: string): string {
   return raw.replace(/\bmin\.?$/i, 'Min.');
 }
 
-/** Returns active pricing items for a category, reading from localStorage (admin state). */
+/**
+ * Active pricing items for a category. SSR-resolved from `site_content`
+ * (draft/published) via SiteContentProvider — used to be localStorage-only.
+ * `oldPrice` is carried through only when set and different from `price`, so
+ * the public list can render the discount ("AKTION") treatment.
+ */
 export function useAdminServices(catId: string, fallback: PricingItem[]): PricingItem[] {
-  const [items, setItems] = useState<PricingItem[]>(fallback);
+  const svcs = useSiteContent().services?.[catId];
+  if (!svcs) return fallback;
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_SVC);
-      if (!raw) return;
-      const all: Record<string, RawService[]> = JSON.parse(raw);
-      const svcs = all[catId];
-      if (!svcs) return;
-      const active = svcs
-        .filter(s => s.active)
-        .map(s => ({
-          name:     s.name,
-          duration: formatDuration(s.duration),
-          price:    formatPrice(s.price),
-        }));
-      if (active.length > 0) setItems(active);
-    } catch { /* ignore */ }
-  }, [catId]);
+  const active = (svcs as RawService[])
+    .filter(s => s.active)
+    .map(s => {
+      const item: PricingItem = {
+        name:     s.name,
+        duration: formatDuration(s.duration),
+        price:    formatPrice(s.price),
+      };
+      const old = (s.oldPrice ?? '').trim();
+      if (old && old !== (s.price ?? '').trim()) item.oldPrice = formatPrice(old);
+      return item;
+    });
 
-  return items;
+  return active.length > 0 ? active : fallback;
 }

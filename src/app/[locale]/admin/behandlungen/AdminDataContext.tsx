@@ -6,6 +6,7 @@ import {
   INIT_REVIEWS, REVIEW_LIMIT,
   type Service, type Campaign, type Category, type PageContent, type PageContentMap,
   type PageBanner, type SiteSettings, type LandingContent, type HeroSlide, type PromoBanner, type AboutValue, type Review,
+  type SiteContent,
 } from './data';
 
 type ServicesMap  = Record<string, Service[]>;
@@ -116,6 +117,8 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [categoriesLoaded, setCategoriesLoaded] = useState(false);
   // Same role as categoriesLoaded, for the page-content draft write-through below.
   const [pageContentLoaded, setPageContentLoaded] = useState(false);
+  // Same role, for the rest of the CMS bundle (services/campaigns/settings/… → /api/content).
+  const [siteContentLoaded, setSiteContentLoaded] = useState(false);
   const [settings,    setSettings]    = useState<SiteSettings>({ ...INIT_SETTINGS, hours: INIT_SETTINGS.hours.map(h => ({ ...h })) });
   const [landingContent, setLandingContent] = useState<LandingContent>({ ...INIT_LANDING_CONTENT });
   const [heroSlides, setHeroSlides]   = useState<HeroSlide[]>(INIT_HERO_SLIDES.map(s => ({ ...s })));
@@ -142,6 +145,39 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     if (promo && promo.length > 0) setPromoBanners(promo);
     if (about && about.length > 0) setAboutValues(about);
     if (revs  && revs.length > 0)  setReviews(revs);
+
+    // The rest of the CMS bundle → site_content.draft. Same fresh-browser
+    // seeding logic as categories/page-content: a browser with a local copy
+    // uses it; one without seeds from `draft` (the shared source of truth)
+    // rather than the hardcoded INIT_* defaults, so the write-through below
+    // can't overwrite the shared draft with those.
+    const hasLocalSite = !!(svcs || cmps || set || lc || hero || promo || about || revs);
+    if (hasLocalSite) {
+      setSiteContentLoaded(true);
+    } else {
+      (async () => {
+        try {
+          const r = await fetch('/api/content?content=draft');
+          if (!r.ok) return; // auth/network failure — leave siteContentLoaded false
+          const res = (await r.json()) as { draft: SiteContent | null };
+          const d = res.draft;
+          if (d && Object.keys(d).length > 0) {
+            if (d.services) setServices(d.services);
+            if (d.campaigns) setCampaigns(d.campaigns);
+            if (d.settings) setSettings(prev => ({ ...prev, ...d.settings, hours: d.settings!.hours ?? prev.hours }));
+            if (d.landingContent) setLandingContent(prev => ({ ...prev, ...d.landingContent }));
+            if (d.heroSlides && d.heroSlides.length > 0) setHeroSlides(d.heroSlides);
+            if (d.promoBanners && d.promoBanners.length > 0) setPromoBanners(d.promoBanners);
+            if (d.aboutValues && d.aboutValues.length > 0) setAboutValues(d.aboutValues);
+            if (d.reviews && d.reviews.length > 0) setReviews(d.reviews);
+          }
+          setSiteContentLoaded(true);
+        } catch {
+          // Network failure — leave siteContentLoaded false, disabling the
+          // write-through for this session rather than risking a clobber.
+        }
+      })();
+    }
 
     // Drop stale localStorage entries for built-in categories removed from code (e.g. a deleted default category).
     const validCats = cats ? cats.filter(c => CATEGORIES.some(d => d.id === c.id) || c.id.startsWith('cat-')) : [];
@@ -263,6 +299,26 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     }, 700);
     return () => clearTimeout(timer);
   }, [pageContent, pageContentLoaded]);
+
+  /* ── CMS bundle draft write-through ───────────────────
+     services / campaigns / settings / landing copy / hero slides / promo
+     banners / about values / reviews → site_content.draft (debounced). Same
+     guard rationale as the two above. */
+  useEffect(() => {
+    if (!siteContentLoaded) return;
+    const bundle: SiteContent = {
+      services, campaigns, settings, landingContent,
+      heroSlides, promoBanners, aboutValues, reviews,
+    };
+    const timer = setTimeout(() => {
+      fetch('/api/content', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bundle),
+      }).catch(() => { /* best-effort */ });
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [services, campaigns, settings, landingContent, heroSlides, promoBanners, aboutValues, reviews, siteContentLoaded]);
 
   /* ── Services ────────────────────────────────────── */
   const updateService = useCallback((catId: string, id: string, field: keyof Service, value: string | boolean) =>

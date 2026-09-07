@@ -1,22 +1,13 @@
 'use client';
-import { useState, useEffect } from 'react';
 import { INIT_REVIEWS, type Review } from '@/app/[locale]/admin/behandlungen/data';
+import { useSiteContent } from '@/context/SiteContentContext';
 
-const LS_REVIEWS = 'epilisse_admin_reviews';
-
-/** Returns active reviews, reading from localStorage (admin state), falling back to defaults when empty. */
+/**
+ * Active (visible) reviews. SSR-resolved from `site_content` via
+ * SiteContentProvider — used to be localStorage-only.
+ */
 export function useAdminReviews(): Review[] {
-  const [reviews, setReviews] = useState<Review[]>(INIT_REVIEWS);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_REVIEWS);
-      if (!raw) return;
-      const stored: Review[] = JSON.parse(raw);
-      if (stored.length === 0) return;
-      setReviews(stored);
-    } catch { /* ignore */ }
-  }, []);
-
-  return reviews.filter(r => r.active);
+  const stored = useSiteContent().reviews;
+  const all = stored && stored.length > 0 ? stored : INIT_REVIEWS;
+  return all.filter(r => r.active);
 }

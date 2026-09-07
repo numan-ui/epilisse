@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { PREVIEW_GRADIENT, FRONTEND_SLUG, type Service, type Campaign, type PageBanner, type ImagePosition } from '../data';
 import { useAdminData } from '../AdminDataContext';
 
-const EMPTY_SERVICE: Omit<Service, 'id'> = { name: '', price: '', duration: '', active: true };
+const EMPTY_SERVICE: Omit<Service, 'id'> = { name: '', price: '', duration: '', active: true, oldPrice: '' };
 const EMPTY_CAMPAIGN: Omit<Campaign, 'id'> = { label: '', title: '', desc: '', price: '', oldPrice: '', cta: 'JETZT BUCHEN', icon: 'auto_fix_high', image: '', imagePosition: 'top', active: true };
 
 const BANNER_ICONS = ['auto_awesome', 'spa', 'diamond', 'loyalty', 'favorite', 'face_retouching_natural', 'health_and_beauty', 'self_improvement', 'fitness_center', 'card_membership', 'auto_fix_high', 'star'];
@@ -22,6 +22,7 @@ export default function CategoryDetailPage() {
     updateCampaign: ctxUpdateCampaign, deleteCampaign: ctxDeleteCampaign, addCampaign: ctxAddCampaign,
     updatePageField, updatePageParagraph, updatePageBenefit, addPageBenefit, removePageBenefit, updatePageBanner,
     categories, updateCategory, deleteCategory,
+    settings, landingContent, heroSlides, promoBanners, aboutValues, reviews,
   } = useAdminData();
 
   const category = categories.find((c) => c.id === catId);
@@ -79,6 +80,14 @@ export default function CategoryDetailPage() {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(categories),
+        }),
+        fetch('/api/content', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            services: allServices, campaigns: allCampaigns, settings, landingContent,
+            heroSlides, promoBanners, aboutValues, reviews,
+          }),
         }),
       ]);
     } catch { /* best-effort — localStorage copy stays authoritative for the editor */ }
@@ -205,9 +214,10 @@ export default function CategoryDetailPage() {
 
             <div className="grid grid-cols-12 gap-3 px-6 py-2 font-label-caps text-[10px] text-outline uppercase bg-surface-container-lowest border-b border-outline-variant/30">
               <div className="col-span-1" />
-              <div className="col-span-4">Bezeichnung</div>
+              <div className="col-span-3">Bezeichnung</div>
               <div className="col-span-2">Preis (€)</div>
-              <div className="col-span-3">Dauer</div>
+              <div className="col-span-2">Aktion – statt (€)</div>
+              <div className="col-span-2">Dauer</div>
               <div className="col-span-2 text-right">Aktiv / Löschen</div>
             </div>
 
@@ -227,7 +237,7 @@ export default function CategoryDetailPage() {
                 <div className="col-span-1">
                   <span className="material-symbols-outlined text-outline cursor-move select-none text-[20px]">drag_indicator</span>
                 </div>
-                <div className="col-span-4">
+                <div className="col-span-3">
                   <input
                     className="w-full bg-transparent border-b border-transparent hover:border-outline-variant focus:border-primary font-body-md text-on-surface p-0 focus:outline-none transition-colors"
                     value={svc.name}
@@ -244,7 +254,18 @@ export default function CategoryDetailPage() {
                     />
                   </div>
                 </div>
-                <div className="col-span-3">
+                <div className="col-span-2">
+                  <div className="flex items-center gap-1 border border-dashed border-outline-variant/50 px-2 py-1 focus-within:border-primary transition-colors" title="Nur ausfüllen bei einer Aktion – der frühere Preis, wird durchgestrichen angezeigt">
+                    <span className="text-outline text-[12px] shrink-0">€</span>
+                    <input
+                      className="w-full border-none p-0 focus:ring-0 text-[14px] text-outline line-through focus:outline-none bg-transparent placeholder:text-outline/50 placeholder:no-underline"
+                      placeholder="—"
+                      value={svc.oldPrice ?? ''}
+                      onChange={(e) => updateService(svc.id, 'oldPrice', e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="col-span-2">
                   <div className="flex items-center gap-1 border border-outline-variant/60 px-2 py-1 focus-within:border-primary transition-colors">
                     <span className="material-symbols-outlined text-[15px] text-outline shrink-0">schedule</span>
                     <input
@@ -278,7 +299,7 @@ export default function CategoryDetailPage() {
                 <div className="col-span-1">
                   <span className="material-symbols-outlined text-primary text-[20px]">add_circle</span>
                 </div>
-                <div className="col-span-4">
+                <div className="col-span-3">
                   <input
                     ref={svcNameRef}
                     className="w-full border-b border-primary bg-transparent font-body-md text-on-surface p-0 focus:outline-none placeholder:text-outline"
@@ -300,7 +321,19 @@ export default function CategoryDetailPage() {
                     />
                   </div>
                 </div>
-                <div className="col-span-3">
+                <div className="col-span-2">
+                  <div className="flex items-center gap-1 border border-dashed border-primary/30 px-2 py-1">
+                    <span className="text-outline text-[12px] shrink-0">€</span>
+                    <input
+                      className="w-full border-none p-0 focus:ring-0 text-[14px] text-outline line-through focus:outline-none bg-transparent placeholder:text-outline/50 placeholder:no-underline"
+                      placeholder="Statt (opt.)"
+                      value={newSvc.oldPrice ?? ''}
+                      onChange={(e) => setNewSvc(p => ({ ...p, oldPrice: e.target.value }))}
+                      onKeyDown={(e) => e.key === 'Enter' && addService()}
+                    />
+                  </div>
+                </div>
+                <div className="col-span-2">
                   <div className="flex items-center gap-1 border border-primary/40 px-2 py-1">
                     <span className="material-symbols-outlined text-[15px] text-outline shrink-0">schedule</span>
                     <input

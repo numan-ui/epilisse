@@ -16,7 +16,10 @@ const EMPTY_CAT: Omit<Category, 'id'> = { icon: 'auto_awesome', name: '', desc: 
 export default function BehandlungenPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'de';
-  const { services, campaigns, categories, categoriesLoaded, pageContent, addCategory } = useAdminData();
+  const {
+    services, campaigns, categories, categoriesLoaded, pageContent, addCategory,
+    settings, landingContent, heroSlides, promoBanners, aboutValues, reviews,
+  } = useAdminData();
 
   const [addOpen, setAddOpen] = useState(false);
   const [newCat, setNewCat]   = useState<Omit<Category, 'id'>>(EMPTY_CAT);
@@ -54,8 +57,8 @@ export default function BehandlungenPage() {
         throw new Error(putBody.error || 'Speichern fehlgeschlagen.');
       }
 
-      // Flush the current Seiteninhalt (page content) into its draft too, for
-      // the same reason — its write-through is debounced.
+      // Flush the Seiteninhalt (page content) and the rest of the CMS bundle
+      // into their drafts too — all three write-throughs are debounced.
       const pcPut = await fetch('/api/page-content', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -66,6 +69,16 @@ export default function BehandlungenPage() {
         throw new Error(pcBody.error || 'Speichern der Seiteninhalte fehlgeschlagen.');
       }
 
+      const contentPut = await fetch('/api/content', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ services, campaigns, settings, landingContent, heroSlides, promoBanners, aboutValues, reviews }),
+      });
+      if (!contentPut.ok) {
+        const cBody = await contentPut.json().catch(() => ({}));
+        throw new Error(cBody.error || 'Speichern der Inhalte fehlgeschlagen.');
+      }
+
       const res = await fetch('/api/categories', { method: 'POST' });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.error || 'Veröffentlichung fehlgeschlagen.');
@@ -74,7 +87,11 @@ export default function BehandlungenPage() {
       const pcPubBody = await pcPub.json().catch(() => ({}));
       if (!pcPub.ok) throw new Error(pcPubBody.error || 'Veröffentlichung der Seiteninhalte fehlgeschlagen.');
 
-      setPublishMsg({ ok: true, text: 'Kategorien & Seiteninhalte sind jetzt live.' });
+      const contentPub = await fetch('/api/content', { method: 'POST' });
+      const contentPubBody = await contentPub.json().catch(() => ({}));
+      if (!contentPub.ok) throw new Error(contentPubBody.error || 'Veröffentlichung der Inhalte fehlgeschlagen.');
+
+      setPublishMsg({ ok: true, text: 'Alle Änderungen sind jetzt live.' });
     } catch (err) {
       setPublishMsg({ ok: false, text: err instanceof Error ? err.message : 'Veröffentlichung fehlgeschlagen.' });
     } finally {

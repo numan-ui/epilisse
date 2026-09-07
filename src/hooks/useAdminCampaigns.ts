@@ -1,9 +1,7 @@
 'use client';
-import { useState, useEffect } from 'react';
 import { INIT_CAMPAIGNS, type Campaign as AdminCampaign, type PageContent } from '@/app/[locale]/admin/behandlungen/data';
 import type { Campaign as FrontendCampaign } from '@/components/ServicePageTemplate';
-
-const LS_CMP = 'epilisse_admin_campaigns';
+import { useSiteContent } from '@/context/SiteContentContext';
 
 function toFrontend(c: AdminCampaign): FrontendCampaign {
   return {
@@ -19,22 +17,14 @@ function toFrontend(c: AdminCampaign): FrontendCampaign {
   };
 }
 
-/** All active campaigns for a category, in list order — the page decides how many get a full banner. */
+/**
+ * All active campaigns for a category, in list order. SSR-resolved from
+ * `site_content` via SiteContentProvider — used to be localStorage-only.
+ */
 export function useAdminCampaigns(catId: string): FrontendCampaign[] {
-  const initActive = (INIT_CAMPAIGNS[catId] ?? []).filter(c => c.active);
-  const [result, setResult] = useState<FrontendCampaign[]>(initActive.map(toFrontend));
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_CMP);
-      if (!raw) return;
-      const all: Record<string, AdminCampaign[]> = JSON.parse(raw);
-      const active = (all[catId] ?? []).filter(c => c.active);
-      setResult(active.map(toFrontend));
-    } catch { /* ignore */ }
-  }, [catId]);
-
-  return result;
+  const stored = useSiteContent().campaigns;
+  const list = stored?.[catId] ?? INIT_CAMPAIGNS[catId] ?? [];
+  return list.filter(c => c.active).map(toFrontend);
 }
 
 /** If the admin has added real campaigns, show those; otherwise fall back to the 2 fixed Seiteninhalt banners. */

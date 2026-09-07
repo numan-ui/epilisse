@@ -1,7 +1,8 @@
 /** Where the focal point of a banner image sits, so cropping (bg-cover) doesn't cut off the subject. */
 export type ImagePosition = 'top' | 'center' | 'bottom';
 
-export type Service  = { id: string; name: string; price: string; duration: string; active: boolean };
+/** oldPrice: optional pre-discount price. When set and non-empty, `price` is the discounted price and the public list shows an "AKTION" treatment (old price struck through, new price highlighted). */
+export type Service  = { id: string; name: string; price: string; duration: string; active: boolean; oldPrice?: string };
 export type Campaign = { id: string; label: string; title: string; desc: string; price: string; oldPrice?: string; cta: string; icon: string; image: string; imagePosition?: ImagePosition; active: boolean };
 export type Category = { id: string; icon: string; name: string; desc: string; visible: boolean; image: string; kicker: string };
 
@@ -201,6 +202,22 @@ export const INIT_REVIEWS: Review[] = [
   { id: 'rv7', name: 'Isabella', text: 'Es war eine richtig gute und gründliche Behandlung. Sehr einfühlsam, sympathisch und ich habe mich direkt wohlgefühlt. Es wurde mir ein gutes Gefühl vermittelt, ebenso wurde ich kompetent beraten für ggf. andere Behandlungen.', treatment: 'Damen Waxing – Bikini', active: true },
   { id: 'rv8', name: 'Katharina', text: 'Ich war inzwischen zweimal dort und bin super zufrieden. Waxing gründlich und die Behandlung sehr nett.', treatment: 'Damen Waxing – Bikini', active: true },
 ];
+
+/**
+ * The DB-backed CMS payload (everything except the category list and per-category
+ * Seiteninhalt, which have their own tables). Keyed exactly like the old
+ * localStorage keys. See supabase/migrations/0022_site_content.sql.
+ */
+export type SiteContent = {
+  services?: Record<string, Service[]>;
+  campaigns?: Record<string, Campaign[]>;
+  settings?: SiteSettings;
+  landingContent?: LandingContent;
+  heroSlides?: HeroSlide[];
+  promoBanners?: PromoBanner[];
+  aboutValues?: AboutValue[];
+  reviews?: Review[];
+};
 
 export const FRONTEND_SLUG: Record<string, string> = {
   laser:   'laser-haarentfernung',

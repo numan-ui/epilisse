@@ -1,8 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
 import { INIT_HERO_SLIDES, type HeroSlide } from '@/app/[locale]/admin/behandlungen/data';
-
-const LS_HERO = 'epilisse_admin_hero_slides';
+import { useSiteContent } from '@/context/SiteContentContext';
 
 /** Empty string in an admin field means "not set" — fall back to the default rather than rendering blank. */
 const str = (v: string | undefined, fallback: string) => (v && v.trim() !== '') ? v : fallback;
@@ -15,26 +13,19 @@ function mergeSlide(stored: HeroSlide, fallback?: HeroSlide): HeroSlide {
     headline: str(stored.headline, fallback.headline),
     sub:      str(stored.sub, fallback.sub),
     cta:      str(stored.cta, fallback.cta),
-    // '' is a valid, meaningful choice (booking modal) — only fall back when the field is missing entirely (pre-existing saved slides).
+    // '' is a valid, meaningful choice (booking modal) — only fall back when the field is missing entirely.
     ctaLink:  stored.ctaLink ?? fallback.ctaLink ?? '',
     image:    str(stored.image, fallback.image),
     duration,
   };
 }
 
-/** Returns hero slides, reading from localStorage (admin state), falling back to defaults when empty. */
+/**
+ * Hero slider slides for the homepage. SSR-resolved from `site_content` via
+ * SiteContentProvider — used to be localStorage-only.
+ */
 export function useAdminHeroSlides(): HeroSlide[] {
-  const [slides, setSlides] = useState<HeroSlide[]>(INIT_HERO_SLIDES);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_HERO);
-      if (!raw) return;
-      const stored: HeroSlide[] = JSON.parse(raw);
-      if (stored.length === 0) return;
-      setSlides(stored.map(s => mergeSlide(s, INIT_HERO_SLIDES.find(d => d.id === s.id))));
-    } catch { /* ignore */ }
-  }, []);
-
-  return slides;
+  const stored = useSiteContent().heroSlides;
+  if (!stored || stored.length === 0) return INIT_HERO_SLIDES;
+  return stored.map(s => mergeSlide(s, INIT_HERO_SLIDES.find(d => d.id === s.id)));
 }

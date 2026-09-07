@@ -8,6 +8,7 @@ import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useAdminServices } from "@/hooks/useAdminServices";
 import { useBookingModal } from "@/context/BookingModalContext";
 import { FRONTEND_SLUG } from "@/app/[locale]/admin/behandlungen/data";
+import { discountPct } from "@/lib/price";
 
 const LOCALES = [
   { code: "de", label: "DE" },
@@ -42,7 +43,7 @@ const FALLBACK_PRICING: Record<string, { name: string; duration: string; price: 
   ],
 };
 
-type PricingItem = { name: string; duration: string; price: string };
+type PricingItem = { name: string; duration: string; price: string; oldPrice?: string };
 type Cat = ReturnType<typeof useAdminCategories>[number];
 
 /** One category's price table. A component (not a per-category hook call in
@@ -78,15 +79,28 @@ function PricingSection({ cat, fallback }: { cat: Cat; fallback: PricingItem[] }
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-0">
-        {items.map((item, i) => (
+        {items.map((item, i) => {
+          const pct = discountPct(item.oldPrice, item.price);
+          return (
           <div
             key={i}
-            className="flex items-center justify-between py-6 border-b border-outline-variant hover:bg-surface/50 transition-colors px-4 group cursor-pointer"
+            className={`flex items-center justify-between py-6 border-b px-4 group cursor-pointer transition-colors ${
+              item.oldPrice
+                ? 'border-primary/20 bg-primary/[0.035] hover:bg-primary/[0.06]'
+                : 'border-outline-variant hover:bg-surface/50'
+            }`}
           >
-            <div className="flex flex-col">
-              <span className="font-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">
-                {item.name}
-              </span>
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="font-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">
+                  {item.name}
+                </span>
+                {item.oldPrice && (
+                  <span className="font-label-caps text-[10px] tracking-[0.18em] uppercase text-primary border border-primary/40 px-1.5 py-0.5 leading-none">
+                    Aktion{pct != null ? ` · −${pct} %` : ''}
+                  </span>
+                )}
+              </div>
               {item.duration && (
                 <span className="font-body-sm text-secondary">
                   Behandlungsdauer: ca. {item.duration}
@@ -94,15 +108,23 @@ function PricingSection({ cat, fallback }: { cat: Cat; fallback: PricingItem[] }
               )}
             </div>
             <div className="flex items-center gap-4 md:gap-6 shrink-0 ml-4">
-              <span className="font-display-lg text-headline-md text-primary whitespace-nowrap">
-                {item.price}
-              </span>
+              <div className="flex items-baseline gap-2 whitespace-nowrap">
+                {item.oldPrice && (
+                  <span className="font-body-md text-secondary/60 line-through decoration-1">
+                    {item.oldPrice}
+                  </span>
+                )}
+                <span className="font-display-lg text-headline-md text-primary">
+                  {item.price}
+                </span>
+              </div>
               <span className="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">
                 arrow_forward
               </span>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

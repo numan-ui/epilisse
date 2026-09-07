@@ -1,20 +1,12 @@
 'use client';
-import { useState, useEffect } from 'react';
 import { INIT_LANDING_CONTENT, type LandingContent } from '@/app/[locale]/admin/behandlungen/data';
+import { useSiteContent } from '@/context/SiteContentContext';
 
-const LS_LC = 'epilisse_admin_landing_content';
-
+/**
+ * Landing-page copy (nav labels, section titles, footer text). SSR-resolved
+ * from `site_content` via SiteContentProvider — used to be localStorage-only.
+ */
 export function useAdminLandingContent(): LandingContent {
-  const [content, setContent] = useState<LandingContent>(INIT_LANDING_CONTENT);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_LC);
-      if (!raw) return;
-      const stored: Partial<LandingContent> = JSON.parse(raw);
-      setContent(prev => ({ ...prev, ...stored }));
-    } catch { /* ignore */ }
-  }, []);
-
-  return content;
+  const stored = useSiteContent().landingContent;
+  return stored ? { ...INIT_LANDING_CONTENT, ...stored } : INIT_LANDING_CONTENT;
 }

@@ -7,12 +7,14 @@ import { routing } from "@/i18n/routing";
 import { BookingModalProvider } from "@/context/BookingModalContext";
 import { CategoriesProvider } from "@/context/CategoriesContext";
 import { PageContentProvider } from "@/context/PageContentContext";
+import { SiteContentProvider } from "@/context/SiteContentContext";
 import BookingModal from "@/components/BookingModal";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 import SmoothScroll from "@/components/SmoothScroll";
 import { SITE_URL, buildMetadata } from "@/lib/seo";
 import { getServerCategories } from "@/lib/content/categories";
 import { getServerPageContent } from "@/lib/content/pageContent";
+import { getServerSiteContent } from "@/lib/content/site";
 import { getServerTheme } from "@/lib/theme/server";
 import { deriveTokens } from "@/lib/theme/derive";
 import { themeVarsToCss } from "@/lib/theme/css";
@@ -98,8 +100,11 @@ export default async function LocaleLayout({
     ? null
     : themeVarsToCss(deriveTokens(theme).vars);
 
-  const categories = await getServerCategories();
-  const pageContent = await getServerPageContent();
+  const [categories, pageContent, siteContent] = await Promise.all([
+    getServerCategories(),
+    getServerPageContent(),
+    getServerSiteContent(),
+  ]);
 
   return (
     <html
@@ -130,10 +135,12 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <CategoriesProvider value={categories}>
             <PageContentProvider value={pageContent}>
-              <BookingModalProvider>
-                {children}
-                <BookingModal />
-              </BookingModalProvider>
+              <SiteContentProvider value={siteContent}>
+                <BookingModalProvider>
+                  {children}
+                  <BookingModal />
+                </BookingModalProvider>
+              </SiteContentProvider>
             </PageContentProvider>
           </CategoriesProvider>
         </NextIntlClientProvider>
