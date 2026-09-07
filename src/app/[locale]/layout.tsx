@@ -6,11 +6,13 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { BookingModalProvider } from "@/context/BookingModalContext";
 import { CategoriesProvider } from "@/context/CategoriesContext";
+import { PageContentProvider } from "@/context/PageContentContext";
 import BookingModal from "@/components/BookingModal";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 import SmoothScroll from "@/components/SmoothScroll";
 import { SITE_URL, buildMetadata } from "@/lib/seo";
 import { getServerCategories } from "@/lib/content/categories";
+import { getServerPageContent } from "@/lib/content/pageContent";
 import { getServerTheme } from "@/lib/theme/server";
 import { deriveTokens } from "@/lib/theme/derive";
 import { themeVarsToCss } from "@/lib/theme/css";
@@ -97,6 +99,7 @@ export default async function LocaleLayout({
     : themeVarsToCss(deriveTokens(theme).vars);
 
   const categories = await getServerCategories();
+  const pageContent = await getServerPageContent();
 
   return (
     <html
@@ -126,10 +129,12 @@ export default async function LocaleLayout({
         <SmoothScroll />
         <NextIntlClientProvider messages={messages}>
           <CategoriesProvider value={categories}>
-            <BookingModalProvider>
-              {children}
-              <BookingModal />
-            </BookingModalProvider>
+            <PageContentProvider value={pageContent}>
+              <BookingModalProvider>
+                {children}
+                <BookingModal />
+              </BookingModalProvider>
+            </PageContentProvider>
           </CategoriesProvider>
         </NextIntlClientProvider>
       </body>

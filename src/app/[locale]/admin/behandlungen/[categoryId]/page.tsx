@@ -63,7 +63,25 @@ export default function CategoryDetailPage() {
     setAddCmpOpen(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // The Seiteninhalt + category list both auto-mirror to their Supabase
+    // `draft` (debounced) via AdminDataContext; this button force-flushes now
+    // so "Gespeichert!" is truthful even right after an edit. Publishing to
+    // the live site is the separate "Veröffentlichen" button on the overview.
+    try {
+      await Promise.all([
+        fetch('/api/page-content', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(allPageContent),
+        }),
+        fetch('/api/categories', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(categories),
+        }),
+      ]);
+    } catch { /* best-effort — localStorage copy stays authoritative for the editor */ }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };

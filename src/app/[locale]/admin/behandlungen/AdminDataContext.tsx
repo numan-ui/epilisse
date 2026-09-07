@@ -114,6 +114,8 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   // the loaded categories value has actually committed, which would PUT fresh-mount
   // defaults into `draft` and clobber a real admin's saved list).
   const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+  // Same role as categoriesLoaded, for the page-content draft write-through below.
+  const [pageContentLoaded, setPageContentLoaded] = useState(false);
   const [settings,    setSettings]    = useState<SiteSettings>({ ...INIT_SETTINGS, hours: INIT_SETTINGS.hours.map(h => ({ ...h })) });
   const [landingContent, setLandingContent] = useState<LandingContent>({ ...INIT_LANDING_CONTENT });
   const [heroSlides, setHeroSlides]   = useState<HeroSlide[]>(INIT_HERO_SLIDES.map(s => ({ ...s })));
@@ -134,7 +136,6 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     const revs  = ls.read<Review[]>(LS_REVIEWS);
     if (svcs) setServices(svcs);
     if (cmps) setCampaigns(cmps);
-    if (pc)   setPageContent(pc);
     if (set)  setSettings(prev => ({ ...prev, ...set, hours: set.hours ?? prev.hours }));
     if (lc)   setLandingContent(prev => ({ ...prev, ...lc }));
     if (hero && hero.length > 0) setHeroSlides(hero);
@@ -177,6 +178,32 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         }
       })();
     }
+
+    // Page content — same draft-seeding logic as categories above. A browser
+    // with a local copy uses it; one without seeds from `draft` (the shared
+    // source of truth) rather than the 3 hardcoded INIT_PAGE_CONTENT defaults,
+    // so the write-through below can't overwrite the shared draft — and every
+    // admin-created category's Seiteninhalt — with those.
+    if (pc && Object.keys(pc).length > 0) {
+      setPageContent(pc);
+      setPageContentLoaded(true);
+    } else {
+      (async () => {
+        try {
+          const r = await fetch('/api/page-content?content=draft');
+          if (!r.ok) return; // auth/network failure — leave pageContentLoaded false
+          const res = (await r.json()) as { draft: PageContentMap | null };
+          if (res.draft && Object.keys(res.draft).length > 0) {
+            setPageContent(res.draft);
+            ls.write(LS_PC, res.draft);
+          }
+          setPageContentLoaded(true);
+        } catch {
+          // Network failure — leave pageContentLoaded false, disabling the
+          // write-through for this session rather than risking a clobber.
+        }
+      })();
+    }
   }, []);
 
   /* ── Categories draft write-through ───────────────────
@@ -200,12 +227,11 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   }, [categories, categoriesLoaded]);
 
   /* ── Page-content self-heal ───────────────────────────
-     pageContent lives in localStorage only (it is never mirrored to Supabase,
-     unlike the category list). On a browser that received a cat-* category from
-     the shared `draft` — or one whose LS_PC write was lost to a quota error —
-     the matching pageContent entry is missing, which used to hide the entire
-     "Seiteninhalt" editor for that category. Backfill a blank page for any
-     category without one so the editor always renders. */
+     On a browser that received a cat-* category from the shared `draft` — or
+     one whose LS_PC write was lost to a quota error — the matching pageContent
+     entry can be missing, which used to hide the entire "Seiteninhalt" editor
+     for that category. Backfill a blank page for any category without one so
+     the editor always renders. Runs once page content has loaded. */
   useEffect(() => {
     if (!categoriesLoaded) return;
     setPageContent(prev => {
@@ -216,7 +242,27 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       ls.write(LS_PC, next);
       return next;
     });
-  }, [categories, categoriesLoaded]);
+  }, [categories, categoriesLoaded, pageContentLoaded]);
+
+  /* ── Page-content draft write-through ─────────────────
+     Mirrors the category list one above: the admin's Seiteninhalt stays
+     localStorage-backed for the editing UX, but is also debounced-mirrored to
+     Supabase `site_page_content.draft` so the public service pages — SSR-fed
+     via getServerPageContent — can reflect it (locally with CONTENT_PREVIEW=1,
+     everywhere once "Veröffentlichen" publishes). Guarded on pageContentLoaded
+     so it never fires with the fresh-mount INIT_PAGE_CONTENT default before
+     the real value has loaded. */
+  useEffect(() => {
+    if (!pageContentLoaded) return;
+    const timer = setTimeout(() => {
+      fetch('/api/page-content', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pageContent),
+      }).catch(() => { /* best-effort — admin's localStorage copy stays the source of truth for the editing UI */ });
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [pageContent, pageContentLoaded]);
 
   /* ── Services ────────────────────────────────────── */
   const updateService = useCallback((catId: string, id: string, field: keyof Service, value: string | boolean) =>

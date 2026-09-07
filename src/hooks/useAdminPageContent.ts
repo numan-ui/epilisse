@@ -1,8 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
 import { INIT_PAGE_CONTENT, type PageContent, type PageBanner } from '@/app/[locale]/admin/behandlungen/data';
-
-const LS_PC = 'epilisse_admin_page_content';
+import { usePageContentFromServer } from '@/context/PageContentContext';
 
 /** Empty string in an admin field means "not set" — fall back to the default rather than rendering blank. */
 const str = (v: string | undefined, fallback: string) => (v && v.trim() !== '') ? v : fallback;
@@ -40,18 +38,17 @@ function mergeContent(stored: PageContent, fallback: PageContent): PageContent {
   };
 }
 
+/**
+ * Public-facing page content for a category. Used to be localStorage-only
+ * (per-browser, never reached production — see memory:
+ * project_categories_db_migration_2026-09-04). Now SSR-resolved from
+ * `site_page_content` (draft/published, see getServerPageContent) and handed
+ * down via PageContentProvider in the locale layout. The admin's own editor
+ * still reads/writes localStorage for its live-editing UX (AdminDataContext).
+ */
 export function useAdminPageContent(catId: string): PageContent {
   const fallback = INIT_PAGE_CONTENT[catId];
-  const [content, setContent] = useState<PageContent>(fallback);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_PC);
-      if (!raw) return;
-      const all: Record<string, PageContent> = JSON.parse(raw);
-      if (all[catId]) setContent(mergeContent(all[catId], fallback));
-    } catch { /* ignore */ }
-  }, [catId, fallback]);
-
-  return content;
+  const fromServer = usePageContentFromServer();
+  const stored = fromServer?.[catId];
+  return stored ? mergeContent(stored, fallback) : fallback;
 }
