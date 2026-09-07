@@ -195,6 +195,33 @@ Datumstext (immer, wenn Datum gesetzt): `"Gültig 01.09.–30.09.2026"` /
 - `src/app/[locale]/sitemap.ts` um `/aktionen` erweitern; einfache
   `metadata` (Title/Description) auf der Seite.
 
+## Homepage-Banner Redesign (kompakter + ästhetischer)
+
+Der bestehende Full-Width-Banner (`page.tsx`, `min-h-[400px]`) hat viel
+vertikalen Leerraum und ein generisches Stockfoto. Das Layout-Prinzip
+(Text links, Bild rechts) bleibt, aber:
+
+- **Höhe ~halbieren:** Zielhöhe ~200px (statt `min-h-[400px]`), Inhalt
+  vertikal zentriert. Bei mehreren Bannern kleinerer vertikaler Abstand.
+- **Panel-Kontrast:** Textpanel bekommt eine eigene Flächenfarbe
+  (`surface-container` o. ä.) + feiner Rand/Schatten, damit die Karte auf
+  dem Seitenhintergrund „schwebt".
+- **Kompakte Textspalte:** Label (klein, tracking) · Titel (Serif-Display,
+  kleinere Stufe als heute, max. 2 Zeilen) · Beschreibung auf 1 kurze Zeile
+  gekürzt oder auf dem Banner weggelassen · **Aktionspreis-Pill inline**
+  (alter Preis durchgestrichen + neuer Preis hervorgehoben) direkt neben der
+  CTA · **eine** primäre CTA + optionaler Sekundär-Textlink statt zweitem
+  Outline-Button.
+- **Countdown-Badge:** kleiner Chip oben rechts in der Karte
+  (`countdownLabel`), nur wenn ≤ 10 Tage.
+- **Bild:** rechte ~40 %, full-bleed, `imagePosition`-Crop; Redaktionshinweis
+  im Admin, behandlungsnahe Motive statt generischer Stockbilder zu wählen.
+- Mobile: Bild oben (kurz, ~120px) oder ausgeblendet, Text darunter, gleiche
+  Kompaktheit.
+
+Die Kategorieseiten-Karten (`ServicePageTemplate`) behalten ihr aktuelles
+Kartendesign; nur Datumstext + Countdown-Badge kommen dort hinzu.
+
 ## Testing
 
 Neuer E2E-Spec `tests/e2e/admin-aktionen-crud.spec.ts` (ersetzt
@@ -228,7 +255,8 @@ anpassen.
   `useAdminPromoBanners.ts` entfernen/umleiten.
 - `src/lib/aktion.ts` — `countdownLabel` + Datumstext-Formatierung.
 - `src/app/[locale]/page.tsx` — Banner-Sektion auf `useAktionen` umstellen,
-  Preis/Datum/Countdown ergänzen; Nav-Link.
+  Preis/Datum/Countdown ergänzen; Banner-Redesign (kompakt, ~200px, Panel-
+  Kontrast, inline Aktionspreis-Pill); Nav-Link.
 - `src/components/ServicePageTemplate.tsx` — Karten auf `useAktionen` umstellen,
   Datum/Countdown ergänzen; Nav-Link.
 - `src/app/[locale]/aktionen/page.tsx` — neu.
