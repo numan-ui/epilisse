@@ -40,6 +40,22 @@ const defaultCampaigns   = (): CampaignsMap    =>
 const defaultPageContent = (): PageContentMap  =>
   Object.fromEntries(Object.entries(INIT_PAGE_CONTENT).map(([k, v]) => [k, { ...v, infoParagraphs: [...v.infoParagraphs] as [string, string], benefits: [...v.benefits], campaign1: { ...v.campaign1 }, campaign2: { ...v.campaign2 } }]));
 
+const emptyPageBanner = (): PageBanner => ({ label: '', title: '', body: '', cta: 'JETZT BUCHEN', icon: 'auto_fix_high', image: '' });
+
+/** A blank page for a category that has no stored/seeded page content (e.g. a cat-* category pulled from the shared draft on a browser that never created it locally). */
+const blankPageContent = (cat: Pick<Category, 'name' | 'desc'>): PageContent => ({
+  label: cat.desc || cat.name,
+  h1: cat.name,
+  heroDesc: cat.desc || '',
+  heroImage: '',
+  infoTitle: cat.name,
+  infoParagraphs: ['', ''],
+  benefitsTitle: 'Ihre Vorteile',
+  benefits: [],
+  campaign1: emptyPageBanner(),
+  campaign2: emptyPageBanner(),
+});
+
 interface AdminDataCtx {
   services:  ServicesMap;
   campaigns: CampaignsMap;
@@ -183,6 +199,25 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(timer);
   }, [categories, categoriesLoaded]);
 
+  /* ── Page-content self-heal ───────────────────────────
+     pageContent lives in localStorage only (it is never mirrored to Supabase,
+     unlike the category list). On a browser that received a cat-* category from
+     the shared `draft` — or one whose LS_PC write was lost to a quota error —
+     the matching pageContent entry is missing, which used to hide the entire
+     "Seiteninhalt" editor for that category. Backfill a blank page for any
+     category without one so the editor always renders. */
+  useEffect(() => {
+    if (!categoriesLoaded) return;
+    setPageContent(prev => {
+      const missing = categories.filter(c => !prev[c.id]);
+      if (missing.length === 0) return prev;
+      const next = { ...prev };
+      for (const c of missing) next[c.id] = blankPageContent(c);
+      ls.write(LS_PC, next);
+      return next;
+    });
+  }, [categories, categoriesLoaded]);
+
   /* ── Services ────────────────────────────────────── */
   const updateService = useCallback((catId: string, id: string, field: keyof Service, value: string | boolean) =>
     setServices(prev => {
@@ -224,10 +259,11 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   /* ── Page content ────────────────────────────────── */
   const _pcUpdate = useCallback((catId: string, updater: (pc: PageContent) => PageContent) =>
     setPageContent(prev => {
-      const current = prev[catId] ?? INIT_PAGE_CONTENT[catId];
+      const current = prev[catId] ?? INIT_PAGE_CONTENT[catId]
+        ?? blankPageContent(categories.find(c => c.id === catId) ?? { name: '', desc: '' });
       const next = { ...prev, [catId]: updater(current) };
       ls.write(LS_PC, next); return next;
-    }), []);
+    }), [categories]);
 
   const updatePageField = useCallback((catId: string, field: keyof Omit<PageContent, 'infoParagraphs' | 'benefits' | 'campaign1' | 'campaign2'>, value: string) =>
     _pcUpdate(catId, pc => ({ ...pc, [field]: value })), [_pcUpdate]);

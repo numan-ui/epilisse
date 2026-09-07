@@ -488,7 +488,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════════════ */}
       <section
         id="behandlungen"
-        className="py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
+        className="pt-20 pb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
       >
         {/* Section header */}
         <motion.div
@@ -496,7 +496,7 @@ export default function HomePage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="text-center mb-20"
+          className="text-center mb-12"
         >
           <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-3">
             {lc.servicesSectionLabel || t("services.sectionLabel")}
