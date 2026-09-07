@@ -169,12 +169,18 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
       <main className="mt-[73px]">
 
         {/* ── HERO ─────────────────────────────────────────────────────── */}
-        <section className="relative w-full h-[440px] md:h-[620px] overflow-hidden">
+        {/* Curated /images heroes are cropped to fill (object-cover). An admin-
+            uploaded hero (base64 data URL) is shown whole (object-contain) on a
+            dark ground so nothing important gets cropped off. */}
+        {(() => {
+          const heroUploaded = !!data.heroImage && !data.heroImage.startsWith("/");
+          return (
+        <section className={`relative w-full h-[440px] md:h-[620px] overflow-hidden ${heroUploaded ? "bg-[#2a2320]" : ""}`}>
           <div className="absolute inset-0 z-0">
             <SmartImage
               src={data.heroImage}
               alt={data.h1}
-              className="object-cover"
+              className={heroUploaded ? "object-contain" : "object-cover"}
               sizes="100vw"
               priority
             />
@@ -192,6 +198,8 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
             </div>
           </div>
         </section>
+          );
+        })()}
 
         {/* ── INFO & BENEFITS ──────────────────────────────────────────── */}
         <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
