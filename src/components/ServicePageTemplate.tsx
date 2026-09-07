@@ -192,8 +192,6 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
             </div>
           </div>
         </section>
-          );
-        })()}
 
         {/* ── INFO & BENEFITS ──────────────────────────────────────────── */}
         <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
