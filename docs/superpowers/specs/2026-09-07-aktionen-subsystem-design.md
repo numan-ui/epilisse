@@ -198,26 +198,36 @@ Datumstext (immer, wenn Datum gesetzt): `"Gültig 01.09.–30.09.2026"` /
 ## Homepage-Banner Redesign (kompakter + ästhetischer)
 
 Der bestehende Full-Width-Banner (`page.tsx`, `min-h-[400px]`) hat viel
-vertikalen Leerraum und ein generisches Stockfoto. Das Layout-Prinzip
-(Text links, Bild rechts) bleibt, aber:
+vertikalen Leerraum und ein generisches Stockfoto. Gewählte Variante:
+**"Editorial Split"** — das heutige Prinzip (Text links, Bild rechts) bleibt,
+aber halbhoch und aufgeräumt:
 
-- **Höhe ~halbieren:** Zielhöhe ~200px (statt `min-h-[400px]`), Inhalt
-  vertikal zentriert. Bei mehreren Bannern kleinerer vertikaler Abstand.
-- **Panel-Kontrast:** Textpanel bekommt eine eigene Flächenfarbe
-  (`surface-container` o. ä.) + feiner Rand/Schatten, damit die Karte auf
-  dem Seitenhintergrund „schwebt".
-- **Kompakte Textspalte:** Label (klein, tracking) · Titel (Serif-Display,
-  kleinere Stufe als heute, max. 2 Zeilen) · Beschreibung auf 1 kurze Zeile
-  gekürzt oder auf dem Banner weggelassen · **Aktionspreis-Pill inline**
-  (alter Preis durchgestrichen + neuer Preis hervorgehoben) direkt neben der
-  CTA · **eine** primäre CTA + optionaler Sekundär-Textlink statt zweitem
-  Outline-Button.
-- **Countdown-Badge:** kleiner Chip oben rechts in der Karte
-  (`countdownLabel`), nur wenn ≤ 10 Tage.
-- **Bild:** rechte ~40 %, full-bleed, `imagePosition`-Crop; Redaktionshinweis
-  im Admin, behandlungsnahe Motive statt generischer Stockbilder zu wählen.
-- Mobile: Bild oben (kurz, ~120px) oder ausgeblendet, Text darunter, gleiche
-  Kompaktheit.
+- **Höhe: fix ~200px** (statt `min-h-[400px]`), Inhalt vertikal zentriert.
+  Mehrere Banner untereinander mit kleinerem vertikalem Abstand.
+- **Grid:** Textspalte : Bild = `1.5fr : 1fr` (≈ 60 / 40). Bild rechts
+  full-bleed, `imagePosition`-Crop.
+- **Panel:** eigene Fläche (`surface-container` /
+  `--color-surface-container`), 1px `outline-variant`-Rand, weicher Schatten
+  → Karte „schwebt". `3px`-Kante links in `primary`.
+- **Textspalte, vertikal zentriert, in dieser Reihenfolge:**
+  1. Label (11px, `tracking` ~.24em, uppercase, `primary`)
+  2. Titel (Playfair Display, ~23px, max. 2 Zeilen, `text-wrap: balance`)
+  3. Beschreibung — **eine** kurze Zeile (`text-body-sm`, `secondary`)
+  4. **`Gültig bis TT.MM.JJJJ`** (bzw. Zeitraum) — eigene Zeile, ~11.5px,
+     `muted` — **kommt VOR** der Preis/CTA-Zeile
+  5. Fußzeile (eine Reihe, `flex-wrap`): **Aktionspreis-Pill inline**
+     (alter Preis durchgestrichen ~14px `muted` + neuer Preis ~22px `bold`
+     `primary`/`rose-deep`) · **eine** primäre CTA (`--radius-cta` 8px)
+- **Countdown-Chip:** absolut oben rechts in der Karte, nur wenn
+  `countdownLabel(endDate)` ≠ null (≤ 10 Tage). Pill: `primary`-Text auf
+  `primary`/12%-Fläche, `primary`/22%-Rand.
+- Ohne `oldPrice`: nur `price` (kein Strich, kein Pill-Kontrast). Ohne
+  `price`: Preisblock entfällt, CTA rückt vor. Ohne Datum: Zeile 4 entfällt.
+- **Mobile (`max-width: 720px`):** eine Spalte, Bild zuerst (`order: -1`,
+  ~110px hoch), Text darunter, gleiche Reihenfolge.
+- Referenz-Mockup: Artifact
+  `https://claude.ai/code/artifact/67e59a66-bd73-4933-845e-89afc4aa5425`
+  (Variante A).
 
 Die Kategorieseiten-Karten (`ServicePageTemplate`) behalten ihr aktuelles
 Kartendesign; nur Datumstext + Countdown-Badge kommen dort hinzu.
