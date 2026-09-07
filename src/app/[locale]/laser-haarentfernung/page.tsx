@@ -2,7 +2,7 @@
 import ServicePageTemplate from "@/components/ServicePageTemplate";
 import { useAdminServices } from "@/hooks/useAdminServices";
 import { useAdminPageContent } from "@/hooks/useAdminPageContent";
-import { useAdminCampaigns, resolveCampaigns } from "@/hooks/useAdminCampaigns";
+import { useCategoryCampaigns, resolveCampaigns } from "@/hooks/useAktionen";
 import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useParams } from "next/navigation";
 
@@ -19,7 +19,7 @@ export default function LaserPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'de';
   const pageContent  = useAdminPageContent('laser');
-  const adminCamps   = useAdminCampaigns('laser');
+  const adminCamps   = useCategoryCampaigns('laser');
   const categories   = useAdminCategories();
   const pricingItems = useAdminServices('laser', FALLBACK_PRICING);
   return (

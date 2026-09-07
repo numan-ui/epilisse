@@ -28,6 +28,8 @@ export interface Campaign {
   imagePosition?: "top" | "center" | "bottom";
   price?: string;
   oldPrice?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface ServicePageData {

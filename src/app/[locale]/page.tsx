@@ -10,7 +10,8 @@ import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useAdminHeroSlides } from "@/hooks/useAdminHeroSlides";
-import { useAdminPromoBanners } from "@/hooks/useAdminPromoBanners";
+import { useAktionen, homeAktionen } from "@/hooks/useAktionen";
+import { countdownLabel, validityText } from "@/lib/aktion";
 import { useAdminAboutValues } from "@/hooks/useAdminAboutValues";
 import { useBookingModal } from "@/context/BookingModalContext";
 import SmartImage from "@/components/SmartImage";
@@ -87,7 +88,7 @@ export default function HomePage() {
   const categories = useAdminCategories();
   const lc         = useAdminLandingContent();
   const heroSlides = useAdminHeroSlides();
-  const promoBanners = useAdminPromoBanners();
+  const banners = homeAktionen(useAktionen());
   const aboutValues = useAdminAboutValues();
   const booking = useBookingModal();
 
@@ -216,6 +217,9 @@ export default function HomePage() {
           <Link href="/preise" className="font-label-caps text-label-caps font-semibold text-on-surface-variant hover:text-primary transition-colors duration-300">
             {lc.navPreise || t("nav.preise")}
           </Link>
+          <Link href="/aktionen" className="font-label-caps text-label-caps font-semibold text-on-surface-variant hover:text-primary transition-colors duration-300">
+            {lc.navAktionen || t("nav.aktionen")}
+          </Link>
           <Link href="/ueber-uns" className="font-label-caps text-label-caps font-semibold text-on-surface-variant hover:text-primary transition-colors duration-300">
             {lc.navUeberUns || t("nav.ueberUns")}
           </Link>
@@ -270,6 +274,7 @@ export default function HomePage() {
           {[
             { href: "/behandlungen", label: lc.navBehandlungen || t("nav.behandlungen"), internal: true },
             { href: "/preise", label: lc.navPreise || t("nav.preise"), internal: true },
+            { href: "/aktionen", label: lc.navAktionen || t("nav.aktionen"), internal: true },
             { href: "/ueber-uns", label: lc.navUeberUns || t("nav.ueberUns"), internal: true },
             { href: "#kontakt", label: lc.navKontakt || t("nav.kontakt"), internal: false },
           ].map((item) =>
@@ -559,69 +564,80 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════
-          PROMO — Kombi-Paket campaign section
+          PROMO — Aktion / Kombi-Paket (Editorial Split, ~200px)
       ══════════════════════════════════════════════════════ */}
       <section
         id="preise"
-        className="mb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto space-y-8"
+        className="mb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto space-y-6"
       >
-        {promoBanners.map((banner) => (
-          <motion.div
-            key={banner.id}
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="bento-card relative w-full min-h-[400px] overflow-hidden group border border-outline-variant/30"
-          >
-            <div className="absolute inset-0 bg-secondary-container/30 z-10" />
-            <div className="absolute inset-0 flex flex-col md:flex-row items-center justify-between z-20 px-8 md:px-24">
-              {/* Text */}
-              <div className="text-center md:text-left max-w-xl py-12 md:py-16">
-                <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] mb-4 block">
-                  {banner.label}
+        {banners.map((b) => {
+          const badge = countdownLabel(b.endDate);
+          const valid = validityText(b.startDate, b.endDate);
+          return (
+            <motion.div
+              key={b.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="relative grid md:grid-cols-[1.5fr_1fr] min-h-[200px] overflow-hidden rounded-[14px] border border-outline-variant/40 bg-surface-container shadow-[0_18px_40px_-24px_rgba(80,30,45,0.35)]"
+            >
+              {badge && (
+                <span className="absolute top-3.5 right-4 z-20 inline-flex items-center gap-1 font-label-caps text-[10px] tracking-wide text-primary bg-primary/12 border border-primary/25 rounded-full px-2.5 py-1">
+                  <span className="material-symbols-outlined text-[13px]">schedule</span>{badge}
                 </span>
-                <h2 className="font-display-lg text-display-lg font-bold text-on-surface mb-6 leading-tight whitespace-pre-line">
-                  {banner.title}
+              )}
+
+              {/* Text */}
+              <div className="flex flex-col justify-center gap-2 border-l-[3px] border-primary px-7 py-6 md:px-9 order-2 md:order-1">
+                <span className="font-label-caps text-label-caps text-primary tracking-[0.22em]">
+                  {b.label || "Exklusives Angebot"}
+                </span>
+                <h2 className="font-display-lg text-[22px] md:text-[24px] leading-tight text-on-surface text-balance whitespace-pre-line max-w-[22ch]">
+                  {b.title}
                 </h2>
-                <p className="font-body-md text-body-md text-secondary mb-8 max-w-md">
-                  {banner.desc}
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4">
+                {b.desc && (
+                  <p className="font-body-sm text-body-sm text-secondary max-w-[46ch] line-clamp-1">{b.desc}</p>
+                )}
+                {valid && (
+                  <span className="font-body-sm text-[11.5px] text-on-surface-variant opacity-80">{valid}</span>
+                )}
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-1">
+                  {b.price && (
+                    <span className="flex items-baseline gap-2">
+                      {b.oldPrice && (
+                        <span className="font-body-sm text-[14px] text-on-surface-variant line-through">{b.oldPrice}</span>
+                      )}
+                      <span className="font-body-lg text-[22px] font-bold text-primary">{b.price}</span>
+                    </span>
+                  )}
                   <button
                     type="button"
                     onClick={() => booking.open()}
-                    className="bg-primary text-on-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all text-center rounded-[var(--radius-cta)]"
+                    className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all rounded-[var(--radius-cta)]"
                   >
-                    {banner.ctaPrimary}
+                    {b.cta || "Angebot sichern"}
                   </button>
-                  {banner.ctaSecondary && (
-                    <a
-                      href="#behandlungen"
-                      className="border border-primary text-primary px-8 py-4 font-label-caps text-label-caps tracking-widest hover:bg-primary/5 transition-all text-center rounded-[var(--radius-cta)]"
-                    >
-                      {banner.ctaSecondary}
-                    </a>
-                  )}
                 </div>
               </div>
 
               {/* Image */}
-              <div className="hidden md:block w-[380px] h-[400px] relative overflow-hidden flex-shrink-0">
-                <div className="absolute inset-0 shadow-2xl" style={{ background: 'linear-gradient(135deg, var(--color-surface-container-low), var(--color-secondary-container))' }} />
-                {banner.image && (
+              <div className="relative min-h-[120px] md:min-h-full overflow-hidden order-1 md:order-2 bg-secondary-container/40">
+                {b.image && (
                   <SmartImage
-                    src={banner.image}
-                    alt={banner.title}
+                    src={b.image}
+                    alt={b.title}
                     onError={e => { e.currentTarget.style.display = 'none'; }}
-                    className="brand-photo object-cover shadow-2xl scale-110 group-hover:scale-100 transition-transform duration-1000"
-                    sizes="380px"
+                    className={`brand-photo object-cover w-full h-full ${
+                      b.imagePosition === 'bottom' ? 'object-bottom' : b.imagePosition === 'center' ? 'object-center' : 'object-top'
+                    }`}
+                    sizes="(min-width:768px) 40vw, 100vw"
                   />
                 )}
               </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          );
+        })}
       </section>
 
       {/* ══════════════════════════════════════════════════════
@@ -831,6 +847,7 @@ export default function HomePage() {
             </h4>
             <ul className="flex flex-col gap-4 font-body-sm text-body-sm text-secondary">
               {[
+                { key: 'aktionen', name: lc.navAktionen || t("nav.aktionen"), href: '/aktionen' },
                 ...CORE_CAT_ORDER.filter(isVisible).map(id => ({ key: id, name: getCatName(id), href: CORE_CAT_HREF[id] })),
                 ...customCats.map(cat => ({ key: cat.id, name: cat.name, href: `/${FRONTEND_SLUG[cat.id] ?? cat.id}` })),
               ].map((item) => (
