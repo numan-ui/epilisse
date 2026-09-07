@@ -391,7 +391,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
       </main>
 
       {/* ── FOOTER ───────────────────────────────────────────────────────── */}
-      <footer className="bg-surface-container-highest w-full px-margin-mobile md:px-margin-desktop py-section-gap grid grid-cols-1 md:grid-cols-4 gap-gutter border-t border-outline-variant">
+      <footer className="bg-surface-container-highest w-full px-margin-mobile md:px-margin-desktop pt-10 md:pt-12 pb-16 md:pb-20 grid grid-cols-1 md:grid-cols-4 gap-gutter border-t border-outline-variant">
         <div>
           <Link href="/" className="font-display-lg text-[26px] text-primary tracking-wide font-bold mb-6 block">
             {settings.name}

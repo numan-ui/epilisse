@@ -488,7 +488,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════════════ */}
       <section
         id="behandlungen"
-        className="pt-20 pb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
+        className="pt-20 pb-16 md:pb-20 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
       >
         {/* Section header */}
         <motion.div
@@ -563,7 +563,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════════════ */}
       <section
         id="preise"
-        className="mb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto space-y-8"
+        className="mb-16 md:mb-20 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto space-y-8"
       >
         {promoBanners.map((banner) => (
           <motion.div
@@ -629,7 +629,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════════════ */}
       <section
         id="uber-uns"
-        className="py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
+        className="py-16 md:py-20 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
       >
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -691,14 +691,14 @@ export default function HomePage() {
       ══════════════════════════════════════════════════════ */}
       <section
         id="kontakt"
-        className="py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
+        className="pt-16 md:pt-20 pb-10 md:pb-12 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
       >
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="flex flex-col items-center mb-20"
+          className="flex flex-col items-center mb-12"
         >
           <div className="flex items-center gap-3 mb-4">
             <span className="w-2.5 h-2.5 rounded-full bg-primary" />
@@ -796,7 +796,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════════════
           FOOTER
       ══════════════════════════════════════════════════════ */}
-      <footer className="bg-surface-container-highest border-t border-outline-variant w-full px-margin-mobile md:px-margin-desktop py-section-gap">
+      <footer className="bg-surface-container-highest border-t border-outline-variant w-full px-margin-mobile md:px-margin-desktop pt-10 md:pt-12 pb-16 md:pb-20">
         <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-gutter">
 
           {/* Brand col */}
