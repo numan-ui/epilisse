@@ -488,7 +488,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════════════ */}
       <section
         id="behandlungen"
-        className="pt-20 pb-16 md:pb-20 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
+        className="py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
       >
         {/* Section header */}
         <motion.div
@@ -563,7 +563,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════════════ */}
       <section
         id="preise"
-        className="mb-16 md:mb-20 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto space-y-8"
+        className="mb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto space-y-8"
       >
         {promoBanners.map((banner) => (
           <motion.div
@@ -629,7 +629,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════════════ */}
       <section
         id="uber-uns"
-        className="py-16 md:py-20 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
+        className="py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
       >
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -691,7 +691,7 @@ export default function HomePage() {
       ══════════════════════════════════════════════════════ */}
       <section
         id="kontakt"
-        className="pt-16 md:pt-20 pb-10 md:pb-12 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
+        className="py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
       >
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -796,7 +796,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════════════
           FOOTER
       ══════════════════════════════════════════════════════ */}
-      <footer className="bg-surface-container-highest border-t border-outline-variant w-full px-margin-mobile md:px-margin-desktop pt-10 md:pt-12 pb-16 md:pb-20">
+      <footer className="bg-surface-container-highest border-t border-outline-variant w-full px-margin-mobile md:px-margin-desktop pt-12 pb-16">
         <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-gutter">
 
           {/* Brand col */}

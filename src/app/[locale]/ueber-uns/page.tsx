@@ -176,7 +176,7 @@ export default function UeberUnsPage() {
 
       {/* ── BEWERTUNGEN — Real Treatwell reviews ────────────────────────── */}
       <section className="pb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-3">
             {t("reviews.sectionLabel")}
           </span>
@@ -240,7 +240,7 @@ export default function UeberUnsPage() {
       </section>
 
       {/* ── FOOTER ───────────────────────────────────────────────────────── */}
-      <footer className="bg-surface-container-highest border-t border-outline-variant w-full px-margin-mobile md:px-margin-desktop py-12">
+      <footer className="bg-surface-container-highest border-t border-outline-variant w-full px-margin-mobile md:px-margin-desktop pt-12 pb-16">
         <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <Link href="/" className="font-display-lg text-headline-md tracking-widest text-primary">
             {settings.name}

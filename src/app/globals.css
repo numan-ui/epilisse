@@ -101,7 +101,7 @@
   /* ── Spacing ────────────────────────────────────────────── */
   --spacing-margin-mobile: 16px;
   --spacing-margin-desktop: 64px;
-  --spacing-section-gap: 128px;
+  --spacing-section-gap: 64px;
   --spacing-gutter: 24px;
 
   /* ── Width ──────────────────────────────────────────────── */

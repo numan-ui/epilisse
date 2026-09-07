@@ -194,7 +194,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
         </section>
 
         {/* ── INFO & BENEFITS ──────────────────────────────────────────── */}
-        <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pt-8 md:pt-10 pb-12 md:pb-16">
+        <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter">
             <div className="md:col-span-7 flex flex-col justify-center">
               <h2 className="font-headline-lg text-headline-lg text-primary mb-8">{data.infoTitle}</h2>
@@ -219,9 +219,9 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
         </section>
 
         {/* ── PRICING ──────────────────────────────────────────────────── */}
-        <section className="bg-surface-container-lowest py-12 md:py-16">
+        <section className="bg-surface-container-lowest py-section-gap">
           <div className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
-            <div className="text-center mb-10">
+            <div className="text-center mb-12">
               <span className="font-label-caps text-label-caps text-primary tracking-widest uppercase">
                 {data.pricingLabel}
               </span>
@@ -269,7 +269,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
 
         {/* ── CAMPAIGN BANNERS ─────────────────────────────────────────── */}
         {resolvedBanners.length > 0 && (
-          <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop my-12 md:my-16 space-y-8">
+          <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop my-section-gap space-y-8">
             {resolvedBanners.map((banner, i) => {
               const imageLeft = i % 2 === 1; // alternate sides: 1st image-right, 2nd image-left, ...
               const dark = i % 2 === 0;
@@ -356,8 +356,8 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
 
         {/* ── WEITERE ANGEBOTE (campaigns beyond the first 2, image-free) ──── */}
         {moreOffers.length > 0 && (
-          <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop my-12 md:my-16">
-            <h3 className="font-headline-sm text-headline-sm text-primary text-center mb-10">Weitere Angebote</h3>
+          <section className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop my-section-gap">
+            <h3 className="font-headline-sm text-headline-sm text-primary text-center mb-12">Weitere Angebote</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {moreOffers.map((offer, i) => (
                 <div
@@ -391,7 +391,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
       </main>
 
       {/* ── FOOTER ───────────────────────────────────────────────────────── */}
-      <footer className="bg-surface-container-highest w-full px-margin-mobile md:px-margin-desktop pt-10 md:pt-12 pb-16 md:pb-20 grid grid-cols-1 md:grid-cols-4 gap-gutter border-t border-outline-variant">
+      <footer className="bg-surface-container-highest w-full px-margin-mobile md:px-margin-desktop pt-12 pb-16 grid grid-cols-1 md:grid-cols-4 gap-gutter border-t border-outline-variant">
         <div>
           <Link href="/" className="font-display-lg text-[26px] text-primary tracking-wide font-bold mb-6 block">
             {settings.name}
