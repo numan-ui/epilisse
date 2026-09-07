@@ -31,7 +31,8 @@ export default function CategoryDetailPage() {
   const campaigns  = allCampaigns[catId]  ?? [];
   const pc         = allPageContent[catId];
 
-  const [saved, setSaved]         = useState(false);
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'ok' | 'error'>('idle');
+  const [saveErr, setSaveErr]     = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [addSvcOpen, setAddSvcOpen] = useState(false);
   const [addCmpOpen, setAddCmpOpen] = useState(false);
@@ -65,34 +66,33 @@ export default function CategoryDetailPage() {
   };
 
   const handleSave = async () => {
-    // The Seiteninhalt + category list both auto-mirror to their Supabase
-    // `draft` (debounced) via AdminDataContext; this button force-flushes now
-    // so "Gespeichert!" is truthful even right after an edit. Publishing to
-    // the live site is the separate "Veröffentlichen" button on the overview.
+    // Force-flushes all three drafts now (they also auto-mirror, debounced, via
+    // AdminDataContext). This only writes the DRAFT — the live site changes
+    // only when "Veröffentlichen" (overview page) copies draft → published.
+    setSaveState('saving');
+    setSaveErr('');
+    const put = (url: string, body: unknown) =>
+      fetch(url, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     try {
-      await Promise.all([
-        fetch('/api/page-content', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(allPageContent),
-        }),
-        fetch('/api/categories', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(categories),
-        }),
-        fetch('/api/content', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            services: allServices, campaigns: allCampaigns, settings, landingContent,
-            heroSlides, promoBanners, aboutValues, reviews,
-          }),
+      const [pc, cat, content] = await Promise.all([
+        put('/api/page-content', allPageContent),
+        put('/api/categories', categories),
+        put('/api/content', {
+          services: allServices, campaigns: allCampaigns, settings, landingContent,
+          heroSlides, promoBanners, aboutValues, reviews,
         }),
       ]);
-    } catch { /* best-effort — localStorage copy stays authoritative for the editor */ }
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+      const bad = [pc, cat, content].find(r => !r.ok);
+      if (bad) {
+        const j = await bad.json().catch(() => ({}));
+        throw new Error(j.error || `Speichern fehlgeschlagen (HTTP ${bad.status}).`);
+      }
+      setSaveState('ok');
+      setTimeout(() => setSaveState('idle'), 2500);
+    } catch (e) {
+      setSaveState('error');
+      setSaveErr(e instanceof Error ? e.message : 'Speichern fehlgeschlagen.');
+    }
   };
 
   const handleDeleteCategory = () => {
@@ -182,15 +182,28 @@ export default function CategoryDetailPage() {
               </button>
             )
           )}
-          <button
-            onClick={handleSave}
-            className={`flex items-center gap-2 py-2.5 px-5 font-label-caps text-label-caps transition-all ${
-              saved ? 'bg-green-600 text-white' : 'bg-primary text-on-primary hover:brightness-110'
-            }`}
-          >
-            <span className="material-symbols-outlined text-[16px]">{saved ? 'check' : 'save'}</span>
-            {saved ? 'Gespeichert!' : 'Speichern'}
-          </button>
+          <div className="flex flex-col items-end gap-1">
+            <button
+              onClick={handleSave}
+              disabled={saveState === 'saving'}
+              className={`flex items-center gap-2 py-2.5 px-5 font-label-caps text-label-caps transition-all disabled:opacity-60 ${
+                saveState === 'ok' ? 'bg-green-600 text-white'
+                : saveState === 'error' ? 'bg-error text-white'
+                : 'bg-primary text-on-primary hover:brightness-110'
+              }`}
+            >
+              <span className={`material-symbols-outlined text-[16px] ${saveState === 'saving' ? 'animate-spin' : ''}`}>
+                {saveState === 'ok' ? 'check' : saveState === 'error' ? 'error' : saveState === 'saving' ? 'progress_activity' : 'save'}
+              </span>
+              {saveState === 'saving' ? 'Speichert…' : saveState === 'ok' ? 'Als Entwurf gespeichert' : saveState === 'error' ? 'Fehler' : 'Speichern'}
+            </button>
+            {saveState === 'error' && saveErr && (
+              <span className="font-body-sm text-[11px] text-error max-w-[260px] text-right leading-tight">{saveErr}</span>
+            )}
+            {saveState === 'ok' && (
+              <span className="font-body-sm text-[11px] text-outline text-right">Zum Live-Schalten: „Veröffentlichen“ auf der Übersicht.</span>
+            )}
+          </div>
         </div>
       </header>
 
