@@ -272,3 +272,17 @@ html.lenis body {
 .lenis.lenis-smooth iframe {
   pointer-events: none;
 }
+
+/* ── Discounted price accent ─────────────────────────────────────────────
+   A slow, subtle warm glow that breathes every few seconds on an "Aktion"
+   price so it draws the eye without blinking. Disabled for reduced motion. */
+@keyframes epilisse-price-glow {
+  0%, 100% { text-shadow: 0 0 0 rgba(0, 0, 0, 0); }
+  50%      { text-shadow: 0 0 14px color-mix(in srgb, var(--color-primary) 45%, transparent); }
+}
+.price-glow {
+  animation: epilisse-price-glow 3.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .price-glow { animation: none; }
+}

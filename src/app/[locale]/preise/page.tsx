@@ -84,19 +84,19 @@ function PricingSection({ cat, fallback }: { cat: Cat; fallback: PricingItem[] }
           return (
           <div
             key={i}
-            className={`flex items-center justify-between py-6 border-b px-4 group cursor-pointer transition-colors ${
+            className={`flex items-center justify-between py-6 px-4 border-b group cursor-pointer transition-colors ${
               item.oldPrice
-                ? 'border-primary/20 bg-primary/[0.035] hover:bg-primary/[0.06]'
+                ? 'border-outline-variant/50 border-l-[3px] border-l-primary bg-gradient-to-r from-primary/[0.10] via-primary/[0.04] to-transparent hover:from-primary/[0.16]'
                 : 'border-outline-variant hover:bg-surface/50'
             }`}
           >
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3 flex-wrap">
                 <span className="font-body-lg font-bold text-on-surface group-hover:text-primary transition-colors">
                   {item.name}
                 </span>
                 {item.oldPrice && (
-                  <span className="font-label-caps text-[10px] tracking-[0.18em] uppercase text-primary border border-primary/40 px-1.5 py-0.5 leading-none">
+                  <span className="font-label-caps text-[10px] tracking-[0.16em] uppercase bg-primary text-on-primary px-2 py-1 leading-none shadow-sm">
                     Aktion{pct != null ? ` · −${pct} %` : ''}
                   </span>
                 )}
@@ -108,13 +108,13 @@ function PricingSection({ cat, fallback }: { cat: Cat; fallback: PricingItem[] }
               )}
             </div>
             <div className="flex items-center gap-4 md:gap-6 shrink-0 ml-4">
-              <div className="flex items-baseline gap-2 whitespace-nowrap">
+              <div className="flex items-baseline gap-2.5 whitespace-nowrap">
                 {item.oldPrice && (
-                  <span className="font-body-md text-secondary/60 line-through decoration-1">
+                  <span className="font-body-md text-[15px] text-on-surface/45 line-through decoration-[1.5px]">
                     {item.oldPrice}
                   </span>
                 )}
-                <span className="font-display-lg text-headline-md text-primary">
+                <span className={`font-display-lg text-headline-md text-primary font-semibold${item.oldPrice ? ' price-glow' : ''}`}>
                   {item.price}
                 </span>
               </div>
