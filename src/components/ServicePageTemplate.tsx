@@ -327,15 +327,15 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
                   <p className={`font-body-lg text-body-lg mb-8 ${dark ? "opacity-90" : "text-secondary"}`}>{banner.body}</p>
                   {banner.price && (
                     <div className="mb-8">
-                      <span className={`font-label-caps text-label-caps tracking-widest block mb-1.5 ${dark ? "opacity-80" : "text-primary"}`}>
-                        AKTIONSPREIS
+                      <span className={`font-label-caps text-[11px] tracking-[0.25em] uppercase block mb-2 ${dark ? "text-on-primary-container" : "text-primary"}`}>
+                        Aktionspreis
                       </span>
                       <div className="flex items-baseline gap-3">
-                        <span className={`font-headline-lg text-headline-lg ${dark ? "text-on-primary-container" : "text-primary"}`}>
+                        <span className={`font-display-lg text-display-lg leading-none ${dark ? "text-on-primary-container" : "text-primary"}`}>
                           {banner.price}
                         </span>
                         {banner.oldPrice && (
-                          <span className={`font-body-md line-through ${dark ? "opacity-60" : "text-outline"}`}>
+                          <span className={`font-body-sm line-through decoration-1 ${dark ? "text-on-primary-container/50" : "text-outline"}`}>
                             {banner.oldPrice}
                           </span>
                         )}
