@@ -312,30 +312,32 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
                 <div
                   key={`text-${i}`}
                   className={`p-12 md:p-20 flex flex-col justify-center relative overflow-hidden ${
-                    dark ? "bg-primary-container text-on-primary-container" : "bg-surface-container-low text-on-surface"
+                    dark
+                      ? "bg-[color-mix(in_srgb,var(--color-primary-container),#180d10_32%)] text-white"
+                      : "bg-surface-container-low text-on-surface"
                   }`}
                 >
-                  <div className="absolute top-0 right-0 p-10 opacity-10">
+                  <div className={`absolute top-0 right-0 p-10 ${dark ? "opacity-[0.12]" : "opacity-10"}`}>
                     <span className="material-symbols-outlined text-[180px]">{banner.icon}</span>
                   </div>
-                  <span className={`font-label-caps text-label-caps tracking-[0.2em] mb-4 ${dark ? "" : "text-primary"}`}>
+                  <span className={`font-label-caps text-label-caps tracking-[0.22em] mb-4 ${dark ? "text-white/65" : "text-primary"}`}>
                     {banner.label}
                   </span>
-                  <h2 className={`font-headline-lg text-display-lg mb-6 leading-tight ${dark ? "text-on-primary-container" : ""}`}>
+                  <h2 className={`font-headline-lg text-display-lg mb-6 leading-tight ${dark ? "text-white" : ""}`}>
                     {banner.title}
                   </h2>
-                  <p className={`font-body-lg text-body-lg mb-8 ${dark ? "opacity-90" : "text-secondary"}`}>{banner.body}</p>
+                  <p className={`font-body-lg text-body-lg mb-8 ${dark ? "text-white/80" : "text-secondary"}`}>{banner.body}</p>
                   {banner.price && (
                     <div className="mb-8">
-                      <span className={`font-label-caps text-[11px] tracking-[0.25em] uppercase block mb-2 ${dark ? "text-on-primary-container" : "text-primary"}`}>
+                      <span className={`font-label-caps text-[11px] tracking-[0.28em] uppercase block mb-2 ${dark ? "text-white/60" : "text-primary"}`}>
                         Aktionspreis
                       </span>
                       <div className="flex items-baseline gap-3">
-                        <span className={`font-display-lg text-display-lg leading-none ${dark ? "text-on-primary-container" : "text-primary"}`}>
+                        <span className={`font-display-lg text-display-lg leading-none ${dark ? "text-white" : "text-primary"}`}>
                           {banner.price}
                         </span>
                         {banner.oldPrice && (
-                          <span className={`font-body-sm line-through decoration-1 ${dark ? "text-on-primary-container/50" : "text-outline"}`}>
+                          <span className={`font-body-sm line-through decoration-[1.5px] ${dark ? "text-white/45" : "text-outline"}`}>
                             {banner.oldPrice}
                           </span>
                         )}
@@ -348,7 +350,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
                       onClick={() => booking.open(categoryId)}
                       className={`inline-block px-10 py-4 font-label-caps text-label-caps tracking-widest transition-all rounded-[var(--radius-cta)] ${
                         dark
-                          ? "bg-on-primary-container text-primary-container hover:opacity-90"
+                          ? "bg-white text-primary hover:bg-white/90"
                           : "bg-primary text-on-primary hover:bg-primary-container"
                       }`}
                     >
