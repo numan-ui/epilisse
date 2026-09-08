@@ -3,6 +3,7 @@ export type ImagePosition = 'top' | 'center' | 'bottom';
 
 /** oldPrice: optional pre-discount price. When set and non-empty, `price` is the discounted price and the public list shows an "AKTION" treatment (old price struck through, new price highlighted). */
 export type Service  = { id: string; name: string; price: string; duration: string; active: boolean; oldPrice?: string };
+/** @deprecated superseded by `Aktion` — retained only to type the legacy `SiteContent.campaigns` blob during the 0023 migration window. */
 export type Campaign = { id: string; label: string; title: string; desc: string; price: string; oldPrice?: string; cta: string; icon: string; image: string; imagePosition?: ImagePosition; active: boolean };
 export type Category = { id: string; icon: string; name: string; desc: string; visible: boolean; image: string; kicker: string };
 
@@ -61,25 +62,6 @@ export const INIT_SERVICES: Record<string, Service[]> = {
     s('m6', 'Nageldesign',         '80.00', '90 min'),
     s('m7', 'Paraffin-Behandlung', '30.00', '30 min'),
     s('m8', 'Nagelverstärkung',    '50.00', '60 min', false),
-  ],
-};
-
-const c = (
-  id: string, label: string, title: string, desc: string,
-  price: string, oldPrice?: string,
-  cta = 'JETZT BUCHEN', icon = 'auto_fix_high', image = '',
-): Campaign =>
-  ({ id, label, title, desc, price, oldPrice, cta, icon, image, active: true });
-
-export const INIT_CAMPAIGNS: Record<string, Campaign[]> = {
-  laser: [
-    c('cl1', 'AKTIVE AKTION', 'Winter Glow Kombi-Paket',   'Ganzes Gesicht + Dekolleté inkl. Maske.',         '120,00€', '149,00€', 'JETZT BUCHEN', 'auto_awesome'),
-  ],
-  gesicht: [
-    c('cg1', 'BESTSELLER',    'HydraFacial Duo-Paket',      '2× HydraFacial Premium zum Sonderpreis.',         '249,00€', '298,00€', 'JETZT BUCHEN', 'spa'),
-  ],
-  mani: [
-    c('cm1', 'DUO DEAL',      'Mani & Pedi Paket',          'Gel-Maniküre + Spa-Pediküre zusammen.',           '99,00€',  '130,00€', 'JETZT BUCHEN', 'favorite'),
   ],
 };
 
@@ -207,19 +189,8 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
   },
 ];
 
+/** @deprecated superseded by `Aktion` — retained only to type the legacy `SiteContent.promoBanners` blob during the 0023 migration window. */
 export type PromoBanner = { id: string; label: string; title: string; desc: string; ctaPrimary: string; ctaSecondary: string; image: string };
-
-export const PROMO_BANNER_LIMIT = 4;
-
-export const INIT_PROMO_BANNERS: PromoBanner[] = [
-  {
-    id: 'promo1',
-    label: 'EXKLUSIVES ANGEBOT', title: 'Winter Glow\nKombi-Paket',
-    desc: 'Erhalten Sie 20 % Rabatt auf unsere exklusive Kombination aus Gesichtshydrierung und Maniküre. Gültig bis Ende der Saison.',
-    ctaPrimary: 'ANGEBOT SICHERN', ctaSecondary: 'DETAILS ANSEHEN',
-    image: '/images/promo-winter-glow.png',
-  },
-];
 
 export type AboutValue = { id: string; icon: string; title: string; desc: string };
 
