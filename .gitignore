@@ -10,3 +10,4 @@ playwright/.cache/
 
 .vercel
 .claude
+.mcp.json

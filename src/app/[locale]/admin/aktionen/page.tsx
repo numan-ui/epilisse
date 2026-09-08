@@ -13,18 +13,24 @@ export default function AdminAktionenPage() {
   );
 
   return (
-    <div className="max-w-4xl space-y-10 pb-24">
-      <header>
-        <h2 className="font-headline-sm text-headline-sm text-on-surface mb-1">Aktionen</h2>
-        <p className="font-body-sm text-on-surface-variant opacity-70">
-          Alle Kombi-Pakete &amp; Angebote. Pro Kategorie max. {AKTION_CATEGORY_LIMIT},
-          auf der Startseite max. {AKTION_HOME_LIMIT} ({homeCount} aktiv).
-          Eine Aktion, die im Kategoriebereich inaktiv ist, erscheint auch auf der
-          Startseite und unter /aktionen nicht.
-        </p>
+    <>
+      <header className="h-20 border-b border-outline-variant/30 flex items-center px-8 bg-surface/80 backdrop-blur-md shrink-0">
+        <div className="flex items-center gap-4">
+          <h2 className="font-headline-md text-headline-md text-on-surface">Aktionen</h2>
+          <span className="text-outline-variant">|</span>
+          <p className="font-body-sm text-secondary">Kombi-Pakete &amp; Angebote pro Kategorie und auf der Startseite</p>
+        </div>
       </header>
 
-      {categories.map(cat => {
+      <div className="flex-1 overflow-y-auto p-8">
+        <div className="max-w-4xl space-y-10 pb-24">
+          <p className="font-body-sm text-on-surface-variant opacity-70">
+            Pro Kategorie max. {AKTION_CATEGORY_LIMIT}, auf der Startseite max. {AKTION_HOME_LIMIT} ({homeCount} aktiv).
+            Eine Aktion, die im Kategoriebereich inaktiv ist, erscheint auch auf der
+            Startseite und unter /aktionen nicht.
+          </p>
+
+          {categories.map(cat => {
         const rows = aktionen.filter(a => a.category === cat.id);
         const catFull = rows.length >= AKTION_CATEGORY_LIMIT;
         return (
@@ -57,9 +63,11 @@ export default function AdminAktionenPage() {
                 onRemove={() => removeAktion(a.id)}
               />
             ))}
-          </section>
-        );
-      })}
-    </div>
+            </section>
+          );
+        })}
+        </div>
+      </div>
+    </>
   );
 }
