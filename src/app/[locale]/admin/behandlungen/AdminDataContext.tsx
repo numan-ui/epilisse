@@ -269,7 +269,11 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       const missing = categories.filter(c => !prev[c.id]);
       if (missing.length === 0) return prev;
       const next = { ...prev };
-      for (const c of missing) next[c.id] = blankPageContent(c);
+      const seeds = defaultPageContent();
+      // A built-in with a code seed (laser/gesicht/mani/aktionen) is backfilled
+      // from that seed, not a bare {h1: name} — otherwise the seed's real hero
+      // copy / benefits never reach the page.
+      for (const c of missing) next[c.id] = seeds[c.id] ?? blankPageContent(c);
       ls.write(LS_PC, next);
       return next;
     });
