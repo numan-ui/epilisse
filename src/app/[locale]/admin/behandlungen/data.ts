@@ -29,10 +29,20 @@ export const AKTION_HOME_LIMIT = 10;     // sum across all categories, on the ho
 export const AKTION_CATEGORY_LIMIT = 10; // per category
 
 export const CATEGORIES: Category[] = [
-  { id: 'laser',   icon: 'auto_awesome',    name: 'Laser-Haarentfernung', desc: 'Premium Diodenlaser-Technologie für seidig glatte Haut.',        visible: true,  image: '', kicker: 'TECHNOLOGIE' },
-  { id: 'gesicht', icon: 'face',             name: 'Gesichtsästhetik',     desc: 'Exklusive Behandlungen für strahlende Hautgesundheit.',          visible: true,  image: '', kicker: 'GESICHTSPFLEGE' },
-  { id: 'mani',    icon: 'spa',              name: 'Maniküre',             desc: 'Luxuriöse Nagelpflege und Handmassage.',                        visible: true,  image: '', kicker: 'NAGELPFLEGE' },
+  { id: 'laser',    icon: 'auto_awesome', name: 'Laser-Haarentfernung', desc: 'Premium Diodenlaser-Technologie für seidig glatte Haut.',  visible: true, image: '', kicker: 'TECHNOLOGIE' },
+  { id: 'gesicht',  icon: 'face',         name: 'Gesichtsästhetik',     desc: 'Exklusive Behandlungen für strahlende Hautgesundheit.',    visible: true, image: '', kicker: 'GESICHTSPFLEGE' },
+  { id: 'mani',     icon: 'spa',          name: 'Maniküre',             desc: 'Luxuriöse Nagelpflege und Handmassage.',                  visible: true, image: '', kicker: 'NAGELPFLEGE' },
+  { id: 'aktionen', icon: 'sell',         name: 'Aktionen',             desc: 'Aktuelle Kombi-Pakete & Angebote zu Vorzugspreisen.',     visible: true, image: '', kicker: 'ANGEBOTE' },
 ];
+
+/**
+ * Categories that are real for booking (they appear in the booking modal's
+ * category step and validate against the CRM `categories` table) but are NOT
+ * listed as a treatment tile on the homepage services grid / /behandlungen /
+ * /preise — those surfaces are for actual treatments. "Aktionen" has its own
+ * nav link, homepage promo banner and /aktionen page instead.
+ */
+export const PSEUDO_CATEGORY_IDS = ['aktionen'];
 
 const s = (id: string, name: string, price: string, duration: string, active = true): Service =>
   ({ id, name, price, duration, active });
@@ -215,6 +225,7 @@ export const INIT_ABOUT_VALUES: AboutValue[] = [
   { id: 'av1', icon: 'workspace_premium', title: '15 Jahre Erfahrung', desc: 'Über 15 Jahre Praxis in der ästhetischen Kosmetik und Laser-Haarentfernung in München.' },
   { id: 'av2', icon: 'verified', title: 'NiSV-Fachkunde Laserstrahlung', desc: 'Offizieller Fachkundenachweis nach NiSV für den sicheren Betrieb von Lasergeräten.' },
   { id: 'av3', icon: 'health_and_beauty', title: 'Medizinischer Hygienestandard', desc: 'Behandlungen unter klinischen Hygienebedingungen – für Ihre Sicherheit bei jedem Termin.' },
+  { id: 'av4', icon: 'diversity_1', title: 'Persönliche Betreuung', desc: 'Beratung und Behandlung durch die Inhaberin selbst – individuell auf Ihren Hauttyp abgestimmt, keine anonyme Abfertigung.' },
 ];
 
 export type Review = { id: string; name: string; text: string; treatment: string; active: boolean };
@@ -252,15 +263,17 @@ export type SiteContent = {
 };
 
 export const FRONTEND_SLUG: Record<string, string> = {
-  laser:   'laser-haarentfernung',
-  gesicht: 'gesichtsaesthetik',
-  mani:    'manikure-pedikure',
+  laser:    'laser-haarentfernung',
+  gesicht:  'gesichtsaesthetik',
+  mani:     'manikure-pedikure',
+  aktionen: 'aktionen',
 };
 
 export const PREVIEW_GRADIENT: Record<string, string> = {
-  laser:   'linear-gradient(135deg,#fff8e7 0%,#f5e5a0 100%)',
-  gesicht: 'linear-gradient(135deg,#fff0f5 0%,#fdd5e8 100%)',
-  mani:    'linear-gradient(135deg,#fff1f2 0%,#fecdd3 100%)',
+  laser:    'linear-gradient(135deg,#fff8e7 0%,#f5e5a0 100%)',
+  gesicht:  'linear-gradient(135deg,#fff0f5 0%,#fdd5e8 100%)',
+  mani:     'linear-gradient(135deg,#fff1f2 0%,#fecdd3 100%)',
+  aktionen: 'linear-gradient(135deg,#fdf2f4 0%,#f3d9df 100%)',
 };
 
 export type PageBanner = {
@@ -342,5 +355,29 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
     ],
     campaign1: { label: 'Limited Edition', title: 'Velvet Touch Combo', body: 'Das ultimative Duo: Spa-Maniküre & Spa-Pediküre inkl. Shellac und einem Glas Champagner während der Behandlung. Normaler Einzelpreis: 180 € – jetzt 145 €.', cta: 'ANGEBOT SICHERN', icon: 'favorite', image: '/images/promo-winter-glow.png' },
     campaign2: { label: 'Exklusives Membership', title: 'Nail Membership', body: 'Monatliche Shellac-Maniküre zum exklusiven Vorzugspreis. Als Mitglied profitieren Sie von Premium-Service, Prioritätsbuchung und 10% Rabatt auf alle Zusatzleistungen.', cta: 'MEHR ERFAHREN', icon: 'card_membership', image: '/images/manikure-pedikure.png' },
+  },
+  // "Aktionen" service page (hero / info / benefits). The price list and the
+  // banners on /aktionen are generated from the active Aktionen themselves, so
+  // campaign1/campaign2 here stay blank. Placeholder copy — the owner maintains
+  // the real text via the admin category editor.
+  aktionen: {
+    label: 'Limitierte Angebote',
+    h1: 'Aktionen & Kombi-Pakete',
+    heroDesc: 'Unsere laufenden Angebote auf einen Blick – ausgewählte Behandlungen zu Vorzugspreisen, solange sie gültig sind.',
+    heroImage: '/images/promo-winter-glow.png',
+    infoTitle: 'Schönheit zum Vorzugspreis',
+    infoParagraphs: [
+      'In unseren Aktionen bündeln wir beliebte Behandlungen zu Paketen mit spürbarem Preisvorteil – ideal, um eine neue Behandlung kennenzulernen oder Ihre gewohnte Pflege aufzufrischen.',
+      'Jede Aktion ist zeitlich begrenzt. Sichern Sie sich Ihren Termin, solange das Angebot läuft – die Buchung erfolgt wie gewohnt über unser Terminsystem.',
+    ],
+    benefitsTitle: 'Ihre Vorteile',
+    benefits: [
+      'Ausgewählte Premium-Behandlungen zum Kombi-Preis',
+      'Zeitlich begrenzte Angebote mit klarer Laufzeit',
+      'Gleiche Qualität und persönliche Beratung wie bei allen Behandlungen',
+      'Einfache Online-Buchung ohne Vorkasse',
+    ],
+    campaign1: { label: '', title: '', body: '', cta: '', icon: 'auto_awesome', image: '' },
+    campaign2: { label: '', title: '', body: '', cta: '', icon: 'auto_awesome', image: '' },
   },
 };

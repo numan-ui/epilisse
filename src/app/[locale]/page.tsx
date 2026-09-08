@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
-import { FRONTEND_SLUG } from "@/app/[locale]/admin/behandlungen/data";
+import { FRONTEND_SLUG, PSEUDO_CATEGORY_IDS } from "@/app/[locale]/admin/behandlungen/data";
 import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
@@ -114,8 +114,10 @@ export default function HomePage() {
   const getCatImage = (id: string) => categories.find(c => c.id === id)?.image || '';
   const getCatDesc  = (id: string) => categories.find(c => c.id === id)?.desc || '';
 
-  /* ── Bento grid: visible original cats + custom cats ─── */
-  const visibleCats  = categories.filter(c => c.visible);
+  /* ── Bento grid: visible original cats + custom cats. "Aktionen" is a
+     bookable category but not a treatment tile — it has its own nav link,
+     promo banner and /aktionen page — so keep it out of the grid + footer. ─── */
+  const visibleCats  = categories.filter(c => c.visible && !PSEUDO_CATEGORY_IDS.includes(c.id));
   const customCats   = visibleCats.filter(c => !ORIG_IDS.includes(c.id));
   const isVisible    = (id: string) => categories.find(c => c.id === id)?.visible !== false;
   const getCatName   = (id: string) => categories.find(c => c.id === id)?.name ?? '';

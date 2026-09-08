@@ -9,6 +9,7 @@ import {
   type SiteContent,
 } from './data';
 import { deriveAktionen } from '@/lib/aktion';
+import { mergeCategories } from '@/lib/content/mergeCategories';
 
 type ServicesMap  = Record<string, Service[]>;
 
@@ -169,11 +170,14 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       })();
     }
 
-    // Drop stale localStorage entries for built-in categories removed from code (e.g. a deleted default category).
-    const validCats = cats ? cats.filter(c => CATEGORIES.some(d => d.id === c.id) || c.id.startsWith('cat-')) : [];
-    if (validCats.length > 0) {
-      setCategories(validCats);
-      if (validCats.length !== cats!.length) ls.write(LS_CAT, validCats);
+    // Reconcile the local list against code: drop stale built-ins, fill blank
+    // built-in fields, and inject any built-in the stored list predates (e.g.
+    // "aktionen" added after this browser last saved). Only when there IS a
+    // local list — null/empty still seeds from the shared draft below.
+    const mergedCats = cats && cats.length > 0 ? mergeCategories(cats) : [];
+    if (mergedCats.length > 0) {
+      setCategories(mergedCats);
+      if (JSON.stringify(mergedCats) !== JSON.stringify(cats)) ls.write(LS_CAT, mergedCats);
       setCategoriesLoaded(true);
     } else {
       // This browser has no (valid) local copy — could be a genuinely fresh
@@ -190,8 +194,9 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
           if (!r.ok) return; // auth/network failure — leave categoriesLoaded false, see below
           const res = (await r.json()) as { draft: Category[] | null };
           if (res.draft && res.draft.length > 0) {
-            setCategories(res.draft);
-            ls.write(LS_CAT, res.draft);
+            const merged = mergeCategories(res.draft);
+            setCategories(merged);
+            ls.write(LS_CAT, merged);
           }
           // res.draft empty/null is a real signal (nothing published yet) — safe to proceed.
           setCategoriesLoaded(true);

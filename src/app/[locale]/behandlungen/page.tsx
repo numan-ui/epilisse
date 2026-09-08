@@ -6,7 +6,7 @@ import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useBookingModal } from "@/context/BookingModalContext";
-import { FRONTEND_SLUG } from "@/app/[locale]/admin/behandlungen/data";
+import { FRONTEND_SLUG, PSEUDO_CATEGORY_IDS } from "@/app/[locale]/admin/behandlungen/data";
 
 const LOCALES = [
   { code: "de", label: "DE" },
@@ -42,7 +42,8 @@ export default function BehandlungenPage() {
     { href: "/#kontakt", label: lc.navKontakt || "Kontakt" },
   ];
 
-  const visibleCats = categories.filter(c => c.visible);
+  // "Aktionen" is bookable but not a treatment — it has its own /aktionen page.
+  const visibleCats = categories.filter(c => c.visible && !PSEUDO_CATEGORY_IDS.includes(c.id));
 
   return (
     <div className="min-h-screen bg-surface text-on-surface font-body-md overflow-x-hidden">

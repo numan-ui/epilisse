@@ -75,7 +75,7 @@ export default function OwnerManifesto({ className = '' }: { className?: string 
                 style={{ fontVariationSettings: "'FILL' 1" }}
                 aria-hidden
               >
-                check_circle
+                {v.icon?.trim() || 'check_circle'}
               </span>
               <div>
                 <h3 className="font-headline-sm text-[15px] font-medium text-on-surface mb-0.5">

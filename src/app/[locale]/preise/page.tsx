@@ -7,7 +7,7 @@ import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useAdminServices } from "@/hooks/useAdminServices";
 import { useBookingModal } from "@/context/BookingModalContext";
-import { FRONTEND_SLUG } from "@/app/[locale]/admin/behandlungen/data";
+import { FRONTEND_SLUG, PSEUDO_CATEGORY_IDS } from "@/app/[locale]/admin/behandlungen/data";
 import { discountPct } from "@/lib/price";
 
 const LOCALES = [
@@ -153,7 +153,7 @@ export default function PreisePage() {
   // Every visible category gets its own price table — built-in (with a
   // hardcoded fallback) or admin-created (no fallback; PricingSection just
   // renders nothing until the admin adds priced services for it).
-  const visibleCats = categories.filter(c => c.visible);
+  const visibleCats = categories.filter(c => c.visible && !PSEUDO_CATEGORY_IDS.includes(c.id));
 
   return (
     <div className="min-h-screen bg-surface text-on-surface font-body-md overflow-x-hidden">
