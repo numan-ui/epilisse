@@ -2,9 +2,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAdminData } from '../behandlungen/AdminDataContext';
-import { HERO_SLIDE_LIMIT, PROMO_BANNER_LIMIT, ABOUT_VALUE_LIMIT, REVIEW_LIMIT, FRONTEND_SLUG, type LandingContent } from '../behandlungen/data';
+import { HERO_SLIDE_LIMIT, ABOUT_VALUE_LIMIT, REVIEW_LIMIT, FRONTEND_SLUG, type LandingContent } from '../behandlungen/data';
 
-const SECTIONS = ['Navigation', 'Hero-Slider', 'Angebot', 'Kombi-Angebot', 'Über Uns', 'Kontakt-Texte', 'Footer'] as const;
+const SECTIONS = ['Navigation', 'Hero-Slider', 'Angebot', 'Über Uns', 'Kontakt-Texte', 'Footer'] as const;
 type Section = typeof SECTIONS[number];
 
 const VALUE_ICONS = ['verified', 'lock', 'star', 'diamond', 'favorite', 'health_and_beauty', 'auto_awesome', 'spa', 'thumb_up', 'workspace_premium'];
@@ -117,7 +117,6 @@ export default function StartseitePage() {
   const {
     landingContent: lc, updateLandingField,
     heroSlides, updateHeroSlide, addHeroSlide, removeHeroSlide, reorderHeroSlide,
-    promoBanners, updatePromoBanner, addPromoBanner, removePromoBanner,
     aboutValues, updateAboutValue, addAboutValue, removeAboutValue,
     reviews, updateReview, addReview, removeReview,
     categories,
@@ -309,63 +308,7 @@ export default function StartseitePage() {
             </section>
           )}
 
-          {/* ── Kombi-Angebot (promo) ────────────────────── */}
-          {active === 'Kombi-Angebot' && (
-            <section className="max-w-2xl space-y-8">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-headline-sm text-headline-sm text-on-surface mb-1">Kombi-Angebot Banner</h3>
-                  <p className="font-body-sm text-on-surface-variant opacity-70">Promo-Banner zwischen Angebot und Über-Uns-Sektion (max. {PROMO_BANNER_LIMIT}).</p>
-                </div>
-                <span className="font-label-caps text-[10px] text-outline shrink-0">{promoBanners.length} / {PROMO_BANNER_LIMIT}</span>
-              </div>
-              {promoBanners.map((banner, i) => (
-                <div key={banner.id} className="bg-surface-container-lowest border border-outline-variant p-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-label-caps text-[10px] text-primary">BANNER {i + 1}</span>
-                    {promoBanners.length > 1 && (
-                      <button
-                        onClick={() => removePromoBanner(banner.id)}
-                        className="text-outline hover:text-error transition-colors"
-                        title="Banner löschen"
-                      >
-                        <span className="material-symbols-outlined text-[18px]">delete_outline</span>
-                      </button>
-                    )}
-                  </div>
-                  <Field label="Label (Kicker)">
-                    <input className={INPUT_CLS} value={banner.label} onChange={e => updatePromoBanner(banner.id, 'label', e.target.value)} />
-                  </Field>
-                  <Field label="Titel (Zeilenumbruch mit Enter)">
-                    <textarea className={`${INPUT_CLS} resize-none`} rows={2} value={banner.title} onChange={e => updatePromoBanner(banner.id, 'title', e.target.value)} />
-                  </Field>
-                  <Field label="Beschreibung">
-                    <textarea className={`${INPUT_CLS} resize-none`} rows={3} value={banner.desc} onChange={e => updatePromoBanner(banner.id, 'desc', e.target.value)} />
-                  </Field>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Field label="Primärer Button">
-                      <input className={INPUT_CLS} value={banner.ctaPrimary} onChange={e => updatePromoBanner(banner.id, 'ctaPrimary', e.target.value)} />
-                    </Field>
-                    <Field label="Sekundärer Button (optional)">
-                      <input className={INPUT_CLS} value={banner.ctaSecondary} onChange={e => updatePromoBanner(banner.id, 'ctaSecondary', e.target.value)} />
-                    </Field>
-                  </div>
-                  <Field label="Bild">
-                    <ImageUpload value={banner.image} onChange={v => updatePromoBanner(banner.id, 'image', v)} />
-                  </Field>
-                </div>
-              ))}
-              {promoBanners.length < PROMO_BANNER_LIMIT && (
-                <button
-                  onClick={addPromoBanner}
-                  className="w-full border-2 border-dashed border-outline-variant py-4 flex items-center justify-center gap-2 text-outline hover:text-primary hover:border-primary transition-all font-label-caps text-[11px]"
-                >
-                  <span className="material-symbols-outlined text-[18px]">add_circle</span>
-                  Banner hinzufügen
-                </button>
-              )}
-            </section>
-          )}
+          {/* Kombi-Angebot / Promo-Banner sind zu „Aktionen" umgezogen — siehe /admin/aktionen */}
 
           {/* ── Über Uns ─────────────────────────────────── */}
           {active === 'Über Uns' && (

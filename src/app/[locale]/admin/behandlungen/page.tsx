@@ -17,8 +17,8 @@ export default function BehandlungenPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'de';
   const {
-    services, campaigns, categories, categoriesLoaded, pageContent, addCategory,
-    settings, landingContent, heroSlides, promoBanners, aboutValues, reviews,
+    services, aktionen, categories, categoriesLoaded, pageContent, addCategory,
+    settings, landingContent, heroSlides, aboutValues, reviews,
   } = useAdminData();
 
   const [addOpen, setAddOpen] = useState(false);
@@ -72,7 +72,7 @@ export default function BehandlungenPage() {
       const contentPut = await fetch('/api/content', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ services, campaigns, settings, landingContent, heroSlides, promoBanners, aboutValues, reviews }),
+        body: JSON.stringify({ services, aktionen, settings, landingContent, heroSlides, aboutValues, reviews }),
       });
       if (!contentPut.ok) {
         const cBody = await contentPut.json().catch(() => ({}));
@@ -149,10 +149,9 @@ export default function BehandlungenPage() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {categories.map((cat) => {
             const svcs          = services[cat.id]  ?? [];
-            const cmps          = campaigns[cat.id] ?? [];
             const serviceCount  = svcs.length;
             const activeCount   = svcs.filter(s => s.active).length;
-            const campaignCount = cmps.filter(c => c.active).length;
+            const campaignCount = aktionen.filter(a => a.category === cat.id && a.activeInCategory).length;
 
             return (
               <Link
@@ -178,7 +177,7 @@ export default function BehandlungenPage() {
                   <div>
                     <p className="font-body-sm text-[11px] text-outline">{activeCount}/{serviceCount} Services</p>
                     {campaignCount > 0 && (
-                      <p className="font-label-caps text-[10px] text-primary mt-0.5">{campaignCount} Kampagne{campaignCount > 1 ? 'n' : ''}</p>
+                      <p className="font-label-caps text-[10px] text-primary mt-0.5">{campaignCount} Aktion{campaignCount > 1 ? 'en' : ''}</p>
                     )}
                   </div>
                   <span className="material-symbols-outlined text-[18px] text-outline group-hover:text-primary group-hover:translate-x-1 transition-all">

@@ -2,11 +2,12 @@
 import { useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { PREVIEW_GRADIENT, FRONTEND_SLUG, type Service, type Campaign, type PageBanner, type ImagePosition } from '../data';
+import { PREVIEW_GRADIENT, FRONTEND_SLUG, AKTION_CATEGORY_LIMIT, AKTION_HOME_LIMIT, type Service, type PageBanner } from '../data';
 import { useAdminData } from '../AdminDataContext';
+import ImageUpload from '../ImageUpload';
+import { AktionCard } from '../../aktionen/AktionCard';
 
 const EMPTY_SERVICE: Omit<Service, 'id'> = { name: '', price: '', duration: '', active: true, oldPrice: '' };
-const EMPTY_CAMPAIGN: Omit<Campaign, 'id'> = { label: '', title: '', desc: '', price: '', oldPrice: '', cta: 'JETZT BUCHEN', icon: 'auto_fix_high', image: '', imagePosition: 'top', active: true };
 
 const BANNER_ICONS = ['auto_awesome', 'spa', 'diamond', 'loyalty', 'favorite', 'face_retouching_natural', 'health_and_beauty', 'self_improvement', 'fitness_center', 'card_membership', 'auto_fix_high', 'star'];
 
@@ -17,27 +18,26 @@ export default function CategoryDetailPage() {
   const catId     = params?.categoryId as string;
 
   const {
-    services: allServices, campaigns: allCampaigns, pageContent: allPageContent,
+    services: allServices, aktionen: allAktionen, pageContent: allPageContent,
     updateService: ctxUpdateService, deleteService: ctxDeleteService, addService: ctxAddService,
-    updateCampaign: ctxUpdateCampaign, deleteCampaign: ctxDeleteCampaign, addCampaign: ctxAddCampaign,
+    updateAktion, addAktion: ctxAddAktion, removeAktion,
     updatePageField, updatePageParagraph, updatePageBenefit, addPageBenefit, removePageBenefit, updatePageBanner,
     categories, updateCategory, deleteCategory,
-    settings, landingContent, heroSlides, promoBanners, aboutValues, reviews,
+    settings, landingContent, heroSlides, aboutValues, reviews,
   } = useAdminData();
 
   const category = categories.find((c) => c.id === catId);
 
-  const services   = allServices[catId]   ?? [];
-  const campaigns  = allCampaigns[catId]  ?? [];
-  const pc         = allPageContent[catId];
+  const services     = allServices[catId] ?? [];
+  const catAktionen  = allAktionen.filter(a => a.category === catId);
+  const homeCount    = allAktionen.filter(a => a.activeInCategory && a.activeOnHome).length;
+  const pc           = allPageContent[catId];
 
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'ok' | 'error'>('idle');
   const [saveErr, setSaveErr]     = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [addSvcOpen, setAddSvcOpen] = useState(false);
-  const [addCmpOpen, setAddCmpOpen] = useState(false);
   const [newSvc, setNewSvc]       = useState(EMPTY_SERVICE);
-  const [newCmp, setNewCmp]       = useState(EMPTY_CAMPAIGN);
   const [contentOpen, setContentOpen] = useState(false);
   const [contentTab, setContentTab]   = useState<'hero' | 'info' | 'banners'>('hero');
   const svcNameRef = useRef<HTMLInputElement>(null);
@@ -54,16 +54,8 @@ export default function CategoryDetailPage() {
     setAddSvcOpen(false);
   };
 
-  /* ── Campaign helpers ────────────────────────────── */
-  const updateCampaign = (id: string, field: keyof Campaign, value: string | boolean) =>
-    ctxUpdateCampaign(catId, id, field, value);
-  const deleteCampaign = (id: string) => ctxDeleteCampaign(catId, id);
-  const addCampaign = () => {
-    if (!newCmp.title.trim()) return;
-    ctxAddCampaign(catId, newCmp);
-    setNewCmp(EMPTY_CAMPAIGN);
-    setAddCmpOpen(false);
-  };
+  /* ── Aktion helpers ──────────────────────────────── */
+  const addAktion = () => ctxAddAktion(catId);
 
   const handleSave = async () => {
     // Force-flushes all three drafts now (they also auto-mirror, debounced, via
@@ -78,8 +70,8 @@ export default function CategoryDetailPage() {
         put('/api/page-content', allPageContent),
         put('/api/categories', categories),
         put('/api/content', {
-          services: allServices, campaigns: allCampaigns, settings, landingContent,
-          heroSlides, promoBanners, aboutValues, reviews,
+          services: allServices, aktionen: allAktionen, settings, landingContent,
+          heroSlides, aboutValues, reviews,
         }),
       ]);
       const bad = [pc, cat, content].find(r => !r.ok);
@@ -376,198 +368,40 @@ export default function CategoryDetailPage() {
             )}
           </section>
 
-            {/* Campaigns — full-width, spacious grid below the services */}
+            {/* Aktionen — the unified Kombi-Paket / offer cards for this category */}
             <section className="bg-surface-container-lowest border border-outline-variant shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
               <div className="flex items-center justify-between p-6 border-b border-outline-variant/40">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-[20px]">auto_fix_high</span>
-                  <h3 className="font-headline-sm text-headline-sm text-on-surface">Kampagnen</h3>
+                  <span className="material-symbols-outlined text-primary text-[20px]">sell</span>
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface">
+                    Aktionen{' '}
+                    <span className="text-outline text-[13px]">({catAktionen.length}/{AKTION_CATEGORY_LIMIT})</span>
+                  </h3>
                 </div>
                 <button
-                  onClick={() => setAddCmpOpen(true)}
-                  className="flex items-center gap-1 text-primary font-label-caps text-[11px] border-b border-primary pb-0.5 hover:opacity-70 transition-opacity"
+                  onClick={addAktion}
+                  disabled={catAktionen.length >= AKTION_CATEGORY_LIMIT}
+                  className="flex items-center gap-1 text-primary font-label-caps text-[11px] border-b border-primary pb-0.5 hover:opacity-70 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   + Hinzufügen
                 </button>
               </div>
 
-              <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
-                {campaigns.length === 0 && (
-                  <p className="md:col-span-2 py-10 text-center font-body-sm text-outline opacity-60">
-                    Noch keine Kampagnen.
+              <div className="p-6 space-y-5">
+                {catAktionen.length === 0 && (
+                  <p className="py-10 text-center font-body-sm text-outline opacity-60">
+                    Noch keine Aktion in dieser Kategorie.
                   </p>
                 )}
-                {(() => {
-                  const activeIds = campaigns.filter(c => c.active).map(c => c.id);
-                  return campaigns.map((cmp) => {
-                    const activeSlot = cmp.active ? activeIds.indexOf(cmp.id) : -1;
-                    const slotLabel =
-                      !cmp.active ? null :
-                      activeSlot === 0 ? 'Banner 1' :
-                      activeSlot === 1 ? 'Banner 2' :
-                      'Kein Banner-Platz (nur Liste)';
-                    return (
-                  <div key={cmp.id} className={`bg-white border border-outline-variant/60 shadow-[0_1px_6px_rgba(0,0,0,0.05)] p-5 space-y-3 relative group transition-opacity ${!cmp.active ? 'opacity-40' : ''}`}>
-                    <div className="flex items-center justify-between">
-                      {slotLabel && (
-                        <span className={`font-label-caps text-[9px] px-2 py-0.5 ${
-                          activeSlot < 2 ? 'bg-primary/10 text-primary' : 'bg-outline-variant/20 text-outline'
-                        }`}>
-                          {slotLabel}
-                        </span>
-                      )}
-                      <div className="flex items-center gap-2 ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => updateCampaign(cmp.id, 'active', !cmp.active)}
-                        className={`relative w-8 h-4 rounded-full transition-colors shrink-0 ${cmp.active ? 'bg-primary' : 'bg-outline-variant'}`}
-                        aria-label={cmp.active ? 'Verbergen' : 'Anzeigen'}
-                        title={cmp.active ? 'Kampagne verbergen' : 'Kampagne anzeigen'}
-                      >
-                        <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${cmp.active ? 'translate-x-4' : 'translate-x-0'}`} />
-                      </button>
-                      <button
-                        onClick={() => deleteCampaign(cmp.id)}
-                        className="text-outline hover:text-error transition-colors"
-                        aria-label="Kampagne löschen"
-                      >
-                        <span className="material-symbols-outlined text-[18px]">delete_outline</span>
-                      </button>
-                      </div>
-                    </div>
-                    <input
-                      className="font-label-caps text-[10px] text-primary bg-transparent border-none focus:outline-none w-full"
-                      value={cmp.label}
-                      onChange={(e) => updateCampaign(cmp.id, 'label', e.target.value)}
-                      placeholder="LABEL"
-                    />
-                    <input
-                      className="font-headline-sm text-[16px] text-on-surface bg-transparent border-b border-transparent hover:border-outline-variant focus:border-primary focus:outline-none w-full transition-colors"
-                      value={cmp.title}
-                      onChange={(e) => updateCampaign(cmp.id, 'title', e.target.value)}
-                      placeholder="Titel der Kampagne"
-                    />
-                    <textarea
-                      className="font-body-sm text-[13px] text-on-surface-variant bg-transparent border-b border-transparent hover:border-outline-variant focus:border-primary focus:outline-none w-full resize-none transition-colors"
-                      rows={2}
-                      value={cmp.desc}
-                      onChange={(e) => updateCampaign(cmp.id, 'desc', e.target.value)}
-                      placeholder="Beschreibung..."
-                    />
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1 border border-outline-variant px-2 py-1 w-28 focus-within:border-primary transition-colors">
-                        <span className="font-label-caps text-[10px] text-primary shrink-0">Preis</span>
-                        <input
-                          className="w-full border-none p-0 text-[14px] font-bold text-primary focus:outline-none bg-transparent"
-                          value={cmp.price}
-                          onChange={(e) => updateCampaign(cmp.id, 'price', e.target.value)}
-                          placeholder="0,00€"
-                        />
-                      </div>
-                      <div className="flex items-center gap-1 border border-outline-variant/50 px-2 py-1 w-28 focus-within:border-primary transition-colors">
-                        <span className="font-label-caps text-[10px] text-outline shrink-0">Statt</span>
-                        <input
-                          className="w-full border-none p-0 text-[13px] text-outline line-through focus:outline-none bg-transparent"
-                          value={cmp.oldPrice ?? ''}
-                          onChange={(e) => updateCampaign(cmp.id, 'oldPrice', e.target.value)}
-                          placeholder="0,00€"
-                        />
-                      </div>
-                    </div>
-                    {/* CTA + Icon */}
-                    <div className="flex gap-2 items-center">
-                      <input
-                        className="flex-1 border-b border-outline-variant/50 focus:border-primary bg-transparent text-[12px] py-0.5 focus:outline-none placeholder:text-outline"
-                        value={cmp.cta}
-                        onChange={(e) => updateCampaign(cmp.id, 'cta', e.target.value)}
-                        placeholder="CTA Text (z.B. JETZT BUCHEN)"
-                      />
-                      <input
-                        className="w-32 border-b border-outline-variant/50 focus:border-primary bg-transparent text-[12px] py-0.5 focus:outline-none placeholder:text-outline font-mono"
-                        value={cmp.icon}
-                        onChange={(e) => updateCampaign(cmp.id, 'icon', e.target.value)}
-                        placeholder="Icon-Name"
-                      />
-                    </div>
-                    <ImageUpload
-                      value={cmp.image}
-                      onChange={v => updateCampaign(cmp.id, 'image', v)}
-                      position={cmp.imagePosition}
-                      onPositionChange={p => updateCampaign(cmp.id, 'imagePosition', p)}
-                    />
-                  </div>
-                    );
-                  });
-                })()}
-
-                {addCmpOpen && (
-                  <div className="md:col-span-2 p-5 bg-primary/5 space-y-3">
-                    <input
-                      className="font-label-caps text-[10px] text-primary bg-transparent border-b border-primary/40 focus:outline-none w-full placeholder:text-outline"
-                      value={newCmp.label}
-                      onChange={(e) => setNewCmp(p => ({ ...p, label: e.target.value }))}
-                      placeholder="LABEL (z.B. AKTION)"
-                    />
-                    <input
-                      className="font-headline-sm text-[15px] text-on-surface bg-transparent border-b border-primary/40 focus:outline-none w-full placeholder:text-outline"
-                      value={newCmp.title}
-                      onChange={(e) => setNewCmp(p => ({ ...p, title: e.target.value }))}
-                      placeholder="Kampagnentitel *"
-                    />
-                    <textarea
-                      className="font-body-sm text-[13px] bg-transparent border-b border-primary/40 focus:outline-none w-full resize-none placeholder:text-outline"
-                      rows={2}
-                      value={newCmp.desc}
-                      onChange={(e) => setNewCmp(p => ({ ...p, desc: e.target.value }))}
-                      placeholder="Kurzbeschreibung..."
-                    />
-                    <div className="flex gap-2">
-                      <input
-                        className="w-24 border border-primary/40 px-2 py-1 text-[13px] font-bold text-primary focus:outline-none bg-transparent placeholder:text-outline"
-                        value={newCmp.price}
-                        onChange={(e) => setNewCmp(p => ({ ...p, price: e.target.value }))}
-                        placeholder="Preis"
-                      />
-                      <input
-                        className="w-24 border border-outline-variant/40 px-2 py-1 text-[13px] text-outline focus:outline-none bg-transparent placeholder:text-outline"
-                        value={newCmp.oldPrice}
-                        onChange={(e) => setNewCmp(p => ({ ...p, oldPrice: e.target.value }))}
-                        placeholder="Statt"
-                      />
-                    </div>
-                    <div className="flex gap-2">
-                      <input
-                        className="flex-1 border border-primary/40 px-2 py-1 text-[12px] focus:outline-none bg-transparent placeholder:text-outline"
-                        value={newCmp.cta}
-                        onChange={(e) => setNewCmp(p => ({ ...p, cta: e.target.value }))}
-                        placeholder="CTA (z.B. JETZT BUCHEN)"
-                      />
-                      <input
-                        className="w-32 border border-primary/40 px-2 py-1 text-[12px] font-mono focus:outline-none bg-transparent placeholder:text-outline"
-                        value={newCmp.icon}
-                        onChange={(e) => setNewCmp(p => ({ ...p, icon: e.target.value }))}
-                        placeholder="Icon-Name"
-                      />
-                    </div>
-                    <ImageUpload
-                      value={newCmp.image}
-                      onChange={v => setNewCmp(p => ({ ...p, image: v }))}
-                    />
-                    <div className="flex gap-2 pt-1">
-                      <button
-                        onClick={addCampaign}
-                        className="bg-primary text-on-primary font-label-caps text-[11px] px-4 py-1.5 hover:brightness-110 transition-all"
-                      >
-                        Hinzufügen
-                      </button>
-                      <button
-                        onClick={() => { setAddCmpOpen(false); setNewCmp(EMPTY_CAMPAIGN); }}
-                        className="font-label-caps text-[11px] text-outline hover:text-error transition-colors px-2"
-                      >
-                        Abbrechen
-                      </button>
-                    </div>
-                  </div>
-                )}
+                {catAktionen.map((akt) => (
+                  <AktionCard
+                    key={akt.id}
+                    a={akt}
+                    homeLocked={!akt.activeOnHome && homeCount >= AKTION_HOME_LIMIT}
+                    onField={(field, value) => updateAktion(akt.id, field, value)}
+                    onRemove={() => removeAktion(akt.id)}
+                  />
+                ))}
               </div>
             </section>
 
@@ -910,72 +744,3 @@ function Field({ label, children, className = '' }: { label: string; children: R
   );
 }
 
-const POSITION_OPTIONS: { value: ImagePosition; label: string; icon: string }[] = [
-  { value: 'top',    label: 'Oben',  icon: 'vertical_align_top' },
-  { value: 'center', label: 'Mitte', icon: 'vertical_align_center' },
-  { value: 'bottom', label: 'Unten', icon: 'vertical_align_bottom' },
-];
-
-function ImageUpload({
-  value, onChange, className, position, onPositionChange,
-}: {
-  value: string; onChange: (v: string) => void; className?: string;
-  position?: ImagePosition; onPositionChange?: (p: ImagePosition) => void;
-}) {
-  const ref = useRef<HTMLInputElement>(null);
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => onChange(reader.result as string);
-    reader.readAsDataURL(file);
-    e.target.value = '';
-  };
-  return (
-    <div className={`space-y-1 ${className ?? ''}`}>
-      <input ref={ref} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-      {value ? (
-        <div className="relative group cursor-pointer" onClick={() => ref.current?.click()}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt="" className="h-16 w-full object-cover border border-outline-variant/30" />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-            <span className="bg-white/90 px-2 py-1 font-label-caps text-[10px] text-primary">Ändern</span>
-            <span
-              className="bg-white/90 px-2 py-1 font-label-caps text-[10px] text-error"
-              onClick={e => { e.stopPropagation(); onChange(''); }}
-            >Entfernen</span>
-          </div>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => ref.current?.click()}
-          className="w-full border border-dashed border-outline-variant/50 hover:border-primary/60 py-3 flex flex-col items-center gap-1 transition-colors group"
-        >
-          <span className="material-symbols-outlined text-[20px] text-outline group-hover:text-primary transition-colors">cloud_upload</span>
-          <span className="font-label-caps text-[10px] text-outline group-hover:text-primary transition-colors">Bild hochladen</span>
-        </button>
-      )}
-      {value && onPositionChange && (
-        <div className="flex gap-1">
-          {POSITION_OPTIONS.map(opt => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => onPositionChange(opt.value)}
-              title={`Bildausschnitt: ${opt.label}`}
-              className={`flex-1 flex items-center justify-center gap-1 py-1 font-label-caps text-[9px] border transition-colors ${
-                (position ?? 'top') === opt.value
-                  ? 'border-primary text-primary bg-primary/5'
-                  : 'border-outline-variant/40 text-outline hover:border-primary hover:text-primary'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[13px]">{opt.icon}</span>
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
