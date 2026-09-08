@@ -5,10 +5,10 @@ import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
-import { useAdminAboutValues } from "@/hooks/useAdminAboutValues";
 import { useAdminReviews } from "@/hooks/useAdminReviews";
 import { useBookingModal } from "@/context/BookingModalContext";
 import SmartImage from "@/components/SmartImage";
+import OwnerManifesto from "@/components/OwnerManifesto";
 
 const LOCALES = [
   { code: "de", label: "DE" },
@@ -26,7 +26,6 @@ export default function UeberUnsPage() {
 
   const settings = useAdminSettings();
   const lc = useAdminLandingContent();
-  const aboutValues = useAdminAboutValues();
   const reviews = useAdminReviews();
   const booking = useBookingModal();
 
@@ -116,8 +115,13 @@ export default function UeberUnsPage() {
         </div>
       )}
 
-      {/* ── ABOUT ────────────────────────────────────────────────────────── */}
+      {/* ── OWNER MANIFESTO ──────────────────────────────────────────────── */}
       <section className="pt-40 pb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
+        <OwnerManifesto />
+      </section>
+
+      {/* ── ABOUT ────────────────────────────────────────────────────────── */}
+      <section className="pb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           {/* Left: text */}
           <div>
@@ -131,26 +135,9 @@ export default function UeberUnsPage() {
               {lc.aboutDesc || t("about.desc", { name: settings.name })}
             </p>
 
-            {/* Values */}
-            <div className="flex flex-col gap-8">
-              {aboutValues.map((v) => (
-                <div key={v.id} className="flex gap-4 items-start">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <span className="material-symbols-outlined text-primary text-xl">{v.icon}</span>
-                  </div>
-                  <div>
-                    <h3 className="font-headline-sm text-headline-sm font-medium text-on-surface mb-1">
-                      {v.title}
-                    </h3>
-                    <p className="font-body-sm text-body-sm text-secondary">{v.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
             <Link
               href="/behandlungen"
-              className="inline-flex items-center gap-1 mt-10 font-label-caps text-label-caps text-primary hover:text-primary-container transition-colors"
+              className="inline-flex items-center gap-1 font-label-caps text-label-caps text-primary hover:text-primary-container transition-colors"
             >
               {t("services.discover")}
               <span className="material-symbols-outlined text-sm">arrow_forward</span>

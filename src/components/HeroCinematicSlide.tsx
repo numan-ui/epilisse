@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import TrustBar from '@/components/TrustBar';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -332,6 +333,10 @@ export default function HeroCinematicSlide({
         >
           {cta}
         </motion.button>
+
+        {/* Real-ratings trust bar — static (no per-beat mount) so it can't
+            trigger the column jump the CTA fade guards against. */}
+        <TrustBar className="mt-8" />
 
       </div>
 

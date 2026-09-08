@@ -12,11 +12,12 @@ import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useAdminHeroSlides } from "@/hooks/useAdminHeroSlides";
 import { useAktionen, homeAktionen } from "@/hooks/useAktionen";
 import { countdownLabel, validityText } from "@/lib/aktion";
-import { useAdminAboutValues } from "@/hooks/useAdminAboutValues";
 import { useBookingModal } from "@/context/BookingModalContext";
 import SmartImage from "@/components/SmartImage";
 import GoldDustEffect from "@/components/GoldDustEffect";
 import HeroCinematicSlide from "@/components/HeroCinematicSlide";
+import OwnerManifesto from "@/components/OwnerManifesto";
+import TrustBar from "@/components/TrustBar";
 
 /* ── Image constants (Stitch AI – replace with real salon photos) ── */
 const IMG = {
@@ -89,7 +90,6 @@ export default function HomePage() {
   const lc         = useAdminLandingContent();
   const heroSlides = useAdminHeroSlides();
   const banners = homeAktionen(useAktionen());
-  const aboutValues = useAdminAboutValues();
   const booking = useBookingModal();
 
   /* ── Dynamic booking URLs from admin settings ─── */
@@ -110,7 +110,6 @@ export default function HomePage() {
   const phoneHref      = displayPhone.replace(/\s/g, '');
 
   /* ── Images: admin override or fallback to originals ─── */
-  const aboutImg = settings.aboutImage || IMG.about;
   const getCatImage = (id: string) => categories.find(c => c.id === id)?.image || '';
   const getCatDesc  = (id: string) => categories.find(c => c.id === id)?.desc || '';
 
@@ -450,6 +449,17 @@ export default function HomePage() {
               >
                 {slide.cta}
               </motion.button>
+              {i === 0 && (
+                <motion.div
+                  key={`trust-${slideKey}`}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
+                  transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
+                  className="pointer-events-auto mt-8"
+                >
+                  <TrustBar />
+                </motion.div>
+              )}
             </div>
           </div>
         ))}
@@ -652,53 +662,8 @@ export default function HomePage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center"
         >
-          {/* Left: text */}
-          <div>
-            <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-3">
-              {lc.aboutSectionLabel || t("about.sectionLabel", { name: settings.name })}
-            </span>
-            <h2 className="font-display-lg text-headline-lg font-semibold text-on-surface mb-6 leading-tight">
-              {lc.aboutTitle || t("about.title")}
-            </h2>
-            <p className="font-body-lg text-body-lg text-secondary mb-10">
-              {lc.aboutDesc || t("about.desc", { name: settings.name })}
-            </p>
-
-            {/* Values */}
-            <div className="flex flex-col gap-8">
-              {aboutValues.map((v) => (
-                <div key={v.id} className="flex gap-4 items-start">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <span className="material-symbols-outlined text-primary text-xl">{v.icon}</span>
-                  </div>
-                  <div>
-                    <h3 className="font-headline-sm text-headline-sm font-medium text-on-surface mb-1">
-                      {v.title}
-                    </h3>
-                    <p className="font-body-sm text-body-sm text-secondary">{v.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right: image */}
-          <div className="bento-card group relative overflow-hidden rounded-xl aspect-[4/5]">
-            <SmartImage
-              src={aboutImg}
-              alt="EPILISSE Studio München"
-              className="brand-photo object-cover group-hover:scale-105 transition-transform duration-700"
-              sizes="(min-width: 768px) 50vw, 100vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-            <div className="absolute bottom-6 left-6 right-6">
-              <span className="font-label-caps text-label-caps text-white/80 tracking-widest">
-                MÜNCHEN · LUXURY BEAUTY CARE
-              </span>
-            </div>
-          </div>
+          <OwnerManifesto />
         </motion.div>
       </section>
 

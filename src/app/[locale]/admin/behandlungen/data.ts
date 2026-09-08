@@ -95,6 +95,11 @@ export type SiteSettings = {
   instagram: string; facebook: string; tiktok: string; google: string;
   treatwellUrl: string;
   aboutImage: string;
+  /** Owner portrait for the manifesto block (homepage + /ueber-uns). Empty → monogram fallback. */
+  ownerImage: string;
+  /** Real ratings shown in the hero trust badge + LocalBusiness aggregateRating. German comma format ("5,0"). */
+  googleRating: string; googleReviewCount: string;
+  treatwellRating: string; treatwellReviewCount: string;
   hours: OpeningDay[];
 };
 
@@ -115,6 +120,9 @@ export const INIT_SETTINGS: SiteSettings = {
   google: '',
   treatwellUrl: 'https://www.treatwell.de/ort/studio-adisa-the-beauty-experience/',
   aboutImage: '',
+  ownerImage: '',
+  googleRating: '4,9', googleReviewCount: '180+',
+  treatwellRating: '4,8', treatwellReviewCount: '51+',
   hours: [
     { day: 'Montag',     open: '09:00', close: '19:00', closed: false },
     { day: 'Dienstag',   open: '09:00', close: '19:00', closed: false },
@@ -130,6 +138,8 @@ export type LandingContent = {
   navBehandlungen: string; navPreise: string; navUeberUns: string; navKontakt: string; navCta: string; navAktionen: string;
   servicesSectionLabel: string; servicesSectionTitle: string;
   aboutSectionLabel: string; aboutTitle: string; aboutDesc: string;
+  /** First-person owner manifesto block (homepage Über-Uns section + top of /ueber-uns). */
+  ownerKicker: string; ownerTitle: string; ownerBody: string; ownerName: string; ownerRole: string;
   contactSectionLabel: string; contactTitle: string;
   contactAddressTitle: string; contactHoursTitle: string; contactPhoneTitle: string;
   footerTagline: string; footerBehandlungenTitle: string; footerStudioTitle: string; footerLegalTitle: string;
@@ -141,6 +151,11 @@ export const INIT_LANDING_CONTENT: LandingContent = {
   servicesSectionLabel: 'UNSER ANGEBOT', servicesSectionTitle: 'Exklusive Behandlungen',
   aboutSectionLabel: 'ÜBER EPILISSE', aboutTitle: 'Münchens Adresse für Premium-Ästhetik',
   aboutDesc: 'Willkommen im EPILISSE Studio – Ihrem exklusiven Kosmetikstudio im Herzen von München. Wir vereinen modernste Behandlungsmethoden mit einem tiefen Verständnis für individuelle Schönheit.',
+  ownerKicker: 'PERSÖNLICHE VERANTWORTUNG',
+  ownerTitle: 'Ihre Haut in den Händen einer zertifizierten Expertin',
+  ownerBody: 'Ich bin Senem – Inhaberin und Lasertherapeutin von EPILISSE. Seit über 15 Jahren behandle ich Haut in München, mit offiziellem NiSV-Fachkundenachweis für Laserstrahlung und laufenden Fortbildungen in ästhetischer Kosmetik. Qualität hört für mich nicht bei der Technologie auf: Jede Kundin berate ich persönlich, jede Behandlung stimme ich auf Ihren Hauttyp ab. Bei mir sind Sie keine Nummer.',
+  ownerName: 'Senem',
+  ownerRole: 'Inhaberin & Lasertherapeutin',
   contactSectionLabel: 'KONTAKT & STANDORT', contactTitle: 'Besuchen Sie uns in München',
   contactAddressTitle: 'Studio Adresse', contactHoursTitle: 'Öffnungszeiten', contactPhoneTitle: 'Telefon',
   footerTagline: 'Ihr Experte für exklusive Schönheit und dauerhafte Haarentfernung im Herzen von München. Qualität, Diskretion und Perfektion.',
@@ -197,9 +212,9 @@ export type AboutValue = { id: string; icon: string; title: string; desc: string
 export const ABOUT_VALUE_LIMIT = 10;
 
 export const INIT_ABOUT_VALUES: AboutValue[] = [
-  { id: 'av1', icon: 'verified', title: 'Qualität', desc: 'Ausschließlich zertifizierte Technologien und medizinische Wirkstoffe auf klinischem Niveau.' },
-  { id: 'av2', icon: 'lock', title: 'Diskretion', desc: 'Ein geschützter Raum für Ihre persönliche Schönheitsreise – absolut vertraulich.' },
-  { id: 'av3', icon: 'star', title: 'Perfektion', desc: 'Jede Behandlung wird individuell auf Ihren Hauttyp und Ihre Wünsche abgestimmt.' },
+  { id: 'av1', icon: 'workspace_premium', title: '15 Jahre Erfahrung', desc: 'Über 15 Jahre Praxis in der ästhetischen Kosmetik und Laser-Haarentfernung in München.' },
+  { id: 'av2', icon: 'verified', title: 'NiSV-Fachkunde Laserstrahlung', desc: 'Offizieller Fachkundenachweis nach NiSV für den sicheren Betrieb von Lasergeräten.' },
+  { id: 'av3', icon: 'health_and_beauty', title: 'Medizinischer Hygienestandard', desc: 'Behandlungen unter klinischen Hygienebedingungen – für Ihre Sicherheit bei jedem Termin.' },
 ];
 
 export type Review = { id: string; name: string; text: string; treatment: string; active: boolean };

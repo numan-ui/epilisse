@@ -331,6 +331,37 @@ export default function StartseitePage() {
                   <ImageUpload value={settings.aboutImage} onChange={v => updateSetting('aboutImage', v)} />
                 </Field>
               </div>
+
+              {/* ── Inhaberin / Manifest ─────────────────── */}
+              <div className="bg-surface-container-lowest border border-outline-variant p-8 space-y-6">
+                <div>
+                  <h4 className="font-headline-sm text-[15px] text-on-surface">Inhaberin (Manifest)</h4>
+                  <p className="font-body-sm text-[12px] text-on-surface-variant opacity-70 mt-1">
+                    Der persönliche „Ich&quot;-Block auf der Startseite und der Über-Uns-Seite. Die Werte unten erscheinen als ✓-Karten daneben.
+                  </p>
+                </div>
+                <Field label="Label (Kicker)">
+                  <input className={INPUT_CLS} value={lc.ownerKicker} onChange={e => set('ownerKicker', e.target.value)} />
+                </Field>
+                <Field label="Titel">
+                  <input className={INPUT_CLS} value={lc.ownerTitle} onChange={e => set('ownerTitle', e.target.value)} />
+                </Field>
+                <Field label="Text (Ich-Form)">
+                  <textarea className={`${INPUT_CLS} resize-none`} rows={5} value={lc.ownerBody} onChange={e => set('ownerBody', e.target.value)} />
+                </Field>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Name">
+                    <input className={INPUT_CLS} value={lc.ownerName} onChange={e => set('ownerName', e.target.value)} />
+                  </Field>
+                  <Field label="Rolle / Titel">
+                    <input className={INPUT_CLS} value={lc.ownerRole} onChange={e => set('ownerRole', e.target.value)} />
+                  </Field>
+                </div>
+                <Field label="Portrait (rund, leer = Initialen)">
+                  <ImageUpload value={settings.ownerImage} onChange={v => updateSetting('ownerImage', v)} />
+                </Field>
+              </div>
+
               <div className="bg-surface-container-lowest border border-outline-variant p-8 space-y-6">
                 <div className="flex items-center justify-between">
                   <h4 className="font-headline-sm text-[15px] text-on-surface">Werte</h4>

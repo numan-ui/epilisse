@@ -35,6 +35,9 @@ export function useAdminSettings(): SiteSettings {
     calendarUrl: str(stored.calendarUrl, INIT_SETTINGS.calendarUrl),
     whatsappMsg: str(stored.whatsappMsg, INIT_SETTINGS.whatsappMsg),
     treatwellUrl: str(stored.treatwellUrl, INIT_SETTINGS.treatwellUrl),
+    googleRating: str(stored.googleRating, INIT_SETTINGS.googleRating),
+    treatwellRating: str(stored.treatwellRating, INIT_SETTINGS.treatwellRating),
+    treatwellReviewCount: str(stored.treatwellReviewCount, INIT_SETTINGS.treatwellReviewCount),
     hours: mergeHours(stored.hours),
   };
 }

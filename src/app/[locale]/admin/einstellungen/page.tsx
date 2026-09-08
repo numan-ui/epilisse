@@ -291,6 +291,57 @@ export default function EinstellungenPage() {
                   </div>
                 ))}
               </div>
+
+              <div className="bg-surface-container-lowest border border-outline-variant p-8 space-y-6">
+                <div>
+                  <h4 className="font-headline-sm text-[15px] text-on-surface">Bewertungs-Zahlen</h4>
+                  <p className="font-body-sm text-[12px] text-on-surface-variant opacity-70 mt-1">
+                    Erscheinen im Vertrauens-Badge im Hero (&bdquo;★ 5,0 Google · ★ 4,9 Treatwell&ldquo;) und in den strukturierten Daten. Leeres Feld blendet den jeweiligen Eintrag aus.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="font-label-caps text-[10px] text-outline uppercase block mb-2">Google Bewertung</label>
+                    <input
+                      className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                      type="text"
+                      placeholder="5,0"
+                      value={settings.googleRating}
+                      onChange={e => updateSetting('googleRating', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="font-label-caps text-[10px] text-outline uppercase block mb-2">Google Anzahl (optional)</label>
+                    <input
+                      className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                      type="text"
+                      placeholder="z.B. 87"
+                      value={settings.googleReviewCount}
+                      onChange={e => updateSetting('googleReviewCount', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="font-label-caps text-[10px] text-outline uppercase block mb-2">Treatwell Bewertung</label>
+                    <input
+                      className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                      type="text"
+                      placeholder="4,9"
+                      value={settings.treatwellRating}
+                      onChange={e => updateSetting('treatwellRating', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="font-label-caps text-[10px] text-outline uppercase block mb-2">Treatwell Anzahl</label>
+                    <input
+                      className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+                      type="text"
+                      placeholder="180+"
+                      value={settings.treatwellReviewCount}
+                      onChange={e => updateSetting('treatwellReviewCount', e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
             </section>
           )}
 

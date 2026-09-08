@@ -23,6 +23,22 @@ export default function LocalBusinessSchema() {
       closes: d.close,
     }));
 
+  // Real ratings (Google + Treatwell). German comma → dot for schema.org; a
+  // count is required for a valid AggregateRating, so pull the first integer
+  // out of either count field and omit the block entirely if none is set.
+  const ratingValue = (s.googleRating || s.treatwellRating || "").replace(",", ".");
+  const reviewCount = (s.googleReviewCount || s.treatwellReviewCount || "").replace(/\D/g, "");
+  const aggregateRating =
+    ratingValue && reviewCount
+      ? {
+          "@type": "AggregateRating",
+          ratingValue,
+          reviewCount,
+          bestRating: "5",
+          worstRating: "1",
+        }
+      : undefined;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BeautySalon",
@@ -32,6 +48,7 @@ export default function LocalBusinessSchema() {
     telephone: s.phone,
     email: s.email,
     priceRange: "€€",
+    ...(aggregateRating ? { aggregateRating } : {}),
     address: {
       "@type": "PostalAddress",
       streetAddress: "Berlepschstraße 2",

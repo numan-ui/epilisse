@@ -4,7 +4,8 @@ import { fieldInput } from './helpers';
 // Covers a gap noted after the initial E2E pass: about-values CRUD
 // (add/remove up to ABOUT_VALUE_LIMIT = 10) was never exercised. Each test
 // gets a fresh browser context, so localStorage always starts from
-// INIT_ABOUT_VALUES (3 seeded values: Qualität, Diskretion, Perfektion).
+// INIT_ABOUT_VALUES (3 seeded credential values, rendered as ✓ cards in the
+// owner manifesto block).
 
 test('adding a value appears in the Über-Uns section on the landing page', async ({ page }) => {
   const marker = `E2E Vertrauen ${Date.now()}`;
