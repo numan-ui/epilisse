@@ -69,14 +69,19 @@ export default function BehandlungenPage() {
         throw new Error(pcBody.error || 'Speichern der Seiteninhalte fehlgeschlagen.');
       }
 
+      const contentPayload = JSON.stringify({ services, aktionen, settings, landingContent, heroSlides, aboutValues, reviews });
       const contentPut = await fetch('/api/content', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ services, aktionen, settings, landingContent, heroSlides, aboutValues, reviews }),
+        body: contentPayload,
       });
       if (!contentPut.ok) {
-        const cBody = await contentPut.json().catch(() => ({}));
-        throw new Error(cBody.error || 'Speichern der Inhalte fehlgeschlagen.');
+        const cBody = await contentPut.json().catch(() => ({} as { error?: string }));
+        const sizeMb = (new Blob([contentPayload]).size / (1024 * 1024)).toFixed(1);
+        const hint = contentPut.status === 413 || Number(sizeMb) > 4
+          ? ` — die Inhalte sind ${sizeMb} MB groß (Limit ~4,5 MB). Bitte hochgeladene Bilder (Hero-Slides, Inhaberin-Foto) verkleinern (<500 KB) und erneut versuchen.`
+          : '';
+        throw new Error((cBody.error || `Speichern der Inhalte fehlgeschlagen (HTTP ${contentPut.status})`) + hint);
       }
 
       const res = await fetch('/api/categories', { method: 'POST' });
