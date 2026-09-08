@@ -2,19 +2,19 @@
 name: Luxus Ästhetik System
 colors:
   surface: '#fcf9f8'
-  surface-dim: '#dcd9d9'
+  surface-dim: '#d3cfce'
   surface-bright: '#fcf9f8'
   surface-container-lowest: '#ffffff'
-  surface-container-low: '#f6f3f2'
-  surface-container: '#f0eded'
-  surface-container-high: '#eae7e7'
-  surface-container-highest: '#e5e2e1'
+  surface-container-low: '#f3efed'
+  surface-container: '#ebe6e3'
+  surface-container-high: '#e1dbd7'
+  surface-container-highest: '#d7d0cb'
   on-surface: '#1c1b1b'
   on-surface-variant: '#4d4635'
   inverse-surface: '#313030'
   inverse-on-surface: '#f3f0ef'
   outline: '#7f7663'
-  outline-variant: '#d0c5af'
+  outline-variant: '#c6b99f'
   surface-tint: '#745b00'
   primary: '#745b00'
   on-primary: '#ffffff'
@@ -151,12 +151,16 @@ The design system utilizes a **Fluid Grid** with generous safe margins to preser
 
 ## Elevation & Depth
 
-To maintain a clean and modern look, depth is communicated through **Tonal Layers** and **Low-Contrast Outlines** rather than heavy shadows.
+Depth is communicated through a **surface ramp with real range**, a **defined resting shadow**, and **visible 1px edges** — restraint, not absence.
 
-*   **Surface Hierarchy:** The base background is "Cream Surface". Cards and containers use "Pure White".
-*   **Shadows:** Use only one type of shadow: a very soft, highly diffused "Ambient Glow" (0px 4px 20px rgba(0,0,0,0.04)) to subtly lift active cards or dropdowns.
+*   **Surface ramp:** The ramp deliberately spans a wide tonal band, not a flat 6% sliver. Base ground is `surface`; `surface-container-lowest` (#ffffff) is the lift; the ramp then steps down to `surface-container-highest` a genuine ~12% darker off `card` so bands and nested panels separate on their own. Derived themes reproduce this range via `deriveTokens()` (`adjustL(card, -0.12)` at the top).
+*   **Shadows:** Cards carry a defined resting shadow — a tight contact edge plus one diffused drop: `0 1px 2px rgba(0,0,0,0.04), 0 8px 24px -12px rgba(0,0,0,0.12)`. `.lux-shadow` (buttons, dropdowns) is `0 1px 2px rgba(0,0,0,0.05), 0 10px 28px -8px rgba(0,0,0,0.10)`. Not a 4% ambient glow.
+*   **Borders:** 1px `outline-variant` at ~60% opacity on cards and panels — a readable edge, not an invisible one. Full borders only; **no left/side accent stripes** (`border-l-*` as decoration is banned — use a full border or a background tint).
 *   **Glassmorphism:** Reserved for the fixed header during scroll, using a backdrop-blur (10px) with 80% opacity of the "Off-White" color to maintain legibility.
-*   **Borders:** Use a 1px "Border-Subtle" (#E5E1D8) for pricing tables and list dividers to define structure without adding visual noise.
+
+## Kicker cadence
+
+The tracked all-caps kicker is a **section-level device: at most one per section**, introducing the section heading. Never place a kicker on every card in a grid — repeated per-card kickers add no weight and read as boilerplate. Per-card status chips (countdown, "Bestseller") are a different element and are fine.
 
 ## Shapes
 

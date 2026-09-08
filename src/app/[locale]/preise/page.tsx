@@ -86,7 +86,7 @@ function PricingSection({ cat, fallback }: { cat: Cat; fallback: PricingItem[] }
             key={i}
             className={`flex items-center justify-between py-6 px-4 border-b group cursor-pointer transition-colors ${
               item.oldPrice
-                ? 'border-outline-variant/50 border-l-[3px] border-l-primary bg-gradient-to-r from-primary/[0.10] via-primary/[0.04] to-transparent hover:from-primary/[0.16]'
+                ? 'border-outline-variant/50 bg-primary/[0.05] hover:bg-primary/[0.09]'
                 : 'border-outline-variant hover:bg-surface/50'
             }`}
           >

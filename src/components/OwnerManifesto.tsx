@@ -60,7 +60,7 @@ export default function OwnerManifesto({ className = '' }: { className?: string 
         <h2 className="font-display-lg text-headline-lg font-semibold text-on-surface mb-6 leading-tight text-balance">
           {title}
         </h2>
-        <p className="font-body-lg text-body-lg text-secondary mb-10 whitespace-pre-line">
+        <p className="font-body-lg text-body-lg text-on-surface-variant mb-10 whitespace-pre-line">
           {body}
         </p>
 
@@ -68,7 +68,7 @@ export default function OwnerManifesto({ className = '' }: { className?: string 
           {values.map((v) => (
             <div
               key={v.id}
-              className="flex gap-3 items-start border border-outline-variant/30 rounded-xl p-4 bg-surface-container-lowest"
+              className="flex gap-3 items-start border border-outline-variant/60 rounded-xl p-4 bg-surface-container-lowest"
             >
               <span
                 className="material-symbols-outlined text-primary text-[20px] mt-0.5 shrink-0"
@@ -81,7 +81,7 @@ export default function OwnerManifesto({ className = '' }: { className?: string 
                 <h3 className="font-headline-sm text-[15px] font-medium text-on-surface mb-0.5">
                   {v.title}
                 </h3>
-                {v.desc && <p className="font-body-sm text-body-sm text-secondary">{v.desc}</p>}
+                {v.desc && <p className="font-body-sm text-body-sm text-on-surface-variant">{v.desc}</p>}
               </div>
             </div>
           ))}

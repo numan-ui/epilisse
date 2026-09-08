@@ -205,13 +205,13 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
           <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter">
             <div className="md:col-span-7 flex flex-col justify-center">
               <h2 className="font-headline-lg text-headline-lg text-primary mb-8">{data.infoTitle}</h2>
-              <div className="space-y-6 font-body-md text-body-md text-secondary leading-loose">
+              <div className="space-y-6 font-body-md text-body-md text-on-surface-variant leading-loose">
                 {data.infoParagraphs.map((p, i) => (
                   <p key={i}>{p}</p>
                 ))}
               </div>
             </div>
-            <div className="md:col-span-5 bg-surface-container-low p-10 flex flex-col justify-center border-l-2 border-primary">
+            <div className="md:col-span-5 bg-surface-container-low p-10 flex flex-col justify-center border border-outline-variant">
               <h3 className="font-headline-sm text-headline-sm text-on-surface mb-6">{data.benefitsTitle}</h3>
               <ul className="space-y-4">
                 {data.benefits.map((b, i) => (
@@ -242,7 +242,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
                   key={i}
                   className={`flex items-center justify-between py-6 px-4 border-b group cursor-pointer transition-colors ${
                     item.oldPrice
-                      ? 'border-outline-variant/50 border-l-[3px] border-l-primary bg-gradient-to-r from-primary/[0.10] via-primary/[0.04] to-transparent hover:from-primary/[0.16]'
+                      ? 'border-outline-variant/50 bg-primary/[0.05] hover:bg-primary/[0.09]'
                       : 'border-outline-variant hover:bg-surface/50'
                   }`}
                 >

@@ -94,14 +94,18 @@ export function deriveTokens(input: ThemeInput): DeriveResult {
   // ── surfaces ──────────────────────────────────────────────
   v['--color-surface'] = surface;
   v['--color-background'] = surface;
+  // Surface ramp — deliberately widened past a flat "quiet luxury" sliver so
+  // cards, bands and the page ground actually separate (see DESIGN.md
+  // "Elevation & surface ramp"). The bottom stays near the picked surface; the
+  // top of the ramp is pushed a real ~12% darker off `card`.
   v['--color-surface-bright'] = adjustL(surface, 0.02);
-  v['--color-surface-dim'] = adjustL(surface, -0.09);
+  v['--color-surface-dim'] = adjustL(surface, -0.13);
   v['--color-surface-container-lowest'] = adjustL(surface, 0.03);
   v['--color-surface-container-low'] = mix(surface, card, 0.45);
   v['--color-surface-container'] = card;
-  v['--color-surface-container-high'] = adjustL(card, -0.035);
-  v['--color-surface-container-highest'] = adjustL(card, -0.07);
-  v['--color-surface-variant'] = adjustL(card, -0.07);
+  v['--color-surface-container-high'] = adjustL(card, -0.055);
+  v['--color-surface-container-highest'] = adjustL(card, -0.12);
+  v['--color-surface-variant'] = adjustL(card, -0.12);
   v['--color-inverse-surface'] = withSL(input.text, 0.06, 0.2);
   v['--color-inverse-on-surface'] = withSL(surface, 0.3, 0.95);
 
@@ -113,8 +117,8 @@ export function deriveTokens(input: ThemeInput): DeriveResult {
     notes.push(`Ana metin rengi okunabilirlik için koyulaştırıldı: ${onSurface.toUpperCase()}`);
   }
   v['--color-on-surface-variant'] = ensureContrast(mix(onSurface, surface, 0.28), surface, 4.5);
-  v['--color-outline'] = ensureContrast(mix(onSurface, surface, 0.5), surface, 3);
-  v['--color-outline-variant'] = mix(onSurface, surface, 0.8);
+  v['--color-outline'] = ensureContrast(mix(onSurface, surface, 0.45), surface, 3);
+  v['--color-outline-variant'] = mix(onSurface, surface, 0.72);
 
   // ── error (kept, lightly re-toned to the surface) ─────────
   v['--color-error'] = '#ba1a1a';

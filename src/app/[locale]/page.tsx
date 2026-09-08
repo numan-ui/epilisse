@@ -550,7 +550,7 @@ export default function HomePage() {
             <Link
               key={card.key}
               href={card.href}
-              className={`bento-card group bg-surface-container-lowest border border-outline-variant/30 cursor-pointer flex flex-col ${uniformCols ? '' : gridSpanClass(i, gridCards.length)}`}
+              className={`bento-card group bg-surface-container-lowest border border-outline-variant/60 cursor-pointer flex flex-col ${uniformCols ? '' : gridSpanClass(i, gridCards.length)}`}
             >
               {/* lg:min-h floors the image area against the text block below growing (a
                   longer admin-entered name/description wrapping to more lines as the
@@ -571,9 +571,8 @@ export default function HomePage() {
                 )}
               </div>
               <div className="p-6">
-                <span className="font-label-caps text-[10px] text-primary tracking-widest block mb-2">{card.kicker}</span>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-2 line-clamp-2">{card.name}</h3>
-                <p className="font-body-sm text-body-sm text-secondary line-clamp-2">{card.desc}</p>
+                <p className="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">{card.desc}</p>
               </div>
             </Link>
           ))}
@@ -588,7 +587,7 @@ export default function HomePage() {
       {banners.length > 0 && (
       <section
         id="preise"
-        className="py-section-gap bg-secondary-container/30 border-y border-outline-variant/30"
+        className="py-section-gap bg-secondary-container/70 border-y border-outline-variant/50"
       >
        <div className="px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
         {/* Section header — same rhythm as the other homepage sections */}
@@ -607,7 +606,7 @@ export default function HomePage() {
           </h2>
           <div className="w-20 h-[2px] bg-primary-fixed-dim mx-auto" />
           {lc.aktionenSectionText && (
-            <p className="font-body-md text-body-md text-secondary max-w-xl mx-auto mt-5">
+            <p className="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto mt-5">
               {lc.aktionenSectionText}
             </p>
           )}
@@ -628,7 +627,7 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="relative grid w-full md:w-fit md:mx-auto md:grid-cols-[minmax(0,440px)_300px] min-h-[200px] overflow-hidden rounded-[14px] border border-outline-variant/40 bg-surface-container shadow-[0_18px_40px_-24px_rgba(80,30,45,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_54px_-24px_rgba(80,30,45,0.45)]"
+              className={`relative grid w-full md:w-fit md:mx-auto ${b.image ? 'md:grid-cols-[minmax(0,440px)_300px]' : 'md:grid-cols-1 md:max-w-[520px]'} min-h-[200px] overflow-hidden rounded-[14px] border border-outline-variant/60 bg-surface-container shadow-[0_18px_40px_-24px_rgba(80,30,45,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_54px_-24px_rgba(80,30,45,0.45)]`}
             >
               {badge && (
                 <span className="absolute top-3.5 right-4 z-20 inline-flex items-center gap-1 font-label-caps text-[10px] tracking-wide text-primary bg-primary/12 border border-primary/25 rounded-full px-2.5 py-1">
@@ -637,7 +636,7 @@ export default function HomePage() {
               )}
 
               {/* Text */}
-              <div className="flex flex-col justify-center gap-2 border-l-[3px] border-primary px-7 py-6 md:px-8 order-2 md:order-1">
+              <div className="flex flex-col justify-center gap-2 px-7 py-6 md:px-8 order-2 md:order-1">
                 <span className="font-label-caps text-label-caps text-primary tracking-[0.22em]">
                   {b.label || "Exklusives Angebot"}
                 </span>
@@ -645,7 +644,7 @@ export default function HomePage() {
                   {b.title}
                 </h2>
                 {b.desc && (
-                  <p className="font-body-sm text-body-sm text-secondary max-w-[46ch] line-clamp-1">{b.desc}</p>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant max-w-[46ch] line-clamp-1">{b.desc}</p>
                 )}
                 {valid && (
                   <span className="font-body-sm text-[11.5px] text-on-surface-variant opacity-80">{valid}</span>
@@ -669,9 +668,11 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Image */}
-              <div className="relative min-h-[120px] md:min-h-full overflow-hidden order-1 md:order-2 bg-secondary-container/40">
-                {b.image && (
+              {/* Image — only when the admin actually set one, so an image-less
+                  offer collapses to a single content column instead of leaving
+                  an empty grey half. */}
+              {b.image && (
+                <div className="relative min-h-[120px] md:min-h-full overflow-hidden order-1 md:order-2 bg-secondary-container/40">
                   <SmartImage
                     src={b.image}
                     alt={b.title}
@@ -681,8 +682,8 @@ export default function HomePage() {
                     }`}
                     sizes="(min-width:768px) 40vw, 100vw"
                   />
-                )}
-              </div>
+                </div>
+              )}
             </motion.div>
           );
         })}
@@ -755,33 +756,33 @@ export default function HomePage() {
         >
 
           {/* Address card */}
-          <div className="bento-card bg-surface-container-low border border-outline-variant/30 p-8 flex flex-col gap-4">
+          <div className="bento-card bg-surface-container-low border border-outline-variant/60 p-8 flex flex-col gap-4">
             <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
               <span className="material-symbols-outlined text-primary">location_on</span>
             </div>
             <h3 className="font-headline-sm text-headline-sm font-medium text-on-surface">
               {lc.contactAddressTitle || t("contact.addressTitle")}
             </h3>
-            <address className="font-body-sm text-body-sm text-secondary not-italic whitespace-pre-line">
+            <address className="font-body-sm text-body-sm text-on-surface-variant not-italic whitespace-pre-line">
               {displayAddress}
             </address>
           </div>
 
           {/* Hours card */}
-          <div className="bento-card bg-surface-container-low border border-outline-variant/30 p-8 flex flex-col gap-4">
+          <div className="bento-card bg-surface-container-low border border-outline-variant/60 p-8 flex flex-col gap-4">
             <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
               <span className="material-symbols-outlined text-primary">schedule</span>
             </div>
             <h3 className="font-headline-sm text-headline-sm font-medium text-on-surface">
               {lc.contactHoursTitle || t("contact.hoursTitle")}
             </h3>
-            <p className="font-body-sm text-body-sm text-secondary whitespace-pre-line">
+            <p className="font-body-sm text-body-sm text-on-surface-variant whitespace-pre-line">
               {displayHours}
             </p>
           </div>
 
           {/* Phone card */}
-          <div className="bento-card bg-surface-container-low border border-outline-variant/30 p-8 flex flex-col gap-4">
+          <div className="bento-card bg-surface-container-low border border-outline-variant/60 p-8 flex flex-col gap-4">
             <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
               <span className="material-symbols-outlined text-primary">phone</span>
             </div>
@@ -790,7 +791,7 @@ export default function HomePage() {
             </h3>
             <a
               href={`tel:${phoneHref}`}
-              className="font-body-sm text-body-sm text-secondary hover:text-primary transition-colors"
+              className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors"
             >
               {displayPhone}
             </a>
@@ -838,7 +839,7 @@ export default function HomePage() {
             <div className="font-display-lg text-headline-md tracking-widest text-primary">
               {settings.name}
             </div>
-            <p className="font-body-sm text-body-sm text-secondary max-w-xs">
+            <p className="font-body-sm text-body-sm text-on-surface-variant max-w-xs">
               {lc.footerTagline || t("footer.tagline")}
             </p>
             <div className="flex gap-4">
