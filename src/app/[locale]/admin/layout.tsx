@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: '/admin/startseite', icon: 'home', label: 'Startseite' },
   { href: '/admin/termine', icon: 'calendar_month', label: 'Termine' },
   { href: '/admin/behandlungen', icon: 'content_cut', label: 'Behandlungen' },
+  { href: '/admin/aktionen', icon: 'sell', label: 'Aktionen' },
   { href: '/admin/kunden', icon: 'group', label: 'Kunden' },
   { href: '/admin/kampagnen', icon: 'campaign', label: 'Kampagnen' },
   { href: '/admin/einstellungen', icon: 'settings', label: 'Einstellungen' },

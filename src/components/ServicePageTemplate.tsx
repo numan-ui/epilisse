@@ -8,6 +8,7 @@ import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useBookingModal } from "@/context/BookingModalContext";
 import { PREVIEW_GRADIENT } from "@/app/[locale]/admin/behandlungen/data";
 import { discountPct } from "@/lib/price";
+import { countdownLabel, validityText } from "@/lib/aktion";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 export interface PricingItem {
@@ -28,6 +29,8 @@ export interface Campaign {
   imagePosition?: "top" | "center" | "bottom";
   price?: string;
   oldPrice?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface ServicePageData {
@@ -93,6 +96,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
   const NAV_LINKS = [
     { href: "/behandlungen", label: lc.navBehandlungen || "Behandlungen" },
     { href: "/preise", label: lc.navPreise || "Preise" },
+    { href: "/aktionen", label: lc.navAktionen || "Aktionen" },
     { href: "/ueber-uns", label: lc.navUeberUns || "Über Uns" },
     { href: "/#kontakt", label: lc.navKontakt || "Kontakt" },
   ];
@@ -320,12 +324,27 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
                   <div className={`absolute top-0 right-0 p-10 ${dark ? "opacity-[0.12]" : "opacity-10"}`}>
                     <span className="material-symbols-outlined text-[180px]">{banner.icon}</span>
                   </div>
-                  <span className={`font-label-caps text-label-caps tracking-[0.22em] mb-4 ${dark ? "text-white/65" : "text-primary"}`}>
-                    {banner.label}
-                  </span>
-                  <h2 className={`font-headline-lg text-display-lg mb-6 leading-tight ${dark ? "text-white" : ""}`}>
+                  <div className="flex flex-wrap items-center gap-3 mb-4">
+                    <span className={`font-label-caps text-label-caps tracking-[0.22em] ${dark ? "text-white/65" : "text-primary"}`}>
+                      {banner.label}
+                    </span>
+                    {(() => {
+                      const cd = countdownLabel(banner.endDate);
+                      return cd ? (
+                        <span className={`font-label-caps text-[10px] rounded-full px-2 py-0.5 border ${dark ? "text-white bg-white/15 border-white/25" : "text-primary bg-primary/10 border-primary/20"}`}>
+                          {cd}
+                        </span>
+                      ) : null;
+                    })()}
+                  </div>
+                  <h2 className={`font-headline-lg text-display-lg mb-3 leading-tight ${dark ? "text-white" : ""}`}>
                     {banner.title}
                   </h2>
+                  {validityText(banner.startDate, banner.endDate) && (
+                    <span className={`font-body-sm text-[12px] mb-4 ${dark ? "text-white/60" : "text-on-surface-variant opacity-80"}`}>
+                      {validityText(banner.startDate, banner.endDate)}
+                    </span>
+                  )}
                   <p className={`font-body-lg text-body-lg mb-8 ${dark ? "text-white/80" : "text-secondary"}`}>{banner.body}</p>
                   {banner.price && (
                     <div className="mb-8">
@@ -393,14 +412,25 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
                   <span className="material-symbols-outlined text-primary text-[32px] mb-4">{offer.icon}</span>
                   <span className="font-label-caps text-label-caps tracking-[0.2em] text-primary mb-2">{offer.label}</span>
                   <h4 className="font-headline-sm text-headline-sm text-on-surface mb-3">{offer.title}</h4>
+                  {(() => {
+                    const cd = countdownLabel(offer.endDate);
+                    return cd ? (
+                      <span className="font-label-caps text-[10px] text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5 mb-3">{cd}</span>
+                    ) : null;
+                  })()}
                   <p className="font-body-sm text-secondary mb-6 flex-1">{offer.body}</p>
                   {offer.price && (
-                    <div className="flex items-baseline gap-2 mb-5">
+                    <div className="flex items-baseline gap-2 mb-2">
                       <span className="font-headline-sm text-headline-sm text-primary">{offer.price}</span>
                       {offer.oldPrice && (
                         <span className="font-body-sm text-outline line-through">{offer.oldPrice}</span>
                       )}
                     </div>
+                  )}
+                  {validityText(offer.startDate, offer.endDate) && (
+                    <span className="font-body-sm text-[11px] text-on-surface-variant opacity-80 mb-5">
+                      {validityText(offer.startDate, offer.endDate)}
+                    </span>
                   )}
                   <button
                     type="button"

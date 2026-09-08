@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import ServicePageTemplate from '@/components/ServicePageTemplate';
 import { useAdminServices } from '@/hooks/useAdminServices';
 import { useAdminPageContent } from '@/hooks/useAdminPageContent';
-import { useAdminCampaigns, resolveCampaigns } from '@/hooks/useAdminCampaigns';
+import { useCategoryCampaigns, resolveCampaigns } from '@/hooks/useAktionen';
 import { useAdminCategories } from '@/hooks/useAdminCategories';
 import { INIT_PAGE_CONTENT } from '@/app/[locale]/admin/behandlungen/data';
 import { Link } from '@/i18n/navigation';
@@ -19,7 +19,7 @@ export default function DynamicCategoryPage() {
 
   const categories   = useAdminCategories();
   const pageContent  = useAdminPageContent(slug);
-  const adminCamps   = useAdminCampaigns(slug);
+  const adminCamps   = useCategoryCampaigns(slug);
   const pricingItems = useAdminServices(slug, []);
 
   useEffect(() => { setHydrated(true); }, []);

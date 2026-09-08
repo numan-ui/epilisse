@@ -1,25 +1,24 @@
 'use client';
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import {
-  INIT_SERVICES, INIT_CAMPAIGNS, INIT_PAGE_CONTENT, CATEGORIES, INIT_SETTINGS, INIT_LANDING_CONTENT,
-  INIT_HERO_SLIDES, HERO_SLIDE_LIMIT, INIT_PROMO_BANNERS, PROMO_BANNER_LIMIT, INIT_ABOUT_VALUES, ABOUT_VALUE_LIMIT,
+  INIT_SERVICES, INIT_AKTIONEN, AKTION_CATEGORY_LIMIT, INIT_PAGE_CONTENT, CATEGORIES, INIT_SETTINGS, INIT_LANDING_CONTENT,
+  INIT_HERO_SLIDES, HERO_SLIDE_LIMIT, INIT_ABOUT_VALUES, ABOUT_VALUE_LIMIT,
   INIT_REVIEWS, REVIEW_LIMIT,
-  type Service, type Campaign, type Category, type PageContent, type PageContentMap,
-  type PageBanner, type SiteSettings, type LandingContent, type HeroSlide, type PromoBanner, type AboutValue, type Review,
+  type Service, type Aktion, type Category, type PageContent, type PageContentMap,
+  type PageBanner, type SiteSettings, type LandingContent, type HeroSlide, type AboutValue, type Review,
   type SiteContent,
 } from './data';
+import { deriveAktionen } from '@/lib/aktion';
 
 type ServicesMap  = Record<string, Service[]>;
-type CampaignsMap = Record<string, Campaign[]>;
 
 const LS_SVC = 'epilisse_admin_services';
-const LS_CMP = 'epilisse_admin_campaigns';
+const LS_AKT = 'epilisse_admin_aktionen';
 const LS_PC  = 'epilisse_admin_page_content';
 const LS_CAT = 'epilisse_admin_categories';
 const LS_SET = 'epilisse_admin_settings';
 const LS_LC  = 'epilisse_admin_landing_content';
 const LS_HERO  = 'epilisse_admin_hero_slides';
-const LS_PROMO = 'epilisse_admin_promo_banners';
 const LS_ABOUT = 'epilisse_admin_about_values';
 const LS_REVIEWS = 'epilisse_admin_reviews';
 
@@ -36,8 +35,6 @@ const ls = {
 
 const defaultServices    = (): ServicesMap     =>
   Object.fromEntries(Object.entries(INIT_SERVICES).map(([k, v]) => [k, v.map(s => ({ ...s }))]));
-const defaultCampaigns   = (): CampaignsMap    =>
-  Object.fromEntries(Object.entries(INIT_CAMPAIGNS).map(([k, v]) => [k, v.map(c => ({ ...c }))]));
 const defaultPageContent = (): PageContentMap  =>
   Object.fromEntries(Object.entries(INIT_PAGE_CONTENT).map(([k, v]) => [k, { ...v, infoParagraphs: [...v.infoParagraphs] as [string, string], benefits: [...v.benefits], campaign1: { ...v.campaign1 }, campaign2: { ...v.campaign2 } }]));
 
@@ -59,22 +56,21 @@ const blankPageContent = (cat: Pick<Category, 'name' | 'desc'>): PageContent => 
 
 interface AdminDataCtx {
   services:  ServicesMap;
-  campaigns: CampaignsMap;
+  aktionen: Aktion[];
   pageContent: PageContentMap;
   categories: Category[];
   categoriesLoaded: boolean;
   settings: SiteSettings;
   landingContent: LandingContent;
   heroSlides: HeroSlide[];
-  promoBanners: PromoBanner[];
   aboutValues: AboutValue[];
   reviews: Review[];
   updateService:        (catId: string, id: string, field: keyof Service,  value: string | boolean) => void;
   deleteService:        (catId: string, id: string) => void;
   addService:           (catId: string, svc: Omit<Service, 'id'>) => void;
-  updateCampaign:       (catId: string, id: string, field: keyof Campaign, value: string | boolean) => void;
-  deleteCampaign:       (catId: string, id: string) => void;
-  addCampaign:          (catId: string, cmp: Omit<Campaign, 'id'>) => void;
+  updateAktion:         (id: string, field: keyof Aktion, value: string | boolean) => void;
+  addAktion:            (category: string) => void;
+  removeAktion:         (id: string) => void;
   updatePageField:      (catId: string, field: keyof Omit<PageContent, 'infoParagraphs' | 'benefits' | 'campaign1' | 'campaign2'>, value: string) => void;
   updatePageParagraph:  (catId: string, index: 0 | 1, value: string) => void;
   updatePageBenefit:    (catId: string, index: number, value: string) => void;
@@ -91,9 +87,6 @@ interface AdminDataCtx {
   addHeroSlide: () => void;
   removeHeroSlide: (id: string) => void;
   reorderHeroSlide: (id: string, position: number) => void;
-  updatePromoBanner: (id: string, field: keyof PromoBanner, value: string) => void;
-  addPromoBanner: () => void;
-  removePromoBanner: (id: string) => void;
   updateAboutValue: (id: string, field: keyof AboutValue, value: string) => void;
   addAboutValue: () => void;
   removeAboutValue: (id: string) => void;
@@ -106,7 +99,7 @@ const Ctx = createContext<AdminDataCtx | null>(null);
 
 export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [services,    setServices]    = useState<ServicesMap>(defaultServices);
-  const [campaigns,   setCampaigns]   = useState<CampaignsMap>(defaultCampaigns);
+  const [aktionen,    setAktionen]    = useState<Aktion[]>(() => INIT_AKTIONEN.map(a => ({ ...a })));
   const [pageContent, setPageContent] = useState<PageContentMap>(defaultPageContent);
   const [categories,  setCategories]  = useState<Category[]>(CATEGORIES.map(c => ({ ...c })));
   // Flips true once the localStorage-load effect below has run, together with (batched
@@ -122,27 +115,24 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [settings,    setSettings]    = useState<SiteSettings>({ ...INIT_SETTINGS, hours: INIT_SETTINGS.hours.map(h => ({ ...h })) });
   const [landingContent, setLandingContent] = useState<LandingContent>({ ...INIT_LANDING_CONTENT });
   const [heroSlides, setHeroSlides]   = useState<HeroSlide[]>(INIT_HERO_SLIDES.map(s => ({ ...s })));
-  const [promoBanners, setPromoBanners] = useState<PromoBanner[]>(INIT_PROMO_BANNERS.map(p => ({ ...p })));
   const [aboutValues, setAboutValues] = useState<AboutValue[]>(INIT_ABOUT_VALUES.map(v => ({ ...v })));
   const [reviews, setReviews] = useState<Review[]>(INIT_REVIEWS.map(r => ({ ...r })));
 
   useEffect(() => {
     const svcs = ls.read<ServicesMap>(LS_SVC);
-    const cmps = ls.read<CampaignsMap>(LS_CMP);
+    const akt  = ls.read<Aktion[]>(LS_AKT);
     const pc   = ls.read<PageContentMap>(LS_PC);
     const cats = ls.read<Category[]>(LS_CAT);
     const set  = ls.read<SiteSettings>(LS_SET);
     const lc   = ls.read<LandingContent>(LS_LC);
     const hero = ls.read<HeroSlide[]>(LS_HERO);
-    const promo = ls.read<PromoBanner[]>(LS_PROMO);
     const about = ls.read<AboutValue[]>(LS_ABOUT);
     const revs  = ls.read<Review[]>(LS_REVIEWS);
     if (svcs) setServices(svcs);
-    if (cmps) setCampaigns(cmps);
+    if (akt && akt.length > 0) setAktionen(akt);
     if (set)  setSettings(prev => ({ ...prev, ...set, hours: set.hours ?? prev.hours }));
     if (lc)   setLandingContent(prev => ({ ...prev, ...lc }));
     if (hero && hero.length > 0) setHeroSlides(hero);
-    if (promo && promo.length > 0) setPromoBanners(promo);
     if (about && about.length > 0) setAboutValues(about);
     if (revs  && revs.length > 0)  setReviews(revs);
 
@@ -151,7 +141,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     // uses it; one without seeds from `draft` (the shared source of truth)
     // rather than the hardcoded INIT_* defaults, so the write-through below
     // can't overwrite the shared draft with those.
-    const hasLocalSite = !!(svcs || cmps || set || lc || hero || promo || about || revs);
+    const hasLocalSite = !!(svcs || akt || set || lc || hero || about || revs);
     if (hasLocalSite) {
       setSiteContentLoaded(true);
     } else {
@@ -163,11 +153,11 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
           const d = res.draft;
           if (d && Object.keys(d).length > 0) {
             if (d.services) setServices(d.services);
-            if (d.campaigns) setCampaigns(d.campaigns);
+            const derivedAkt = deriveAktionen(d);
+            if (derivedAkt.length > 0) setAktionen(derivedAkt);
             if (d.settings) setSettings(prev => ({ ...prev, ...d.settings, hours: d.settings!.hours ?? prev.hours }));
             if (d.landingContent) setLandingContent(prev => ({ ...prev, ...d.landingContent }));
             if (d.heroSlides && d.heroSlides.length > 0) setHeroSlides(d.heroSlides);
-            if (d.promoBanners && d.promoBanners.length > 0) setPromoBanners(d.promoBanners);
             if (d.aboutValues && d.aboutValues.length > 0) setAboutValues(d.aboutValues);
             if (d.reviews && d.reviews.length > 0) setReviews(d.reviews);
           }
@@ -307,8 +297,8 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!siteContentLoaded) return;
     const bundle: SiteContent = {
-      services, campaigns, settings, landingContent,
-      heroSlides, promoBanners, aboutValues, reviews,
+      services, aktionen, settings, landingContent,
+      heroSlides, aboutValues, reviews,
     };
     const timer = setTimeout(() => {
       fetch('/api/content', {
@@ -318,7 +308,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       }).catch(() => { /* best-effort */ });
     }, 700);
     return () => clearTimeout(timer);
-  }, [services, campaigns, settings, landingContent, heroSlides, promoBanners, aboutValues, reviews, siteContentLoaded]);
+  }, [services, aktionen, settings, landingContent, heroSlides, aboutValues, reviews, siteContentLoaded]);
 
   /* ── Services ────────────────────────────────────── */
   const updateService = useCallback((catId: string, id: string, field: keyof Service, value: string | boolean) =>
@@ -339,23 +329,30 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       ls.write(LS_SVC, next); return next;
     }), []);
 
-  /* ── Campaigns ───────────────────────────────────── */
-  const updateCampaign = useCallback((catId: string, id: string, field: keyof Campaign, value: string | boolean) =>
-    setCampaigns(prev => {
-      const next = { ...prev, [catId]: prev[catId].map(c => c.id === id ? { ...c, [field]: value } : c) };
-      ls.write(LS_CMP, next); return next;
+  /* ── Aktionen ─────────────────────────────────────── */
+  const updateAktion = useCallback((id: string, field: keyof Aktion, value: string | boolean) =>
+    setAktionen(prev => {
+      const next = prev.map(a => a.id === id ? { ...a, [field]: value } : a);
+      ls.write(LS_AKT, next); return next;
     }), []);
 
-  const deleteCampaign = useCallback((catId: string, id: string) =>
-    setCampaigns(prev => {
-      const next = { ...prev, [catId]: prev[catId].filter(c => c.id !== id) };
-      ls.write(LS_CMP, next); return next;
+  const addAktion = useCallback((category: string) =>
+    setAktionen(prev => {
+      if (prev.filter(a => a.category === category).length >= AKTION_CATEGORY_LIMIT) return prev;
+      const next: Aktion[] = [...prev, {
+        id: `akt-${Date.now()}`, category,
+        label: '', title: '', desc: '', price: '', oldPrice: undefined,
+        cta: 'JETZT BUCHEN', icon: 'auto_fix_high', image: '', imagePosition: 'top',
+        startDate: undefined, endDate: undefined,
+        activeInCategory: true, activeOnHome: false,
+      }];
+      ls.write(LS_AKT, next); return next;
     }), []);
 
-  const addCampaign = useCallback((catId: string, cmp: Omit<Campaign, 'id'>) =>
-    setCampaigns(prev => {
-      const next = { ...prev, [catId]: [...(prev[catId] ?? []), { ...cmp, id: `c-${Date.now()}` }] };
-      ls.write(LS_CMP, next); return next;
+  const removeAktion = useCallback((id: string) =>
+    setAktionen(prev => {
+      const next = prev.filter(a => a.id !== id);
+      ls.write(LS_AKT, next); return next;
     }), []);
 
   /* ── Page content ────────────────────────────────── */
@@ -402,7 +399,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     const template = templateCatId ? pageContent[templateCatId] : undefined;
     const templateCat = templateCatId ? categories.find(c => c.id === templateCatId) : undefined;
     const templateSvcs = templateCatId ? (services[templateCatId] ?? []) : [];
-    const templateCmps = templateCatId ? (campaigns[templateCatId] ?? []) : [];
+    const templateAkt  = templateCatId ? aktionen.filter(a => a.category === templateCatId) : [];
 
     setCategories(prev => {
       const image = cat.image || templateCat?.image || template?.heroImage || '';
@@ -449,15 +446,15 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       });
     }
 
-    // Seed the template's campaign cards too, so the Kampagnen list isn't left empty.
-    if (templateCmps.length > 0) {
-      setCampaigns(prev => {
-        const cloned = templateCmps.map((c, i) => ({ ...c, id: `c-${Date.now()}-${i}` }));
-        const next = { ...prev, [id]: cloned };
-        ls.write(LS_CMP, next); return next;
+    // Seed the template's Aktionen too, so the Aktionen list isn't left empty.
+    if (templateAkt.length > 0) {
+      setAktionen(prev => {
+        const cloned = templateAkt.map((a, i) => ({ ...a, id: `akt-${Date.now()}-${i}`, category: id }));
+        const next = [...prev, ...cloned];
+        ls.write(LS_AKT, next); return next;
       });
     }
-  }, [categories, pageContent, services, campaigns]);
+  }, [categories, pageContent, services, aktionen]);
 
   const updateCategory = useCallback((id: string, field: keyof Category, value: string | boolean) =>
     setCategories(prev => {
@@ -481,10 +478,10 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       const { [id]: _drop, ...next } = prev;
       ls.write(LS_SVC, next); return next;
     });
-    setCampaigns(prev => {
-      if (!(id in prev)) return prev;
-      const { [id]: _drop, ...next } = prev;
-      ls.write(LS_CMP, next); return next;
+    setAktionen(prev => {
+      const next = prev.filter(a => a.category !== id);
+      if (next.length === prev.length) return prev;
+      ls.write(LS_AKT, next); return next;
     });
   }, []);
 
@@ -543,27 +540,6 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       ls.write(LS_HERO, next); return next;
     }), []);
 
-  /* ── Promo banners (Kombi-Angebot) ────────────────── */
-  const updatePromoBanner = useCallback((id: string, field: keyof PromoBanner, value: string) =>
-    setPromoBanners(prev => {
-      const next = prev.map(p => p.id === id ? { ...p, [field]: value } : p);
-      ls.write(LS_PROMO, next); return next;
-    }), []);
-
-  const addPromoBanner = useCallback(() =>
-    setPromoBanners(prev => {
-      if (prev.length >= PROMO_BANNER_LIMIT) return prev;
-      const next = [...prev, { id: `promo-${Date.now()}`, label: '', title: '', desc: '', ctaPrimary: 'JETZT BUCHEN', ctaSecondary: '', image: '' }];
-      ls.write(LS_PROMO, next); return next;
-    }), []);
-
-  const removePromoBanner = useCallback((id: string) =>
-    setPromoBanners(prev => {
-      if (prev.length <= 1) return prev;
-      const next = prev.filter(p => p.id !== id);
-      ls.write(LS_PROMO, next); return next;
-    }), []);
-
   /* ── Über Uns "Werte" ─────────────────────────────── */
   const updateAboutValue = useCallback((id: string, field: keyof AboutValue, value: string) =>
     setAboutValues(prev => {
@@ -607,14 +583,13 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
 
   return (
     <Ctx.Provider value={{
-      services, campaigns, pageContent, categories, categoriesLoaded, settings, landingContent, heroSlides, promoBanners, aboutValues, reviews,
+      services, aktionen, pageContent, categories, categoriesLoaded, settings, landingContent, heroSlides, aboutValues, reviews,
       updateService, deleteService, addService,
-      updateCampaign, deleteCampaign, addCampaign,
+      updateAktion, addAktion, removeAktion,
       updatePageField, updatePageParagraph, updatePageBenefit, addPageBenefit, removePageBenefit, updatePageBanner,
       addCategory, updateCategory, deleteCategory,
       updateSetting, updateSettingHours, updateLandingField,
       updateHeroSlide, addHeroSlide, removeHeroSlide, reorderHeroSlide,
-      updatePromoBanner, addPromoBanner, removePromoBanner,
       updateAboutValue, addAboutValue, removeAboutValue,
       updateReview, addReview, removeReview,
     }}>

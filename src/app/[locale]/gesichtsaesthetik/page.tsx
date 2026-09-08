@@ -2,7 +2,7 @@
 import ServicePageTemplate from "@/components/ServicePageTemplate";
 import { useAdminServices } from "@/hooks/useAdminServices";
 import { useAdminPageContent } from "@/hooks/useAdminPageContent";
-import { useAdminCampaigns, resolveCampaigns } from "@/hooks/useAdminCampaigns";
+import { useCategoryCampaigns, resolveCampaigns } from "@/hooks/useAktionen";
 import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useParams } from "next/navigation";
 
@@ -19,7 +19,7 @@ export default function GesichtsaesthetikPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'de';
   const pageContent  = useAdminPageContent('gesicht');
-  const adminCamps   = useAdminCampaigns('gesicht');
+  const adminCamps   = useCategoryCampaigns('gesicht');
   const categories   = useAdminCategories();
   const pricingItems = useAdminServices('gesicht', FALLBACK_PRICING);
   return (

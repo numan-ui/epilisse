@@ -145,6 +145,7 @@ export default function PreisePage() {
   const NAV_LINKS = [
     { href: "/#behandlungen", label: lc.navBehandlungen || "Behandlungen" },
     { href: "/preise", label: lc.navPreise || "Preise" },
+    { href: "/aktionen", label: lc.navAktionen || "Aktionen" },
     { href: "/ueber-uns", label: lc.navUeberUns || "Über Uns" },
     { href: "/#kontakt", label: lc.navKontakt || "Kontakt" },
   ];

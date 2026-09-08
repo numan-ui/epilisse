@@ -2,6 +2,7 @@
   "nav": {
     "behandlungen": "Behandlungen",
     "preise": "Preise",
+    "aktionen": "Aktionen",
     "ueberUns": "Über Uns",
     "kontakt": "Kontakt",
     "cta": "TERMIN BUCHEN",
@@ -33,13 +34,6 @@
     "maniDesc": "Nagelästhetik für den perfekten Auftritt.",
     "discover": "ENTDECKEN",
     "details": "DETAILS"
-  },
-  "promo": {
-    "label": "EXKLUSIVES ANGEBOT",
-    "title": "Winter Glow\nKombi-Paket",
-    "desc": "Erhalten Sie 20 % Rabatt auf unsere exklusive Kombination aus Gesichtshydrierung und Maniküre. Gültig bis Ende der Saison.",
-    "ctaPrimary": "ANGEBOT SICHERN",
-    "ctaSecondary": "DETAILS ANSEHEN"
   },
   "about": {
     "sectionLabel": "ÜBER {name}",

@@ -300,8 +300,9 @@ export default function EinstellungenPage() {
               <div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface mb-1">Startseite Bilder</h3>
                 <p className="font-body-sm text-on-surface-variant opacity-70">
-                  Über-Uns-Bereich. Hero-Slider- und Kombi-Angebot-Bilder werden jetzt pro Eintrag unter{' '}
-                  <a href="../startseite" className="text-primary underline">Startseite</a> gepflegt.
+                  Über-Uns-Bereich. Hero-Slider-Bilder pro Eintrag unter{' '}
+                  <a href="../startseite" className="text-primary underline">Startseite</a>, Aktions-Bilder unter{' '}
+                  <a href="../aktionen" className="text-primary underline">Aktionen</a>.
                 </p>
               </div>
 

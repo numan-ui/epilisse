@@ -12,8 +12,10 @@ import type { SiteContent } from '@/app/[locale]/admin/behandlungen/data';
  */
 
 const KEYS: (keyof SiteContent)[] = [
-  'services', 'campaigns', 'settings', 'landingContent',
-  'heroSlides', 'promoBanners', 'aboutValues', 'reviews',
+  'services', 'aktionen', 'settings', 'landingContent',
+  'heroSlides', 'aboutValues', 'reviews',
+  // tolerated during the 0023 migration window — no longer written by the admin
+  'campaigns', 'promoBanners',
 ];
 
 function isValid(body: unknown): body is SiteContent {

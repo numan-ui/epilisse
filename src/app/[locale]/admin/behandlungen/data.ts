@@ -3,8 +3,30 @@ export type ImagePosition = 'top' | 'center' | 'bottom';
 
 /** oldPrice: optional pre-discount price. When set and non-empty, `price` is the discounted price and the public list shows an "AKTION" treatment (old price struck through, new price highlighted). */
 export type Service  = { id: string; name: string; price: string; duration: string; active: boolean; oldPrice?: string };
+/** @deprecated superseded by `Aktion` — retained only to type the legacy `SiteContent.campaigns` blob during the 0023 migration window. */
 export type Campaign = { id: string; label: string; title: string; desc: string; price: string; oldPrice?: string; cta: string; icon: string; image: string; imagePosition?: ImagePosition; active: boolean };
 export type Category = { id: string; icon: string; name: string; desc: string; visible: boolean; image: string; kicker: string };
+
+/**
+ * Unified offer model — replaces the homepage `PromoBanner` and the per-category
+ * `Campaign`. `category` is mandatory. `activeInCategory` gates the category page
+ * + /aktionen; the homepage additionally needs `activeOnHome`. startDate/endDate
+ * are display-only ('YYYY-MM-DD'); endDate also drives the last-10-days
+ * countdown. No auto-hide after endDate.
+ */
+export type Aktion = {
+  id: string;
+  category: string;            // CATEGORIES[].id — 'laser' | 'gesicht' | 'mani' | 'cat-*'
+  label: string; title: string; desc: string;
+  price: string; oldPrice?: string;
+  cta: string; icon: string; image: string; imagePosition?: ImagePosition;
+  startDate?: string; endDate?: string;
+  activeInCategory: boolean;
+  activeOnHome: boolean;
+};
+
+export const AKTION_HOME_LIMIT = 10;     // sum across all categories, on the homepage
+export const AKTION_CATEGORY_LIMIT = 10; // per category
 
 export const CATEGORIES: Category[] = [
   { id: 'laser',   icon: 'auto_awesome',    name: 'Laser-Haarentfernung', desc: 'Premium Diodenlaser-Technologie für seidig glatte Haut.',        visible: true,  image: '', kicker: 'TECHNOLOGIE' },
@@ -43,24 +65,27 @@ export const INIT_SERVICES: Record<string, Service[]> = {
   ],
 };
 
-const c = (
-  id: string, label: string, title: string, desc: string,
-  price: string, oldPrice?: string,
+const a = (
+  id: string, category: string, label: string, title: string, desc: string,
+  price: string, oldPrice: string,
+  activeInCategory: boolean, activeOnHome: boolean,
   cta = 'JETZT BUCHEN', icon = 'auto_fix_high', image = '',
-): Campaign =>
-  ({ id, label, title, desc, price, oldPrice, cta, icon, image, active: true });
+): Aktion => ({
+  id, category, label, title, desc, price,
+  oldPrice: oldPrice || undefined,
+  cta, icon, image, activeInCategory, activeOnHome,
+});
 
-export const INIT_CAMPAIGNS: Record<string, Campaign[]> = {
-  laser: [
-    c('cl1', 'AKTIVE AKTION', 'Winter Glow Kombi-Paket',   'Ganzes Gesicht + Dekolleté inkl. Maske.',         '120,00€', '149,00€', 'JETZT BUCHEN', 'auto_awesome'),
-  ],
-  gesicht: [
-    c('cg1', 'BESTSELLER',    'HydraFacial Duo-Paket',      '2× HydraFacial Premium zum Sonderpreis.',         '249,00€', '298,00€', 'JETZT BUCHEN', 'spa'),
-  ],
-  mani: [
-    c('cm1', 'DUO DEAL',      'Mani & Pedi Paket',          'Gel-Maniküre + Spa-Pediküre zusammen.',           '99,00€',  '130,00€', 'JETZT BUCHEN', 'favorite'),
-  ],
-};
+/** Seed for the unified Aktion model — the 3 seed campaigns + the 1 seed promo banner. */
+export const INIT_AKTIONEN: Aktion[] = [
+  a('cl1', 'laser',   'AKTIVE AKTION', 'Winter Glow Kombi-Paket', 'Ganzes Gesicht + Dekolleté inkl. Maske.', '120,00€', '149,00€', true, false, 'JETZT BUCHEN', 'auto_awesome'),
+  a('cg1', 'gesicht', 'BESTSELLER',    'HydraFacial Duo-Paket',   '2× HydraFacial Premium zum Sonderpreis.', '249,00€', '298,00€', true, false, 'JETZT BUCHEN', 'spa'),
+  a('cm1', 'mani',    'DUO DEAL',      'Mani & Pedi Paket',       'Gel-Maniküre + Spa-Pediküre zusammen.',   '99,00€',  '130,00€', true, false, 'JETZT BUCHEN', 'favorite'),
+  // former homepage promo banner (promo1) — home-active, category best-guess 'gesicht'
+  a('promo1', 'gesicht', 'EXKLUSIVES ANGEBOT', 'Winter Glow\nKombi-Paket',
+    'Erhalten Sie 20 % Rabatt auf unsere exklusive Kombination aus Gesichtshydrierung und Maniküre. Gültig bis Ende der Saison.',
+    '', '', true, true, 'ANGEBOT SICHERN', 'auto_awesome', '/images/promo-winter-glow.png'),
+];
 
 export type OpeningDay = { day: string; open: string; close: string; closed: boolean };
 
@@ -102,7 +127,7 @@ export const INIT_SETTINGS: SiteSettings = {
 };
 
 export type LandingContent = {
-  navBehandlungen: string; navPreise: string; navUeberUns: string; navKontakt: string; navCta: string;
+  navBehandlungen: string; navPreise: string; navUeberUns: string; navKontakt: string; navCta: string; navAktionen: string;
   servicesSectionLabel: string; servicesSectionTitle: string;
   aboutSectionLabel: string; aboutTitle: string; aboutDesc: string;
   contactSectionLabel: string; contactTitle: string;
@@ -112,7 +137,7 @@ export type LandingContent = {
 };
 
 export const INIT_LANDING_CONTENT: LandingContent = {
-  navBehandlungen: 'Behandlungen', navPreise: 'Preise', navUeberUns: 'Über Uns', navKontakt: 'Kontakt', navCta: 'TERMIN BUCHEN',
+  navBehandlungen: 'Behandlungen', navPreise: 'Preise', navUeberUns: 'Über Uns', navKontakt: 'Kontakt', navCta: 'TERMIN BUCHEN', navAktionen: 'Aktionen',
   servicesSectionLabel: 'UNSER ANGEBOT', servicesSectionTitle: 'Exklusive Behandlungen',
   aboutSectionLabel: 'ÜBER EPILISSE', aboutTitle: 'Münchens Adresse für Premium-Ästhetik',
   aboutDesc: 'Willkommen im EPILISSE Studio – Ihrem exklusiven Kosmetikstudio im Herzen von München. Wir vereinen modernste Behandlungsmethoden mit einem tiefen Verständnis für individuelle Schönheit.',
@@ -164,19 +189,8 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
   },
 ];
 
+/** @deprecated superseded by `Aktion` — retained only to type the legacy `SiteContent.promoBanners` blob during the 0023 migration window. */
 export type PromoBanner = { id: string; label: string; title: string; desc: string; ctaPrimary: string; ctaSecondary: string; image: string };
-
-export const PROMO_BANNER_LIMIT = 4;
-
-export const INIT_PROMO_BANNERS: PromoBanner[] = [
-  {
-    id: 'promo1',
-    label: 'EXKLUSIVES ANGEBOT', title: 'Winter Glow\nKombi-Paket',
-    desc: 'Erhalten Sie 20 % Rabatt auf unsere exklusive Kombination aus Gesichtshydrierung und Maniküre. Gültig bis Ende der Saison.',
-    ctaPrimary: 'ANGEBOT SICHERN', ctaSecondary: 'DETAILS ANSEHEN',
-    image: '/images/promo-winter-glow.png',
-  },
-];
 
 export type AboutValue = { id: string; icon: string; title: string; desc: string };
 
@@ -210,10 +224,13 @@ export const INIT_REVIEWS: Review[] = [
  */
 export type SiteContent = {
   services?: Record<string, Service[]>;
+  aktionen?: Aktion[];
+  /** @deprecated migrated to `aktionen` — kept one release for the 0023 migration window */
   campaigns?: Record<string, Campaign[]>;
   settings?: SiteSettings;
   landingContent?: LandingContent;
   heroSlides?: HeroSlide[];
+  /** @deprecated migrated to `aktionen` — kept one release for the 0023 migration window */
   promoBanners?: PromoBanner[];
   aboutValues?: AboutValue[];
   reviews?: Review[];
