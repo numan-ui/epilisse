@@ -17,6 +17,7 @@ import SmartImage from "@/components/SmartImage";
 import GoldDustEffect from "@/components/GoldDustEffect";
 import HeroCinematicSlide from "@/components/HeroCinematicSlide";
 import OwnerManifesto from "@/components/OwnerManifesto";
+import VerifiedReviews from "@/components/VerifiedReviews";
 import TrustBar from "@/components/TrustBar";
 
 /* ── Image constants (Stitch AI – replace with real salon photos) ── */
@@ -666,6 +667,18 @@ export default function HomePage() {
           <OwnerManifesto />
         </motion.div>
       </section>
+
+      {/* ══════════════════════════════════════════════════════
+          VERIFIZIERTE KUNDENERFAHRUNGEN — dark review band
+      ══════════════════════════════════════════════════════ */}
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.15 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+      >
+        <VerifiedReviews />
+      </motion.div>
 
       {/* ══════════════════════════════════════════════════════
           KONTAKT — Contact & location
