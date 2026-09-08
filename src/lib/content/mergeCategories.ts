@@ -1,7 +1,18 @@
-import { CATEGORIES, type Category } from '@/app/[locale]/admin/behandlungen/data';
+import { CATEGORIES, PSEUDO_CATEGORY_IDS, type Category } from '@/app/[locale]/admin/behandlungen/data';
 
 /** Empty string in an admin field means "not set" — fall back to the default rather than rendering blank. */
 const str = (v: string | undefined, fallback: string) => (v && v.trim() !== '') ? v : fallback;
+
+/**
+ * Pseudo categories ("Aktionen") always sit after the real treatment categories —
+ * in the admin list, the booking modal category step, everywhere the list renders.
+ * Stable otherwise (real categories and pseudo categories each keep their order).
+ */
+export function withPseudoLast(cats: Category[]): Category[] {
+  const real   = cats.filter((c) => !PSEUDO_CATEGORY_IDS.includes(c.id));
+  const pseudo = cats.filter((c) =>  PSEUDO_CATEGORY_IDS.includes(c.id));
+  return [...real, ...pseudo];
+}
 
 /**
  * Reconciles a stored category list against the code defaults:
@@ -31,5 +42,5 @@ export function mergeCategories(stored: Category[]): Category[] {
     };
   });
   const customs = stored.filter((c) => c.id.startsWith('cat-'));
-  return [...builtins, ...customs];
+  return withPseudoLast([...builtins, ...customs]);
 }

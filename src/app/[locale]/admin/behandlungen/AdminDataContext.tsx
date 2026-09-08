@@ -9,7 +9,7 @@ import {
   type SiteContent,
 } from './data';
 import { deriveAktionen } from '@/lib/aktion';
-import { mergeCategories } from '@/lib/content/mergeCategories';
+import { mergeCategories, withPseudoLast } from '@/lib/content/mergeCategories';
 
 type ServicesMap  = Record<string, Service[]>;
 
@@ -412,7 +412,8 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
 
     setCategories(prev => {
       const image = cat.image || templateCat?.image || template?.heroImage || '';
-      const next = [...prev, { ...cat, image, id }];
+      // Keep "Aktionen" pinned to the end — a new custom category slots in ahead of it.
+      const next = withPseudoLast([...prev, { ...cat, image, id }]);
       ls.write(LS_CAT, next); return next;
     });
 

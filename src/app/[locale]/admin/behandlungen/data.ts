@@ -147,6 +147,8 @@ export const INIT_SETTINGS: SiteSettings = {
 export type LandingContent = {
   navBehandlungen: string; navPreise: string; navUeberUns: string; navKontakt: string; navCta: string; navAktionen: string;
   servicesSectionLabel: string; servicesSectionTitle: string;
+  /** Header above the homepage Aktionen banner block. Text is optional (blank = no intro paragraph). */
+  aktionenSectionLabel: string; aktionenSectionTitle: string; aktionenSectionText: string;
   aboutSectionLabel: string; aboutTitle: string; aboutDesc: string;
   /** First-person owner manifesto block (homepage Über-Uns section + top of /ueber-uns). */
   ownerKicker: string; ownerTitle: string; ownerBody: string; ownerName: string; ownerRole: string;
@@ -159,6 +161,8 @@ export type LandingContent = {
 export const INIT_LANDING_CONTENT: LandingContent = {
   navBehandlungen: 'Behandlungen', navPreise: 'Preise', navUeberUns: 'Über Uns', navKontakt: 'Kontakt', navCta: 'TERMIN BUCHEN', navAktionen: 'Aktionen',
   servicesSectionLabel: 'UNSER ANGEBOT', servicesSectionTitle: 'Exklusive Behandlungen',
+  aktionenSectionLabel: 'AKTUELLE ANGEBOTE', aktionenSectionTitle: 'Kombi-Pakete & Aktionen',
+  aktionenSectionText: 'Beliebte Behandlungen im Paket – für kurze Zeit zum Vorzugspreis.',
   aboutSectionLabel: 'ÜBER EPILISSE', aboutTitle: 'Münchens Adresse für Premium-Ästhetik',
   aboutDesc: 'Willkommen im EPILISSE Studio – Ihrem exklusiven Kosmetikstudio im Herzen von München. Wir vereinen modernste Behandlungsmethoden mit einem tiefen Verständnis für individuelle Schönheit.',
   ownerKicker: 'PERSÖNLICHE VERANTWORTUNG',

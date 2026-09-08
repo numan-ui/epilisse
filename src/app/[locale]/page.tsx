@@ -578,11 +578,42 @@ export default function HomePage() {
 
       {/* ══════════════════════════════════════════════════════
           PROMO — Aktion / Kombi-Paket (Editorial Split, ~200px)
+          Sits on its own tinted full-bleed band so the offers read as a
+          distinct zone, not just another card row on the page ground.
       ══════════════════════════════════════════════════════ */}
+      {banners.length > 0 && (
       <section
         id="preise"
-        className="mb-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto space-y-6"
+        className="py-section-gap bg-secondary-container/30 border-y border-outline-variant/30"
       >
+       <div className="px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
+        {/* Section header — same rhythm as the other homepage sections */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="text-center mb-12"
+        >
+          <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-3">
+            {lc.aktionenSectionLabel || t("services.sectionLabel")}
+          </span>
+          <h2 className="font-display-lg text-display-lg font-bold text-primary mb-4">
+            {lc.aktionenSectionTitle || "Aktionen"}
+          </h2>
+          <div className="w-20 h-[2px] bg-primary-fixed-dim mx-auto" />
+          {lc.aktionenSectionText && (
+            <p className="font-body-md text-body-md text-secondary max-w-xl mx-auto mt-5">
+              {lc.aktionenSectionText}
+            </p>
+          )}
+        </motion.div>
+
+        {/* Offer cards — each card hugs its content (a capped text column + a
+            fixed image column) and is centred on the band, so the surplus width
+            is taken out of the text side, not the photo, and both sides sit
+            balanced rather than edge-to-edge. */}
+        <div className="flex flex-col items-center gap-6">
         {banners.map((b) => {
           const badge = countdownLabel(b.endDate);
           const valid = validityText(b.startDate, b.endDate);
@@ -593,7 +624,7 @@ export default function HomePage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="relative grid md:grid-cols-[1.5fr_1fr] min-h-[200px] overflow-hidden rounded-[14px] border border-outline-variant/40 bg-surface-container shadow-[0_18px_40px_-24px_rgba(80,30,45,0.35)]"
+              className="relative grid w-full md:w-fit md:mx-auto md:grid-cols-[minmax(0,440px)_300px] min-h-[200px] overflow-hidden rounded-[14px] border border-outline-variant/40 bg-surface-container shadow-[0_18px_40px_-24px_rgba(80,30,45,0.35)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_54px_-24px_rgba(80,30,45,0.45)]"
             >
               {badge && (
                 <span className="absolute top-3.5 right-4 z-20 inline-flex items-center gap-1 font-label-caps text-[10px] tracking-wide text-primary bg-primary/12 border border-primary/25 rounded-full px-2.5 py-1">
@@ -602,7 +633,7 @@ export default function HomePage() {
               )}
 
               {/* Text */}
-              <div className="flex flex-col justify-center gap-2 border-l-[3px] border-primary px-7 py-6 md:px-9 order-2 md:order-1">
+              <div className="flex flex-col justify-center gap-2 border-l-[3px] border-primary px-7 py-6 md:px-8 order-2 md:order-1">
                 <span className="font-label-caps text-label-caps text-primary tracking-[0.22em]">
                   {b.label || "Exklusives Angebot"}
                 </span>
@@ -651,7 +682,10 @@ export default function HomePage() {
             </motion.div>
           );
         })}
+        </div>
+       </div>
       </section>
+      )}
 
       {/* ══════════════════════════════════════════════════════
           ÜBER UNS — About section

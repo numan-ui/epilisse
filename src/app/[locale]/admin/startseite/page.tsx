@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { useAdminData } from '../behandlungen/AdminDataContext';
 import { HERO_SLIDE_LIMIT, ABOUT_VALUE_LIMIT, REVIEW_LIMIT, FRONTEND_SLUG, type LandingContent } from '../behandlungen/data';
 
-const SECTIONS = ['Navigation', 'Hero-Slider', 'Angebot', 'Über Uns', 'Kontakt-Texte', 'Footer'] as const;
+const SECTIONS = ['Navigation', 'Hero-Slider', 'Behandlungs-Titel', 'Aktionen', 'Über Uns', 'Kontakt-Texte', 'Footer'] as const;
 type Section = typeof SECTIONS[number];
 
 const VALUE_ICONS = ['verified', 'lock', 'star', 'diamond', 'favorite', 'health_and_beauty', 'auto_awesome', 'spa', 'thumb_up', 'workspace_premium'];
@@ -290,12 +290,12 @@ export default function StartseitePage() {
             </section>
           )}
 
-          {/* ── Angebot (services section) ──────────────── */}
-          {active === 'Angebot' && (
+          {/* ── Behandlungs-Titel (services grid header) ── */}
+          {active === 'Behandlungs-Titel' && (
             <section className="max-w-2xl space-y-6">
               <div>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface mb-1">Angebot-Sektion</h3>
-                <p className="font-body-sm text-on-surface-variant opacity-70">Überschrift des Behandlungs-Rasters. Kategorienamen, Kurzbeschreibung (Hover-Text auf jeder Karte) &amp; Sichtbarkeit werden unter Behandlungen gepflegt.</p>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface mb-1">Behandlungs-Raster · Überschrift</h3>
+                <p className="font-body-sm text-on-surface-variant opacity-70">Nur die Überschrift über dem Kategorien-Raster. Kategorienamen, Kurzbeschreibung (Hover-Text) &amp; Sichtbarkeit werden unter Behandlungen gepflegt.</p>
               </div>
               <div className="bg-surface-container-lowest border border-outline-variant p-8 space-y-6">
                 <Field label="Label (Kicker)">
@@ -308,7 +308,28 @@ export default function StartseitePage() {
             </section>
           )}
 
-          {/* Kombi-Angebot / Promo-Banner sind zu „Aktionen" umgezogen — siehe /admin/aktionen */}
+          {/* ── Aktionen (homepage promo block header) ───── */}
+          {active === 'Aktionen' && (
+            <section className="max-w-2xl space-y-6">
+              <div>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface mb-1">Aktionen-Sektion · Überschrift</h3>
+                <p className="font-body-sm text-on-surface-variant opacity-70">
+                  Überschrift über dem Aktions-Block auf der Startseite. Die einzelnen Aktions-Karten (Titel, Preis, Bild, Laufzeit) werden unter <a href={`/${locale}/admin/aktionen`} className="text-primary underline">Aktionen</a> gepflegt.
+                </p>
+              </div>
+              <div className="bg-surface-container-lowest border border-outline-variant p-8 space-y-6">
+                <Field label="Label (Kicker)">
+                  <input className={INPUT_CLS} value={lc.aktionenSectionLabel} onChange={e => set('aktionenSectionLabel', e.target.value)} />
+                </Field>
+                <Field label="Titel">
+                  <input className={INPUT_CLS} value={lc.aktionenSectionTitle} onChange={e => set('aktionenSectionTitle', e.target.value)} />
+                </Field>
+                <Field label="Einleitungstext (optional)">
+                  <textarea className={`${INPUT_CLS} resize-none`} rows={2} value={lc.aktionenSectionText} onChange={e => set('aktionenSectionText', e.target.value)} />
+                </Field>
+              </div>
+            </section>
+          )}
 
           {/* ── Über Uns ─────────────────────────────────── */}
           {active === 'Über Uns' && (
