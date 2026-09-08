@@ -146,6 +146,8 @@ export const INIT_SETTINGS: SiteSettings = {
 
 export type LandingContent = {
   navBehandlungen: string; navPreise: string; navUeberUns: string; navKontakt: string; navCta: string; navAktionen: string;
+  /** Thin black bar above the nav (and mirrored under the footer): short location label + a standing availability line. */
+  announceLocation: string; announceAvailability: string;
   servicesSectionLabel: string; servicesSectionTitle: string;
   /** Header above the homepage Aktionen banner block. Text is optional (blank = no intro paragraph). */
   aktionenSectionLabel: string; aktionenSectionTitle: string; aktionenSectionText: string;
@@ -160,6 +162,7 @@ export type LandingContent = {
 
 export const INIT_LANDING_CONTENT: LandingContent = {
   navBehandlungen: 'Behandlungen', navPreise: 'Preise', navUeberUns: 'Über Uns', navKontakt: 'Kontakt', navCta: 'TERMIN BUCHEN', navAktionen: 'Aktionen',
+  announceLocation: 'Sendlinger Str. · Altstadt München', announceAvailability: 'Termine diese Woche verfügbar',
   servicesSectionLabel: 'UNSER ANGEBOT', servicesSectionTitle: 'Exklusive Behandlungen',
   aktionenSectionLabel: 'AKTUELLE ANGEBOTE', aktionenSectionTitle: 'Kombi-Pakete & Aktionen',
   aktionenSectionText: 'Beliebte Behandlungen im Paket – für kurze Zeit zum Vorzugspreis.',

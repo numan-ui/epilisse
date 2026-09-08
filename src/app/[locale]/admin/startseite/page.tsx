@@ -209,6 +209,23 @@ export default function StartseitePage() {
                   <input className={INPUT_CLS} value={lc.navCta} onChange={e => set('navCta', e.target.value)} />
                 </Field>
               </div>
+
+              <div className="bg-surface-container-lowest border border-outline-variant p-8 space-y-6">
+                <div>
+                  <h4 className="font-headline-sm text-[15px] text-on-surface">Info-Leiste (oben &amp; unter dem Footer)</h4>
+                  <p className="font-body-sm text-[12px] text-on-surface-variant opacity-70 mt-1">
+                    Der schmale dunkle Streifen über der Navigation. Die Bewertungen rechts kommen aus den Einstellungen.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Standort-Kurztext">
+                    <input className={INPUT_CLS} value={lc.announceLocation} onChange={e => set('announceLocation', e.target.value)} placeholder="Sendlinger Str. · Altstadt München" />
+                  </Field>
+                  <Field label="Verfügbarkeits-Text (grün)">
+                    <input className={INPUT_CLS} value={lc.announceAvailability} onChange={e => set('announceAvailability', e.target.value)} placeholder="Termine diese Woche verfügbar" />
+                  </Field>
+                </div>
+              </div>
             </section>
           )}
 

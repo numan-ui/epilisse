@@ -19,6 +19,7 @@ import HeroCinematicSlide from "@/components/HeroCinematicSlide";
 import OwnerManifesto from "@/components/OwnerManifesto";
 import VerifiedReviews from "@/components/VerifiedReviews";
 import TrustBar from "@/components/TrustBar";
+import AnnouncementBar from "@/components/AnnouncementBar";
 
 /* ── Image constants (Stitch AI – replace with real salon photos) ── */
 const IMG = {
@@ -202,10 +203,13 @@ export default function HomePage() {
   return (
     <main className="min-h-screen">
 
+      {/* Thin dark utility strip pinned above the nav */}
+      <AnnouncementBar />
+
       {/* ══════════════════════════════════════════════════════
-          NAV BAR — Fixed glassmorphism
+          NAV BAR — Fixed glassmorphism (starts below the strip)
       ══════════════════════════════════════════════════════ */}
-      <nav className="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 glass-nav bg-surface/95 border-b border-outline-variant/30 lux-shadow">
+      <nav className="fixed top-9 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 glass-nav bg-surface/95 border-b border-outline-variant/30 lux-shadow">
         {/* Logo */}
         <a href="#" className="font-display-lg text-[26px] tracking-wide epilisse-logo">
           {settings.name}
@@ -938,6 +942,9 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Same utility strip, mirrored as a static band under the footer */}
+      <AnnouncementBar variant="static" />
 
     </main>
   );
