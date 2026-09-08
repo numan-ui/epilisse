@@ -112,7 +112,7 @@ export default function TrustBar({ className = '' }: { className?: string }) {
               <span className="flex items-baseline gap-2">
                 <span className="font-display-lg font-bold text-[20px] leading-none text-[#2B2621] tabular-nums">
                   {p.rating}
-                  <span className="font-body-sm font-medium text-[11px] text-[#9A9188]">/5</span>
+                  <span className="font-body-sm font-medium text-[11px] text-[#9A9188] ml-1">/5</span>
                 </span>
                 <Stars rating={toNum(p.rating)} uid={`${uid}-${p.label}`} />
               </span>
