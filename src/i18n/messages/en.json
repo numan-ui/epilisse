@@ -2,6 +2,7 @@
   "nav": {
     "behandlungen": "Treatments",
     "preise": "Pricing",
+    "aktionen": "Offers",
     "ueberUns": "About Us",
     "kontakt": "Contact",
     "cta": "BOOK APPOINTMENT",
@@ -33,13 +34,6 @@
     "maniDesc": "Nail aesthetics for the perfect appearance.",
     "discover": "DISCOVER",
     "details": "DETAILS"
-  },
-  "promo": {
-    "label": "EXCLUSIVE OFFER",
-    "title": "Winter Glow\nCombi Package",
-    "desc": "Get 20% off our exclusive combination of facial hydration and manicure. Valid until end of season.",
-    "ctaPrimary": "SECURE OFFER",
-    "ctaSecondary": "VIEW DETAILS"
   },
   "about": {
     "sectionLabel": "ABOUT {name}",

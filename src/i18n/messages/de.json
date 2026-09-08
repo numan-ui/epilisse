@@ -35,13 +35,6 @@
     "discover": "ENTDECKEN",
     "details": "DETAILS"
   },
-  "promo": {
-    "label": "EXKLUSIVES ANGEBOT",
-    "title": "Winter Glow\nKombi-Paket",
-    "desc": "Erhalten Sie 20 % Rabatt auf unsere exklusive Kombination aus Gesichtshydrierung und Maniküre. Gültig bis Ende der Saison.",
-    "ctaPrimary": "ANGEBOT SICHERN",
-    "ctaSecondary": "DETAILS ANSEHEN"
-  },
   "about": {
     "sectionLabel": "ÜBER {name}",
     "title": "Münchens Adresse für Premium-Ästhetik",

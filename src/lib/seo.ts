@@ -8,6 +8,7 @@ export const SEO_ROUTES = [
   "",
   "/behandlungen",
   "/preise",
+  "/aktionen",
   "/ueber-uns",
   "/laser-haarentfernung",
   "/gesichtsaesthetik",
