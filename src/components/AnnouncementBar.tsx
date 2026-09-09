@@ -96,9 +96,9 @@ export default function AnnouncementBar({ variant = 'fixed' }: { variant?: 'fixe
             <span className="material-symbols-outlined text-[16px] text-[--color-primary-fixed-dim] shrink-0">
               workspace_premium
             </span>
-            <span className="font-body-sm text-[12px] tracking-[0.08em] uppercase whitespace-nowrap">
-              <span className="text-white font-semibold">NISHV</span>
-              <span className="text-white/45"> zertifiziert</span>
+            <span className="font-body-sm text-[12px] whitespace-nowrap">
+              <span className="text-white font-semibold tracking-[0.08em]">NISHV</span>
+              <span className="text-white/45 text-[11px]"> zertifiziert</span>
             </span>
           </span>
 
