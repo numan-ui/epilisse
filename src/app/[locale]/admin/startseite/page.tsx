@@ -2,9 +2,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAdminData } from '../behandlungen/AdminDataContext';
-import { HERO_SLIDE_LIMIT, ABOUT_VALUE_LIMIT, REVIEW_LIMIT, FRONTEND_SLUG, type LandingContent } from '../behandlungen/data';
+import { HERO_SLIDE_LIMIT, ABOUT_VALUE_LIMIT, REVIEW_LIMIT, FAQ_GROUP_LIMIT, FAQ_ITEM_LIMIT, FRONTEND_SLUG, type LandingContent } from '../behandlungen/data';
 
-const SECTIONS = ['Navigation', 'Hero-Slider', 'Behandlungs-Titel', 'Aktionen', 'Über Uns', 'Kontakt-Texte', 'Footer'] as const;
+const SECTIONS = ['Navigation', 'Hero-Slider', 'Behandlungs-Titel', 'Aktionen', 'Über Uns', 'FAQ', 'Kontakt-Texte', 'Footer'] as const;
 type Section = typeof SECTIONS[number];
 
 const VALUE_ICONS = ['verified', 'lock', 'star', 'diamond', 'favorite', 'health_and_beauty', 'auto_awesome', 'spa', 'thumb_up', 'workspace_premium'];
@@ -119,6 +119,9 @@ export default function StartseitePage() {
     heroSlides, updateHeroSlide, addHeroSlide, removeHeroSlide, reorderHeroSlide,
     aboutValues, updateAboutValue, addAboutValue, removeAboutValue,
     reviews, updateReview, addReview, removeReview,
+    faqGroups,
+    addFaqGroup, removeFaqGroup, updateFaqGroupLabel, reorderFaqGroup,
+    addFaqItem, removeFaqItem, updateFaqItem, reorderFaqItem,
     categories,
     settings, updateSetting, updateSettingHours,
   } = useAdminData();
@@ -510,6 +513,116 @@ export default function StartseitePage() {
                   </button>
                 )}
               </div>
+            </section>
+          )}
+
+          {/* ── FAQ (homepage question/answer block) ─────── */}
+          {active === 'FAQ' && (
+            <section className="max-w-2xl space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-headline-sm text-headline-sm text-on-surface mb-1">FAQ · Häufige Fragen</h3>
+                  <p className="font-body-sm text-on-surface-variant opacity-70">
+                    Frage-Antwort-Block auf der Startseite. Die Kategorien unten werden zu Reitern; leer = die Sektion wird ausgeblendet.
+                  </p>
+                </div>
+                <span className="font-label-caps text-[10px] text-outline shrink-0">{faqGroups.length} / {FAQ_GROUP_LIMIT}</span>
+              </div>
+
+              {faqGroups.map((g, gi) => (
+                <div key={g.id} className="bg-surface-container-lowest border border-outline-variant p-6 space-y-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="font-label-caps text-[10px] text-primary shrink-0">KATEGORIE</span>
+                      <PositionInput
+                        position={gi + 1}
+                        max={faqGroups.length}
+                        onCommit={pos => reorderFaqGroup(g.id, pos)}
+                      />
+                    </div>
+                    <button
+                      onClick={() => removeFaqGroup(g.id)}
+                      className="text-outline hover:text-error transition-colors shrink-0"
+                      title="Kategorie löschen"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">delete_outline</span>
+                    </button>
+                  </div>
+
+                  <Field label="Reiter-Name (z.B. Laser, Waxing, PMU)">
+                    <input
+                      className={INPUT_CLS}
+                      value={g.label}
+                      onChange={e => updateFaqGroupLabel(g.id, e.target.value)}
+                      placeholder="Kategoriename"
+                    />
+                  </Field>
+
+                  <div className="border-t border-outline-variant/30 pt-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="font-label-caps text-[10px] text-outline">Fragen</span>
+                      <span className="font-label-caps text-[10px] text-outline shrink-0">{g.items.length} / {FAQ_ITEM_LIMIT}</span>
+                    </div>
+
+                    {g.items.map((it, ii) => (
+                      <div key={it.id} className="border-t border-outline-variant/20 pt-3 first:border-t-0 first:pt-0 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="font-label-caps text-[10px] text-primary">FRAGE</span>
+                            <PositionInput
+                              position={ii + 1}
+                              max={g.items.length}
+                              onCommit={pos => reorderFaqItem(g.id, it.id, pos)}
+                            />
+                          </div>
+                          <button
+                            onClick={() => removeFaqItem(g.id, it.id)}
+                            className="text-outline hover:text-error transition-colors"
+                            title="Frage löschen"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">delete_outline</span>
+                          </button>
+                        </div>
+                        <Field label="Frage">
+                          <input
+                            className={INPUT_CLS}
+                            value={it.q}
+                            onChange={e => updateFaqItem(g.id, it.id, 'q', e.target.value)}
+                          />
+                        </Field>
+                        <Field label="Antwort">
+                          <textarea
+                            className={`${INPUT_CLS} resize-none`}
+                            rows={4}
+                            value={it.a}
+                            onChange={e => updateFaqItem(g.id, it.id, 'a', e.target.value)}
+                          />
+                        </Field>
+                      </div>
+                    ))}
+
+                    {g.items.length < FAQ_ITEM_LIMIT && (
+                      <button
+                        onClick={() => addFaqItem(g.id)}
+                        className="w-full border-2 border-dashed border-outline-variant py-2.5 flex items-center justify-center gap-2 text-outline hover:text-primary hover:border-primary transition-all font-label-caps text-[11px]"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">add_circle</span>
+                        Frage hinzufügen
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {faqGroups.length < FAQ_GROUP_LIMIT && (
+                <button
+                  onClick={addFaqGroup}
+                  className="w-full border-2 border-dashed border-outline-variant py-4 flex items-center justify-center gap-2 text-outline hover:text-primary hover:border-primary transition-all font-label-caps text-[11px]"
+                >
+                  <span className="material-symbols-outlined text-[18px]">add_circle</span>
+                  Kategorie hinzufügen
+                </button>
+              )}
             </section>
           )}
 

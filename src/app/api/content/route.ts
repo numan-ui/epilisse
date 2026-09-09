@@ -13,7 +13,7 @@ import type { SiteContent } from '@/app/[locale]/admin/behandlungen/data';
 
 const KEYS: (keyof SiteContent)[] = [
   'services', 'aktionen', 'settings', 'landingContent',
-  'heroSlides', 'aboutValues', 'reviews',
+  'heroSlides', 'aboutValues', 'reviews', 'faqGroups',
   // tolerated during the 0023 migration window — no longer written by the admin
   'campaigns', 'promoBanners',
 ];

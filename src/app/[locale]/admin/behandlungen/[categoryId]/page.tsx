@@ -23,7 +23,7 @@ export default function CategoryDetailPage() {
     updateAktion, addAktion: ctxAddAktion, removeAktion,
     updatePageField, updatePageParagraph, updatePageBenefit, addPageBenefit, removePageBenefit, updatePageBanner,
     categories, updateCategory, deleteCategory,
-    settings, landingContent, heroSlides, aboutValues, reviews,
+    settings, landingContent, heroSlides, aboutValues, reviews, faqGroups,
   } = useAdminData();
 
   const category = categories.find((c) => c.id === catId);
@@ -71,7 +71,7 @@ export default function CategoryDetailPage() {
         put('/api/categories', categories),
         put('/api/content', {
           services: allServices, aktionen: allAktionen, settings, landingContent,
-          heroSlides, aboutValues, reviews,
+          heroSlides, aboutValues, reviews, faqGroups,
         }),
       ]);
       const bad = [pc, cat, content].find(r => !r.ok);

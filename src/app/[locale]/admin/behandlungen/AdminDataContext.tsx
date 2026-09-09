@@ -4,8 +4,10 @@ import {
   INIT_SERVICES, INIT_AKTIONEN, AKTION_CATEGORY_LIMIT, INIT_PAGE_CONTENT, CATEGORIES, INIT_SETTINGS, INIT_LANDING_CONTENT,
   INIT_HERO_SLIDES, HERO_SLIDE_LIMIT, INIT_ABOUT_VALUES, ABOUT_VALUE_LIMIT,
   INIT_REVIEWS, REVIEW_LIMIT,
+  INIT_FAQ_GROUPS, FAQ_GROUP_LIMIT, FAQ_ITEM_LIMIT,
   type Service, type Aktion, type Category, type PageContent, type PageContentMap,
   type PageBanner, type SiteSettings, type LandingContent, type HeroSlide, type AboutValue, type Review,
+  type FaqGroup, type FaqItem,
   type SiteContent,
 } from './data';
 import { deriveAktionen } from '@/lib/aktion';
@@ -22,6 +24,7 @@ const LS_LC  = 'epilisse_admin_landing_content';
 const LS_HERO  = 'epilisse_admin_hero_slides';
 const LS_ABOUT = 'epilisse_admin_about_values';
 const LS_REVIEWS = 'epilisse_admin_reviews';
+const LS_FAQ = 'epilisse_admin_faq_groups';
 
 const ls = {
   read: <T,>(key: string): T | null => {
@@ -66,6 +69,7 @@ interface AdminDataCtx {
   heroSlides: HeroSlide[];
   aboutValues: AboutValue[];
   reviews: Review[];
+  faqGroups: FaqGroup[];
   updateService:        (catId: string, id: string, field: keyof Service,  value: string | boolean) => void;
   deleteService:        (catId: string, id: string) => void;
   addService:           (catId: string, svc: Omit<Service, 'id'>) => void;
@@ -94,6 +98,14 @@ interface AdminDataCtx {
   updateReview: (id: string, field: keyof Review, value: string | boolean) => void;
   addReview: (r: Omit<Review, 'id'>) => void;
   removeReview: (id: string) => void;
+  addFaqGroup: () => void;
+  removeFaqGroup: (id: string) => void;
+  updateFaqGroupLabel: (id: string, label: string) => void;
+  reorderFaqGroup: (id: string, position: number) => void;
+  addFaqItem: (groupId: string) => void;
+  removeFaqItem: (groupId: string, itemId: string) => void;
+  updateFaqItem: (groupId: string, itemId: string, field: keyof Omit<FaqItem, 'id'>, value: string) => void;
+  reorderFaqItem: (groupId: string, itemId: string, position: number) => void;
 }
 
 const Ctx = createContext<AdminDataCtx | null>(null);
@@ -118,6 +130,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [heroSlides, setHeroSlides]   = useState<HeroSlide[]>(INIT_HERO_SLIDES.map(s => ({ ...s })));
   const [aboutValues, setAboutValues] = useState<AboutValue[]>(INIT_ABOUT_VALUES.map(v => ({ ...v })));
   const [reviews, setReviews] = useState<Review[]>(INIT_REVIEWS.map(r => ({ ...r })));
+  const [faqGroups, setFaqGroups] = useState<FaqGroup[]>(INIT_FAQ_GROUPS.map(g => ({ ...g, items: g.items.map(i => ({ ...i })) })));
 
   useEffect(() => {
     const svcs = ls.read<ServicesMap>(LS_SVC);
@@ -129,6 +142,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     const hero = ls.read<HeroSlide[]>(LS_HERO);
     const about = ls.read<AboutValue[]>(LS_ABOUT);
     const revs  = ls.read<Review[]>(LS_REVIEWS);
+    const faq   = ls.read<FaqGroup[]>(LS_FAQ);
     if (svcs) setServices(svcs);
     if (akt && akt.length > 0) setAktionen(akt);
     if (set)  setSettings(prev => ({ ...prev, ...set, hours: set.hours ?? prev.hours }));
@@ -136,13 +150,14 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     if (hero && hero.length > 0) setHeroSlides(hero);
     if (about && about.length > 0) setAboutValues(about);
     if (revs  && revs.length > 0)  setReviews(revs);
+    if (faq   && faq.length > 0)   setFaqGroups(faq);
 
     // The rest of the CMS bundle → site_content.draft. Same fresh-browser
     // seeding logic as categories/page-content: a browser with a local copy
     // uses it; one without seeds from `draft` (the shared source of truth)
     // rather than the hardcoded INIT_* defaults, so the write-through below
     // can't overwrite the shared draft with those.
-    const hasLocalSite = !!(svcs || akt || set || lc || hero || about || revs);
+    const hasLocalSite = !!(svcs || akt || set || lc || hero || about || revs || faq);
     if (hasLocalSite) {
       setSiteContentLoaded(true);
     } else {
@@ -161,6 +176,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
             if (d.heroSlides && d.heroSlides.length > 0) setHeroSlides(d.heroSlides);
             if (d.aboutValues && d.aboutValues.length > 0) setAboutValues(d.aboutValues);
             if (d.reviews && d.reviews.length > 0) setReviews(d.reviews);
+            if (d.faqGroups && d.faqGroups.length > 0) setFaqGroups(d.faqGroups);
           }
           setSiteContentLoaded(true);
         } catch {
@@ -307,7 +323,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     if (!siteContentLoaded) return;
     const bundle: SiteContent = {
       services, aktionen, settings, landingContent,
-      heroSlides, aboutValues, reviews,
+      heroSlides, aboutValues, reviews, faqGroups,
     };
     const timer = setTimeout(() => {
       fetch('/api/content', {
@@ -317,7 +333,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       }).catch(() => { /* best-effort */ });
     }, 700);
     return () => clearTimeout(timer);
-  }, [services, aktionen, settings, landingContent, heroSlides, aboutValues, reviews, siteContentLoaded]);
+  }, [services, aktionen, settings, landingContent, heroSlides, aboutValues, reviews, faqGroups, siteContentLoaded]);
 
   /* ── Services ────────────────────────────────────── */
   const updateService = useCallback((catId: string, id: string, field: keyof Service, value: string | boolean) =>
@@ -591,9 +607,80 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       ls.write(LS_REVIEWS, next); return next;
     }), []);
 
+  /* ── FAQ groups (homepage) ─────────────────────────── */
+  const addFaqGroup = useCallback(() =>
+    setFaqGroups(prev => {
+      if (prev.length >= FAQ_GROUP_LIMIT) return prev;
+      const next = [...prev, { id: `fg-${Date.now()}`, label: '', items: [] }];
+      ls.write(LS_FAQ, next); return next;
+    }), []);
+
+  const removeFaqGroup = useCallback((id: string) =>
+    setFaqGroups(prev => {
+      const next = prev.filter(g => g.id !== id);
+      ls.write(LS_FAQ, next); return next;
+    }), []);
+
+  const updateFaqGroupLabel = useCallback((id: string, label: string) =>
+    setFaqGroups(prev => {
+      const next = prev.map(g => g.id === id ? { ...g, label } : g);
+      ls.write(LS_FAQ, next); return next;
+    }), []);
+
+  const reorderFaqGroup = useCallback((id: string, position: number) =>
+    setFaqGroups(prev => {
+      const from = prev.findIndex(g => g.id === id);
+      if (from === -1) return prev;
+      const to = Math.max(0, Math.min(prev.length - 1, position - 1));
+      if (to === from) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      ls.write(LS_FAQ, next); return next;
+    }), []);
+
+  const addFaqItem = useCallback((groupId: string) =>
+    setFaqGroups(prev => {
+      const next = prev.map(g => {
+        if (g.id !== groupId || g.items.length >= FAQ_ITEM_LIMIT) return g;
+        return { ...g, items: [...g.items, { id: `fi-${Date.now()}`, q: '', a: '' }] };
+      });
+      ls.write(LS_FAQ, next); return next;
+    }), []);
+
+  const removeFaqItem = useCallback((groupId: string, itemId: string) =>
+    setFaqGroups(prev => {
+      const next = prev.map(g => g.id === groupId ? { ...g, items: g.items.filter(i => i.id !== itemId) } : g);
+      ls.write(LS_FAQ, next); return next;
+    }), []);
+
+  const updateFaqItem = useCallback((groupId: string, itemId: string, field: keyof Omit<FaqItem, 'id'>, value: string) =>
+    setFaqGroups(prev => {
+      const next = prev.map(g => g.id === groupId
+        ? { ...g, items: g.items.map(i => i.id === itemId ? { ...i, [field]: value } : i) }
+        : g);
+      ls.write(LS_FAQ, next); return next;
+    }), []);
+
+  const reorderFaqItem = useCallback((groupId: string, itemId: string, position: number) =>
+    setFaqGroups(prev => {
+      const next = prev.map(g => {
+        if (g.id !== groupId) return g;
+        const from = g.items.findIndex(i => i.id === itemId);
+        if (from === -1) return g;
+        const to = Math.max(0, Math.min(g.items.length - 1, position - 1));
+        if (to === from) return g;
+        const items = [...g.items];
+        const [moved] = items.splice(from, 1);
+        items.splice(to, 0, moved);
+        return { ...g, items };
+      });
+      ls.write(LS_FAQ, next); return next;
+    }), []);
+
   return (
     <Ctx.Provider value={{
-      services, aktionen, pageContent, categories, categoriesLoaded, settings, landingContent, heroSlides, aboutValues, reviews,
+      services, aktionen, pageContent, categories, categoriesLoaded, settings, landingContent, heroSlides, aboutValues, reviews, faqGroups,
       updateService, deleteService, addService,
       updateAktion, addAktion, removeAktion,
       updatePageField, updatePageParagraph, updatePageBenefit, addPageBenefit, removePageBenefit, updatePageBanner,
@@ -602,6 +689,8 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       updateHeroSlide, addHeroSlide, removeHeroSlide, reorderHeroSlide,
       updateAboutValue, addAboutValue, removeAboutValue,
       updateReview, addReview, removeReview,
+      addFaqGroup, removeFaqGroup, updateFaqGroupLabel, reorderFaqGroup,
+      addFaqItem, removeFaqItem, updateFaqItem, reorderFaqItem,
     }}>
       {children}
     </Ctx.Provider>

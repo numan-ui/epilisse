@@ -18,7 +18,7 @@ export default function BehandlungenPage() {
   const locale = (params?.locale as string) || 'de';
   const {
     services, aktionen, categories, categoriesLoaded, pageContent, addCategory,
-    settings, landingContent, heroSlides, aboutValues, reviews,
+    settings, landingContent, heroSlides, aboutValues, reviews, faqGroups,
   } = useAdminData();
 
   const [addOpen, setAddOpen] = useState(false);
@@ -69,7 +69,7 @@ export default function BehandlungenPage() {
         throw new Error(pcBody.error || 'Speichern der Seiteninhalte fehlgeschlagen.');
       }
 
-      const contentPayload = JSON.stringify({ services, aktionen, settings, landingContent, heroSlides, aboutValues, reviews });
+      const contentPayload = JSON.stringify({ services, aktionen, settings, landingContent, heroSlides, aboutValues, reviews, faqGroups });
       const contentPut = await fetch('/api/content', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },

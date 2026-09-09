@@ -251,6 +251,20 @@ export const INIT_REVIEWS: Review[] = [
 ];
 
 /**
+ * FAQ shown on the homepage: free-standing groups the admin names (e.g. "Laser",
+ * "Waxing", "PMU"), each with its own question/answer list. Not tied to the
+ * treatment category list. Empty INIT → the homepage section renders nothing
+ * until the admin adds a group.
+ */
+export type FaqItem  = { id: string; q: string; a: string };
+export type FaqGroup = { id: string; label: string; items: FaqItem[] };
+
+export const FAQ_GROUP_LIMIT = 6;
+export const FAQ_ITEM_LIMIT  = 12;
+
+export const INIT_FAQ_GROUPS: FaqGroup[] = [];
+
+/**
  * The DB-backed CMS payload (everything except the category list and per-category
  * Seiteninhalt, which have their own tables). Keyed exactly like the old
  * localStorage keys. See supabase/migrations/0022_site_content.sql.
@@ -267,6 +281,7 @@ export type SiteContent = {
   promoBanners?: PromoBanner[];
   aboutValues?: AboutValue[];
   reviews?: Review[];
+  faqGroups?: FaqGroup[];
 };
 
 export const FRONTEND_SLUG: Record<string, string> = {

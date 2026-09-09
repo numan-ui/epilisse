@@ -1,0 +1,548 @@
+'use client';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useParams } from 'next/navigation';
+import { useAdminCategories } from '@/hooks/useAdminCategories';
+import { useCategoryServices, parseDurationMin } from '@/hooks/useCategoryServices';
+
+type Step = 'category' | 'services' | 'details' | 'success';
+
+interface AvailabilitySlot {
+  time: string;
+  available: boolean;
+}
+
+interface AvailabilityResponse {
+  closed: boolean;
+  dayLabel: string;
+  slots: AvailabilitySlot[];
+}
+
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function ServiceStep({
+  categoryId,
+  selected,
+  onToggle,
+}: {
+  categoryId: string;
+  selected: Set<string>;
+  onToggle: (id: string) => void;
+}) {
+  const services = useCategoryServices(categoryId);
+
+  if (services.length === 0) {
+    return <p className="font-body-sm text-outline py-8 text-center">Keine Services in dieser Kategorie verfügbar.</p>;
+  }
+
+  return (
+    <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1">
+      {services.map((s) => {
+        const isChecked = selected.has(s.id);
+        return (
+          <label
+            key={s.id}
+            className={`flex items-center justify-between gap-4 p-4 border cursor-pointer transition-all ${
+              isChecked ? 'border-primary bg-primary/5' : 'border-outline-variant hover:border-primary/40'
+            }`}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => onToggle(s.id)}
+                className="accent-[var(--color-primary)] w-4 h-4 shrink-0"
+              />
+              <div className="min-w-0">
+                <p className="font-body-md text-on-surface truncate">{s.name}</p>
+                <p className="font-body-sm text-outline">{s.duration}</p>
+              </div>
+            </div>
+            <span className="font-headline-sm text-[15px] text-primary shrink-0">€ {parseFloat(s.price).toFixed(2)}</span>
+          </label>
+        );
+      })}
+    </div>
+  );
+}
+
+export interface BookingFlowProps {
+  /** 'modal' keeps the fixed-overlay dialog chrome; 'inline' renders a plain card in the page flow. */
+  variant: 'modal' | 'inline';
+  /** Modal passes `isOpen`; inline passes a constant `true`. Toggling false→true resets the wizard. */
+  active: boolean;
+  /** Category preselected by the opener (skips the category step). `null` starts on the category picker. */
+  preselectedCategory: string | null;
+  /** Modal: dismiss the dialog. Inline: unused (the flow stays mounted; success offers "Neue Anfrage"). */
+  onClose?: () => void;
+}
+
+/**
+ * The booking wizard (category → services → details+slot → success). Extracted
+ * from BookingModal so the same flow can also be embedded directly in a page
+ * (`variant="inline"`, used on the homepage). The `variant="modal"` output is
+ * markup-identical to the pre-extraction modal — the booking e2e suite covers it.
+ */
+export default function BookingFlow({ variant, active, preselectedCategory, onClose }: BookingFlowProps) {
+  const categories = useAdminCategories().filter((c) => c.visible);
+  const params = useParams();
+  const locale = (params?.locale as string) || 'de';
+
+  const [step, setStep] = useState<Step>('category');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<Set<string>>(new Set());
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [date, setDate] = useState(todayISO());
+  const [time, setTime] = useState<string | null>(null);
+  const [notes, setNotes] = useState('');
+  const [consentDatenschutz, setConsentDatenschutz] = useState(false);
+  const [consentBehandlung, setConsentBehandlung] = useState(false);
+  const [consentMarketing, setConsentMarketing] = useState(false);
+  const [priorConsent, setPriorConsent] = useState<{ datenschutz: boolean; behandlung: boolean; marketing: boolean } | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
+  const [dayClosed, setDayClosed] = useState(false);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+
+  const services = useCategoryServices(selectedCategory ?? '');
+
+  const totalDurationMin = useMemo(() => {
+    const chosen = services.filter((s) => selectedServiceIds.has(s.id));
+    return chosen.reduce((sum, s) => sum + parseDurationMin(s.duration), 0) || 30;
+  }, [services, selectedServiceIds]);
+
+  const reset = useCallback(() => {
+    setSelectedCategory(preselectedCategory);
+    setStep(preselectedCategory ? 'services' : 'category');
+    setSelectedServiceIds(new Set());
+    setName('');
+    setEmail('');
+    setPhone('');
+    setDate(todayISO());
+    setTime(null);
+    setSlots([]);
+    setDayClosed(false);
+    setNotes('');
+    setConsentDatenschutz(false);
+    setConsentBehandlung(false);
+    setConsentMarketing(false);
+    setPriorConsent(null);
+    setError(null);
+  }, [preselectedCategory]);
+
+  useEffect(() => {
+    if (step !== 'details') return;
+    let cancelled = false;
+    setLoadingSlots(true);
+    fetch(`/api/availability?date=${date}&durationMin=${totalDurationMin}`)
+      .then((res) => res.json())
+      .then((data: AvailabilityResponse) => {
+        if (cancelled) return;
+        setDayClosed(data.closed);
+        setSlots(data.slots ?? []);
+        setTime((prev) => (prev && data.slots?.some((s) => s.time === prev && s.available) ? prev : null));
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setSlots([]);
+          setDayClosed(false);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingSlots(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [step, date, totalDurationMin]);
+
+  useEffect(() => {
+    if (!active) return;
+    reset();
+  }, [active, reset]);
+
+  // Returning customer who already gave consent shouldn't be forced to
+  // re-tick the checkboxes — look up their status once both contact fields
+  // are filled in (debounced) and lock in whichever consents are on file.
+  useEffect(() => {
+    if (step !== 'details') return;
+    const trimmedEmail = email.trim();
+    const trimmedPhone = phone.trim();
+    if (!trimmedEmail && !trimmedPhone) {
+      setPriorConsent(null);
+      return;
+    }
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      const qs = new URLSearchParams();
+      if (trimmedEmail) qs.set('email', trimmedEmail);
+      if (trimmedPhone) qs.set('phone', trimmedPhone);
+      fetch(`/api/consent-status?${qs.toString()}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (cancelled) return;
+          if (data.found) {
+            setPriorConsent({ datenschutz: data.datenschutz, behandlung: data.behandlung, marketing: data.marketing });
+            if (data.datenschutz) setConsentDatenschutz(true);
+            if (data.behandlung) setConsentBehandlung(true);
+            if (data.marketing) setConsentMarketing(true);
+          } else {
+            setPriorConsent(null);
+          }
+        })
+        .catch(() => {});
+    }, 500);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [step, email, phone]);
+
+  const selectedCategoryName = useMemo(
+    () => categories.find((c) => c.id === selectedCategory)?.name ?? '',
+    [categories, selectedCategory]
+  );
+
+  // Behandlungseinwilligung is only legally relevant for Laser-Haarentfernung —
+  // every other category only needs Datenschutz (+ optional Marketing).
+  const requiresBehandlung = selectedCategory === 'laser';
+
+  if (!active) return null;
+
+  const toggleService = (id: string) => {
+    setSelectedServiceIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleSubmit = async () => {
+    setError(null);
+    if (!name.trim() || !email.trim() || !phone.trim()) {
+      setError('Bitte Name, E-Mail und Telefon angeben.');
+      return;
+    }
+    if (selectedServiceIds.size === 0) {
+      setError('Bitte mindestens einen Service auswählen.');
+      return;
+    }
+    if (!time) {
+      setError('Bitte eine Uhrzeit auswählen.');
+      return;
+    }
+    if (!consentDatenschutz || (requiresBehandlung && !consentBehandlung)) {
+      setError('Bitte bestätigen Sie die Datenschutz- und Behandlungshinweise.');
+      return;
+    }
+    const chosen = services.filter((s) => selectedServiceIds.has(s.id));
+    // Stored literally (no local-timezone conversion) so it lines up with the
+    // salon's naive wall-clock business hours / availability calculation.
+    const startsAt = `${date}T${time}:00.000Z`;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          categoryId: selectedCategory,
+          categoryName: selectedCategoryName,
+          services: chosen.map((s) => ({
+            name: s.name,
+            price: parseFloat(s.price) || null,
+            durationMin: parseDurationMin(s.duration),
+          })),
+          startsAt,
+          notes,
+          consentDatenschutz,
+          consentBehandlung: requiresBehandlung ? consentBehandlung : false,
+          consentMarketing,
+        }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setError(body.error || 'Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.');
+        return;
+      }
+      setStep('success');
+    } catch {
+      setError('Verbindungsfehler. Bitte versuchen Sie es erneut.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const dismiss = () => (variant === 'modal' ? onClose?.() : reset());
+
+  const content = (
+    <>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="font-headline-sm text-headline-sm text-on-surface">Termin Buchen</h3>
+        {variant === 'modal' && (
+          <button onClick={onClose} className="text-outline hover:text-error transition-colors" aria-label="Schließen">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        )}
+      </div>
+
+      {step === 'category' && (
+        <div className="space-y-2">
+          <p className="font-body-sm text-secondary mb-4">Wählen Sie eine Kategorie</p>
+          <div className="grid grid-cols-2 gap-3">
+            {categories.map((c, i) => (
+              <button
+                key={c.id}
+                onClick={() => {
+                  setSelectedCategory(c.id);
+                  setSelectedServiceIds(new Set());
+                  setStep('services');
+                }}
+                className="flex flex-col items-center gap-2 p-5 border border-outline-variant hover:border-primary hover:bg-primary/5 transition-all text-center"
+              >
+                <span
+                  className="material-symbols-outlined text-primary text-[28px] category-icon-glow"
+                  style={{ animationDelay: `${0.3 + i * 0.15}s` }}
+                >
+                  {c.icon}
+                </span>
+                <span className="font-body-sm text-on-surface">{c.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {step === 'services' && selectedCategory && (
+        <div>
+          <button
+            onClick={() => (preselectedCategory ? dismiss() : setStep('category'))}
+            className="font-label-caps text-[11px] text-outline hover:text-primary transition-colors mb-4 flex items-center gap-1"
+          >
+            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            {preselectedCategory ? 'Abbrechen' : 'Zurück'}
+          </button>
+          <p className="font-body-sm text-secondary mb-4">
+            {selectedCategoryName} — wählen Sie ein oder mehrere Services
+          </p>
+          <ServiceStep categoryId={selectedCategory} selected={selectedServiceIds} onToggle={toggleService} />
+          <button
+            disabled={selectedServiceIds.size === 0}
+            onClick={() => setStep('details')}
+            className="w-full mt-6 bg-primary text-on-primary py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all disabled:opacity-40 disabled:cursor-not-allowed rounded-[var(--radius-cta)]"
+          >
+            Weiter ({selectedServiceIds.size} ausgewählt)
+          </button>
+        </div>
+      )}
+
+      {step === 'details' && (
+        <div className="space-y-4">
+          <button
+            onClick={() => setStep('services')}
+            className="font-label-caps text-[11px] text-outline hover:text-primary transition-colors mb-2 flex items-center gap-1"
+          >
+            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            Zurück
+          </button>
+
+          <div>
+            <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Name *</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">E-Mail *</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+              />
+            </div>
+            <div>
+              <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Telefon *</label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full border-b border-outline-variant bg-transparent py-2 font-body-md text-on-surface focus:border-primary focus:outline-none transition-all"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Datum</label>
+            <input
+              type="date"
+              min={todayISO()}
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full border-b border-outline-variant bg-transparent py-2 font-body-sm text-on-surface focus:border-primary focus:outline-none transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="font-label-caps text-[10px] text-outline uppercase block mb-2">Uhrzeit</label>
+            {loadingSlots && <p className="font-body-sm text-outline">Lädt…</p>}
+            {!loadingSlots && dayClosed && (
+              <p className="font-body-sm text-error">Studio an diesem Tag geschlossen — bitte anderes Datum wählen.</p>
+            )}
+            {!loadingSlots && !dayClosed && slots.length > 0 && slots.every((s) => !s.available) && (
+              <p className="font-body-sm text-error">Keine freien Termine an diesem Tag.</p>
+            )}
+            {!loadingSlots && !dayClosed && slots.some((s) => s.available) && (
+              <div className="grid grid-cols-4 gap-2">
+                {slots.map((s) => (
+                  <button
+                    key={s.time}
+                    type="button"
+                    disabled={!s.available}
+                    onClick={() => setTime(s.time)}
+                    className={`py-2 text-center font-body-sm border transition-all ${
+                      time === s.time
+                        ? 'border-primary bg-primary text-on-primary'
+                        : s.available
+                          ? 'border-outline-variant text-on-surface hover:border-primary/40'
+                          : 'border-outline-variant text-outline opacity-40 cursor-not-allowed line-through'
+                    }`}
+                  >
+                    {s.time}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div>
+            <label className="font-label-caps text-[10px] text-outline uppercase block mb-1">Notiz (optional)</label>
+            <textarea
+              rows={2}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full border-b border-outline-variant bg-transparent py-2 font-body-sm text-on-surface focus:border-primary focus:outline-none resize-none transition-all"
+            />
+          </div>
+
+          <div className="space-y-2 pt-2 border-t border-outline-variant/50">
+            <label className={`flex items-start gap-2 ${priorConsent?.datenschutz ? '' : 'cursor-pointer'}`}>
+              <input
+                type="checkbox"
+                checked={consentDatenschutz}
+                disabled={priorConsent?.datenschutz}
+                onChange={(e) => setConsentDatenschutz(e.target.checked)}
+                className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0 disabled:opacity-70"
+              />
+              <span className="font-body-sm text-secondary">
+                Ich stimme der{' '}
+                <a
+                  href={`/${locale}/datenschutz`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline hover:no-underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Datenschutzerklärung
+                </a>{' '}
+                zu. *{priorConsent?.datenschutz && <span className="text-primary"> — bereits erteilt</span>}
+              </span>
+            </label>
+            {requiresBehandlung && (
+              <label className={`flex items-start gap-2 ${priorConsent?.behandlung ? '' : 'cursor-pointer'}`}>
+                <input
+                  type="checkbox"
+                  checked={consentBehandlung}
+                  disabled={priorConsent?.behandlung}
+                  onChange={(e) => setConsentBehandlung(e.target.checked)}
+                  className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0 disabled:opacity-70"
+                />
+                <span className="font-body-sm text-secondary">
+                  Ich habe die{' '}
+                  <a
+                    href={`/${locale}/behandlungseinwilligung`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline hover:no-underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Behandlungseinwilligung
+                  </a>{' '}
+                  gelesen und stimme der Behandlung zu. *{priorConsent?.behandlung && <span className="text-primary"> — bereits erteilt</span>}
+                </span>
+              </label>
+            )}
+            <label className={`flex items-start gap-2 ${priorConsent?.marketing ? '' : 'cursor-pointer'}`}>
+              <input
+                type="checkbox"
+                checked={consentMarketing}
+                disabled={priorConsent?.marketing}
+                onChange={(e) => setConsentMarketing(e.target.checked)}
+                className="accent-[var(--color-primary)] w-4 h-4 mt-0.5 shrink-0 disabled:opacity-70"
+              />
+              <span className="font-body-sm text-secondary">
+                Ich möchte per E-Mail über Angebote und Aktionen informiert werden (optional).
+                {priorConsent?.marketing && <span className="text-primary"> — bereits erteilt</span>}
+              </span>
+            </label>
+          </div>
+
+          {error && <p className="font-body-sm text-error">{error}</p>}
+
+          <button
+            onClick={handleSubmit}
+            disabled={submitting || !time || dayClosed || !consentDatenschutz || (requiresBehandlung && !consentBehandlung)}
+            className="w-full bg-primary text-on-primary py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all disabled:opacity-60 rounded-[var(--radius-cta)]"
+          >
+            {submitting ? 'Wird gesendet…' : 'Termin anfragen'}
+          </button>
+        </div>
+      )}
+
+      {step === 'success' && (
+        <div className="text-center py-6 space-y-4">
+          <span className="material-symbols-outlined text-primary text-[56px]">check_circle</span>
+          <h4 className="font-headline-sm text-headline-sm text-on-surface">Anfrage erhalten!</h4>
+          <p className="font-body-sm text-secondary">
+            Vielen Dank, {name}. Wir melden uns in Kürze zur Bestätigung Ihres Termins.
+          </p>
+          <button
+            onClick={dismiss}
+            className="mt-4 bg-primary text-on-primary px-8 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all rounded-[var(--radius-cta)]"
+          >
+            {variant === 'modal' ? 'Schließen' : 'Neue Anfrage'}
+          </button>
+        </div>
+      )}
+    </>
+  );
+
+  if (variant === 'inline') {
+    return <div className="bg-surface border border-outline-variant p-6 sm:p-8">{content}</div>;
+  }
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+      onClick={onClose}
+      data-lenis-prevent
+    >
+      <div
+        className="bg-surface w-full max-w-lg border border-outline-variant shadow-2xl p-8 max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {content}
+      </div>
+    </div>
+  );
+}

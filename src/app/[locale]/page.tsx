@@ -18,6 +18,7 @@ import GoldDustEffect from "@/components/GoldDustEffect";
 import HeroCinematicSlide from "@/components/HeroCinematicSlide";
 import OwnerManifesto from "@/components/OwnerManifesto";
 import VerifiedReviews from "@/components/VerifiedReviews";
+import FaqSection from "@/components/FaqSection";
 import TrustBar from "@/components/TrustBar";
 import AnnouncementBar from "@/components/AnnouncementBar";
 
@@ -719,6 +720,18 @@ export default function HomePage() {
         transition={{ duration: 0.7, ease: "easeOut" }}
       >
         <VerifiedReviews />
+      </motion.div>
+
+      {/* ══════════════════════════════════════════════════════
+          FAQ — Häufige Fragen + inline booking
+      ══════════════════════════════════════════════════════ */}
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.15 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+      >
+        <FaqSection />
       </motion.div>
 
       {/* ══════════════════════════════════════════════════════
