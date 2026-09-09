@@ -10,7 +10,7 @@ import { useAdminLandingContent } from '@/hooks/useAdminLandingContent';
  *
  *  left  — pink location pin + short location label · green pulse + a standing
  *          "appointments available" line (label hides < sm)
- *  right — NISHV certification seal (always visible) · compact Google +
+ *  right — NISV certification seal (always visible) · compact Google +
  *          Treatwell rating chips (hidden < md), same numbers as the hero
  *          TrustBar / LocalBusiness schema
  */
@@ -87,17 +87,17 @@ export default function AnnouncementBar({ variant = 'fixed' }: { variant?: 'fixe
           )}
         </div>
 
-        {/* right — NISHV certification seal (always) · rating chips (≥ md) */}
+        {/* right — NISV certification seal (always) · rating chips (≥ md) */}
         <div className="flex items-center gap-4 shrink-0">
           <span
             className="inline-flex items-center gap-1.5 text-white/80"
-            aria-label="NISHV-zertifizierter Betrieb"
+            aria-label="NISV-zertifizierter Betrieb"
           >
             <span className="material-symbols-outlined text-[16px] text-[--color-primary-fixed-dim] shrink-0">
               workspace_premium
             </span>
             <span className="font-body-sm text-[12px] whitespace-nowrap">
-              <span className="text-white font-semibold tracking-[0.08em]">NISHV</span>
+              <span className="text-white font-semibold tracking-[0.08em]">NISV</span>
               <span className="text-white/45 text-[11px]"> zertifiziert</span>
             </span>
           </span>
