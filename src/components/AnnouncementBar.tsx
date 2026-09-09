@@ -10,8 +10,9 @@ import { useAdminLandingContent } from '@/hooks/useAdminLandingContent';
  *
  *  left  — pink location pin + short location label · green pulse + a standing
  *          "appointments available" line (label hides < sm)
- *  right — compact Google + Treatwell rating chips (hidden < md), same numbers
- *          as the hero TrustBar / LocalBusiness schema
+ *  right — NISHV certification seal (always visible) · compact Google +
+ *          Treatwell rating chips (hidden < md), same numbers as the hero
+ *          TrustBar / LocalBusiness schema
  */
 const GoogleGlyph = (
   <svg viewBox="0 0 48 48" className="w-3.5 h-3.5 shrink-0" aria-hidden>
@@ -30,13 +31,13 @@ const TreatwellGlyph = (
 );
 
 function RatingChip({
-  glyph, label, rating, href,
-}: { glyph: React.ReactNode; label: string; rating: string; href?: string }) {
+  glyph, label, rating, href, className = '',
+}: { glyph: React.ReactNode; label: string; rating: string; href?: string; className?: string }) {
   const Tag = (href ? 'a' : 'span') as 'a' | 'span';
   return (
     <Tag
       {...(href ? { href, target: '_blank', rel: 'noopener noreferrer' } : {})}
-      className="inline-flex items-center gap-1.5 text-white/75 hover:text-white transition-colors"
+      className={`inline-flex items-center gap-1.5 text-white/75 hover:text-white transition-colors ${className}`}
       aria-label={`${label}: ${rating} von 5`}
     >
       {glyph}
@@ -86,18 +87,31 @@ export default function AnnouncementBar({ variant = 'fixed' }: { variant?: 'fixe
           )}
         </div>
 
-        {/* right — rating chips */}
-        {(gRating || tRating) && (
-          <div className="hidden md:flex items-center gap-4 shrink-0">
-            {gRating && (
-              <RatingChip glyph={GoogleGlyph} label="Google" rating={gRating} href={s.google?.trim() || undefined} />
-            )}
-            {gRating && tRating && <span className="w-px h-3.5 bg-white/15" />}
-            {tRating && (
-              <RatingChip glyph={TreatwellGlyph} label="Treatwell" rating={tRating} href={s.treatwellUrl?.trim() || undefined} />
-            )}
-          </div>
-        )}
+        {/* right — NISHV certification seal (always) · rating chips (≥ md) */}
+        <div className="flex items-center gap-4 shrink-0">
+          <span
+            className="inline-flex items-center gap-1.5 text-white/80"
+            aria-label="NISHV-zertifizierter Betrieb"
+          >
+            <span className="material-symbols-outlined text-[16px] text-[--color-primary-fixed-dim] shrink-0">
+              workspace_premium
+            </span>
+            <span className="font-body-sm text-[12px] tracking-[0.08em] uppercase whitespace-nowrap">
+              <span className="text-white font-semibold">NISHV</span>
+              <span className="text-white/45"> zertifiziert</span>
+            </span>
+          </span>
+
+          {(gRating || tRating) && <span className="hidden md:block w-px h-3.5 bg-white/15" />}
+
+          {gRating && (
+            <RatingChip glyph={GoogleGlyph} label="Google" rating={gRating} href={s.google?.trim() || undefined} className="hidden md:inline-flex" />
+          )}
+          {gRating && tRating && <span className="hidden md:block w-px h-3.5 bg-white/15" />}
+          {tRating && (
+            <RatingChip glyph={TreatwellGlyph} label="Treatwell" rating={tRating} href={s.treatwellUrl?.trim() || undefined} className="hidden md:inline-flex" />
+          )}
+        </div>
       </div>
     </div>
   );
