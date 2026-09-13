@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { href: '/admin/aktionen', icon: 'sell', label: 'Aktionen' },
   { href: '/admin/kunden', icon: 'group', label: 'Kunden' },
   { href: '/admin/kampagnen', icon: 'campaign', label: 'Kampagnen' },
+  { href: '/admin/faq-bot', icon: 'smart_toy', label: 'FAQ-Chatbot' },
   { href: '/admin/einstellungen', icon: 'settings', label: 'Einstellungen' },
 ];
 
