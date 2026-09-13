@@ -28,6 +28,7 @@ export default function BehandlungenPage() {
     setCopiedCatId(catId);
     setTimeout(() => setCopiedCatId(c => (c === catId ? null : c)), 1500);
   };
+  const copyGeneralBookingLink = () => copyBookingLink('1');
 
   const [addOpen, setAddOpen] = useState(false);
   const [newCat, setNewCat]   = useState<Omit<Category, 'id'>>(EMPTY_CAT);
@@ -117,6 +118,14 @@ export default function BehandlungenPage() {
       <header className="h-20 border-b border-outline-variant/30 flex items-center justify-between px-8 bg-surface/80 backdrop-blur-md shrink-0">
         <div className="flex items-center gap-4">
           <h2 className="font-headline-md text-headline-md text-on-surface">Behandlungen</h2>
+          <button
+            type="button"
+            onClick={copyGeneralBookingLink}
+            title="Allgemeinen Buchungslink kopieren (zeigt zuerst die Kategorieauswahl)"
+            className="p-1.5 rounded text-outline hover:text-primary hover:bg-primary/10 transition-colors"
+          >
+            <span className="material-symbols-outlined text-[18px]">{copiedCatId === '1' ? 'check' : 'link'}</span>
+          </button>
           <span className="text-outline-variant">|</span>
           <p className="font-body-sm text-secondary">Kategorien &amp; Service-Verwaltung</p>
         </div>
