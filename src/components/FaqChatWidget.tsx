@@ -1,13 +1,13 @@
 'use client';
 
-import { useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useBookingModal } from '@/context/BookingModalContext';
 import { parseFaqBlocks, type FaqChatEntry } from '@/lib/faq/parseFaqChat';
 import { findBestAnswer } from '@/lib/faq/match';
 import type { FaqChatContent } from '@/lib/content/faqChatTypes';
 
-type ChatMessage = { role: 'user' | 'bot'; text: string; showBookingCta?: boolean };
+type ChatMessage = { role: 'user' | 'bot'; text: string; showBookingCta?: boolean; loading?: boolean };
 /** Visible UI toggle only offers de/en. Turkish content still exists in
  * faq_chat_content['tr'] and is matched silently — if a visitor types in
  * Turkish, the answer comes back in Turkish even though no TR button is
@@ -42,14 +42,34 @@ const UI_TEXT: Record<WidgetLocale, {
 
 const LOCALE_LABEL: Record<WidgetLocale, string> = { de: 'DE', en: 'EN' };
 
+/** Peek-and-retreat cadence for the closed launcher button (see the button's
+ * motion.div below): how often it nudges into full view to hint it's there,
+ * and how long it stays out before retreating back to its half-tucked rest
+ * position. It never fully disappears at rest — a small pulsing dot stays
+ * visible so the widget's presence is always perceivable, just unobtrusive. */
+const PEEK_INTERVAL_MS = 16000;
+const PEEK_DURATION_MS = 2400;
+
 export default function FaqChatWidget({ content, initialLocale = 'de' }: { content: FaqChatContent; initialLocale?: WidgetLocale }) {
   const { open } = useBookingModal();
   const [isOpen, setIsOpen] = useState(false);
   const [lang, setLang] = useState<WidgetLocale>(initialLocale);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [peeking, setPeeking] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   const t = UI_TEXT[lang];
+
+  useEffect(() => {
+    if (isOpen) return;
+    const id = setInterval(() => {
+      setPeeking(true);
+      const timeout = setTimeout(() => setPeeking(false), PEEK_DURATION_MS);
+      return () => clearTimeout(timeout);
+    }, PEEK_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [isOpen]);
 
   // Pooled across every locale in content (de/en/tr) — a visitor typing in
   // Turkish gets matched (and answered) against faq_chat_content['tr'] even
@@ -66,32 +86,67 @@ export default function FaqChatWidget({ content, initialLocale = 'de' }: { conte
     setMessages([]);
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const text = input.trim();
     if (!text) return;
     setInput('');
 
+    const base = messages.length > 0 ? messages : [{ role: 'bot' as const, text: t.greeting }];
     const match = findBestAnswer(text, entries);
-    setMessages((prev) => [
-      ...(prev.length > 0 ? prev : [{ role: 'bot' as const, text: t.greeting }]),
-      { role: 'user', text },
-      match
-        ? { role: 'bot', text: match.answer }
-        : { role: 'bot', text: t.fallback, showBookingCta: true },
-    ]);
+
+    if (match) {
+      setMessages([...base, { role: 'user', text }, { role: 'bot', text: match.answer }]);
+      return;
+    }
+
+    // No local keyword match — ask the Gemini-backed /ask endpoint, grounded
+    // strictly on the same FAQ content (src/app/api/faq-chat/ask/route.ts).
+    // Shows a "..." placeholder while waiting; any failure/timeout/"not
+    // covered" response degrades to the same generic fallback + booking CTA
+    // this widget always showed before that layer existed.
+    setMessages([...base, { role: 'user', text }, { role: 'bot', text: '···', loading: true }]);
+    try {
+      const res = await fetch('/api/faq-chat/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, locale: lang }),
+      });
+      const data = await res.json().catch(() => null);
+      const answer: string | null = data?.answer ?? null;
+      setMessages([
+        ...base,
+        { role: 'user', text },
+        answer ? { role: 'bot', text: answer } : { role: 'bot', text: t.fallback, showBookingCta: true },
+      ]);
+    } catch {
+      setMessages([...base, { role: 'user', text }, { role: 'bot', text: t.fallback, showBookingCta: true }]);
+    }
   };
+
+  const revealed = isOpen || peeking || hovered;
 
   return (
     <>
-      <button
+      <motion.button
         type="button"
         onClick={() => setIsOpen((v) => !v)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onFocus={() => setHovered(true)}
+        onBlur={() => setHovered(false)}
         aria-label={isOpen ? t.closeLabel : t.openLabel}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center lux-shadow hover:brightness-90 transition-all active:scale-95"
+        animate={{ x: revealed ? 0 : 22 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center lux-shadow hover:brightness-90 active:scale-95"
       >
-        <span className="material-symbols-outlined text-[26px]">{isOpen ? 'close' : 'chat'}</span>
-      </button>
+        <span className="material-symbols-outlined text-[26px]">{isOpen ? 'close' : 'smart_toy'}</span>
+        {!isOpen && (
+          <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-on-primary/90 ring-2 ring-primary">
+            <span className="absolute inset-0 rounded-full bg-on-primary/90 animate-ping" />
+          </span>
+        )}
+      </motion.button>
 
       <AnimatePresence>
         {isOpen && (
@@ -130,7 +185,7 @@ export default function FaqChatWidget({ content, initialLocale = 'de' }: { conte
                         : 'bg-surface-container-low text-on-surface border border-outline-variant/30'
                     }`}
                   >
-                    <p className="whitespace-pre-line">{m.text}</p>
+                    <p className={`whitespace-pre-line ${m.loading ? 'animate-pulse' : ''}`}>{m.text}</p>
                     {m.showBookingCta && (
                       <button
                         type="button"
