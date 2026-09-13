@@ -25,14 +25,14 @@ const UI_TEXT: Record<WidgetLocale, {
   send: string; bookingCta: string; openLabel: string; closeLabel: string;
 }> = {
   de: {
-    title: 'EPILISSE Assistent',
+    title: 'Epibot',
     greeting: 'Hallo! Wie kann ich Ihnen weiterhelfen? Fragen Sie mich gerne zu unseren Behandlungen, Preisen oder Öffnungszeiten.',
     fallback: 'Das kann ich Ihnen leider nicht genau beantworten. Am besten klären wir das persönlich — buchen Sie einfach einen Termin, unser Team hilft Ihnen gerne weiter.',
     placeholder: 'Ihre Frage...', send: 'Senden', bookingCta: 'Termin buchen',
     openLabel: 'Chat öffnen', closeLabel: 'Chat schließen',
   },
   en: {
-    title: 'EPILISSE Assistant',
+    title: 'Epibot',
     greeting: 'Hello! How can I help you? Feel free to ask about our treatments, prices, or opening hours.',
     fallback: "I'm not able to answer that precisely. It's best to clarify this in person — just book an appointment and our team will be happy to help.",
     placeholder: 'Your question...', send: 'Send', bookingCta: 'Book appointment',
