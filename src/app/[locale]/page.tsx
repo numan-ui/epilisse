@@ -429,13 +429,9 @@ export default function HomePage() {
                 but must not swallow clicks; only the CTA re-enables pointer
                 events. */}
             <div className={`pointer-events-none absolute inset-0 z-20 flex flex-col justify-center items-start px-margin-mobile md:px-margin-desktop ${i === 0 ? "lg:hidden" : ""}`}>
-              {/* i === 0 skips the entrance fade so this LCP headline paints
-                  visible straight from SSR HTML instead of sitting at
-                  opacity:0 until React hydrates and Framer Motion runs —
-                  later slide changes (i > 0) still fade in as before. */}
               <motion.h1
                 key={`h-${slideKey}`}
-                initial={i === 0 ? false : { opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 24 }}
                 animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, ease: "easeOut" }}
                 className="font-display-lg text-display-lg md:text-[80px] font-bold leading-none text-white max-w-2xl mb-6"
@@ -444,7 +440,7 @@ export default function HomePage() {
               </motion.h1>
               <motion.p
                 key={`p-${slideKey}`}
-                initial={i === 0 ? false : { opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 24 }}
                 animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
                 className="font-body-lg text-body-lg text-white/90 max-w-lg mb-10"
@@ -454,7 +450,7 @@ export default function HomePage() {
               <motion.button
                 key={`b-${slideKey}`}
                 type="button"
-                initial={i === 0 ? false : { opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 24 }}
                 animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
                 onClick={() => booking.open()}
