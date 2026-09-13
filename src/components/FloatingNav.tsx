@@ -19,7 +19,14 @@ export default function FloatingNav() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > window.innerHeight * 0.6);
+    // Stays hidden through the page and only appears once the visitor
+    // scrolls down to the FAQ (#faq) section — hides again if they scroll
+    // back up above it. Other pages have no #faq section, so fall back to
+    // the footer as the same "reached the end" marker.
+    const target = document.getElementById('faq') || document.querySelector('footer');
+    const onScroll = () => {
+      setVisible(target ? target.getBoundingClientRect().top <= window.innerHeight * 0.5 : false);
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
