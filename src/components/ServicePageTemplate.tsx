@@ -99,7 +99,7 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
     { href: "/preise", label: lc.navPreise || "Preise" },
     { href: "/aktionen", label: lc.navAktionen || "Aktionen" },
     { href: "/ueber-uns", label: lc.navUeberUns || "Über Uns" },
-    { href: "/#kontakt", label: lc.navKontakt || "Kontakt" },
+    { href: "/kontakt", label: lc.navKontakt || "Kontakt" },
   ];
 
   return (

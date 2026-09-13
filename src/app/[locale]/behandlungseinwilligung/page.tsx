@@ -1,5 +1,9 @@
+import FloatingNav from "@/components/FloatingNav";
+import SiteFooter from "@/components/SiteFooter";
+
 export default function BehandlungseinwilligungPage() {
   return (
+    <>
     <main className="max-w-[820px] mx-auto px-6 py-24 text-on-surface">
       <h1 className="font-display-lg text-headline-lg mb-8">Behandlungseinwilligung</h1>
 
@@ -57,5 +61,8 @@ export default function BehandlungseinwilligungPage() {
         </section>
       </div>
     </main>
+    <FloatingNav />
+    <SiteFooter />
+    </>
   );
 }

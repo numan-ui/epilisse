@@ -148,7 +148,7 @@ export default function PreisePage() {
     { href: "/preise", label: lc.navPreise || "Preise" },
     { href: "/aktionen", label: lc.navAktionen || "Aktionen" },
     { href: "/ueber-uns", label: lc.navUeberUns || "Über Uns" },
-    { href: "/#kontakt", label: lc.navKontakt || "Kontakt" },
+    { href: "/kontakt", label: lc.navKontakt || "Kontakt" },
   ];
 
   // Every visible category gets its own price table — built-in (with a

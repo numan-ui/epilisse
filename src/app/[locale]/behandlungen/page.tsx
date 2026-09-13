@@ -40,7 +40,7 @@ export default function BehandlungenPage() {
     { href: "/preise", label: lc.navPreise || "Preise" },
     { href: "/aktionen", label: lc.navAktionen || "Aktionen" },
     { href: "/ueber-uns", label: lc.navUeberUns || "Über Uns" },
-    { href: "/#kontakt", label: lc.navKontakt || "Kontakt" },
+    { href: "/kontakt", label: lc.navKontakt || "Kontakt" },
   ];
 
   // "Aktionen" is bookable but not a treatment — it has its own /aktionen page.

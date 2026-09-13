@@ -9,8 +9,7 @@ import { useAdminLandingContent } from '@/hooks/useAdminLandingContent';
 /**
  * Floating bottom pill nav — appears once the visitor has scrolled past the
  * hero, lets them jump straight to any section/page without scrolling back
- * up to the fixed top nav. Same destinations as the top nav; Kontakt always
- * points at the homepage's contact section since no other page has one.
+ * up to the fixed top nav. Same destinations as the top nav.
  */
 export default function FloatingNav() {
   const t = useTranslations();
@@ -36,9 +35,9 @@ export default function FloatingNav() {
     { href: '/', label: t('nav.home'), icon: 'home' },
     { href: '/behandlungen', label: lc.navBehandlungen || t('nav.behandlungen'), icon: 'spa' },
     { href: '/preise', label: lc.navPreise || t('nav.preise'), icon: 'sell' },
-    { href: '/aktionen', label: lc.navAktionen || t('nav.aktionen'), icon: 'local_offer' },
+    { href: '/aktionen', label: lc.navAktionen || t('nav.aktionen'), icon: 'auto_awesome' },
     { href: '/ueber-uns', label: lc.navUeberUns || t('nav.ueberUns'), icon: 'groups' },
-    { href: '/#kontakt', label: lc.navKontakt || t('nav.kontakt'), icon: 'call' },
+    { href: '/kontakt', label: lc.navKontakt || t('nav.kontakt'), icon: 'call' },
   ];
 
   return (
