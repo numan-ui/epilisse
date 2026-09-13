@@ -303,7 +303,11 @@ export default function HeroCinematicSlide({
           focus-pull blur hides sub-pixel jitter at the phase boundary. */}
       <div className="relative flex flex-col justify-center px-margin-desktop py-28">
         <div className="grid max-w-lg">
-          <AnimatePresence>
+          {/* initial={false}: skip the fade-in on first mount so the LCP
+              headline paints immediately in SSR HTML instead of waiting on
+              GSAP/Lenis hydration to become visible — later phase swaps
+              still cross-fade normally. */}
+          <AnimatePresence initial={false}>
             <motion.div
               key={phase}
               initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}

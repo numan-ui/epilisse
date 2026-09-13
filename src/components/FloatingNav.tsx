@@ -69,8 +69,8 @@ export default function FloatingNav() {
                 </span>
                 <span
                   className={`font-label-caps tracking-wide whitespace-nowrap ${
-                    active ? 'text-[11px] sm:text-[12px]' : 'text-[9px] sm:text-[10px]'
-                  }`}
+                    item.href === '/' ? 'hidden sm:inline' : ''
+                  } ${active ? 'text-[11px] sm:text-[12px]' : 'text-[9px] sm:text-[10px]'}`}
                 >
                   {item.label}
                 </span>
