@@ -338,13 +338,13 @@ export default function HomePage() {
             <button
               key={slide.id}
               onClick={() => goToSlide(i)}
-              className="h-1 bg-white/20 flex-1 overflow-hidden cursor-pointer"
+              className="h-1 bg-white/10 flex-1 overflow-hidden cursor-pointer"
               aria-label={`Slide ${i + 1}`}
             >
               <div
                 key={i === currentSlide ? `active-${slideKey}` : `idle-${i}`}
                 style={i === currentSlide ? { animationDuration: `${slide.duration || 10}s` } : undefined}
-                className={`h-full bg-white ${i === currentSlide ? "progress-animate" : ""} ${i < currentSlide ? "w-full" : i === currentSlide ? "w-0" : "w-0"}`}
+                className={`h-full bg-white/40 ${i === currentSlide ? "progress-animate" : ""} ${i < currentSlide ? "w-full" : i === currentSlide ? "w-0" : "w-0"}`}
               />
             </button>
           ))}
