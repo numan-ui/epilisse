@@ -25,6 +25,13 @@ const LS_HERO  = 'epilisse_admin_hero_slides';
 const LS_ABOUT = 'epilisse_admin_about_values';
 const LS_REVIEWS = 'epilisse_admin_reviews';
 const LS_FAQ = 'epilisse_admin_faq_groups';
+// Last server `updated_at` this browser has reconciled against, per bundle — lets the
+// load effect tell "local copy is merely older than the newest write" apart from
+// "local copy doesn't exist", so a stale/partial local copy can never silently
+// clobber a newer shared draft (see the load effect below for the incident this fixes).
+const LS_CAT_SYNC  = 'epilisse_admin_categories_synced_at';
+const LS_PC_SYNC   = 'epilisse_admin_page_content_synced_at';
+const LS_SITE_SYNC = 'epilisse_admin_site_content_synced_at';
 
 const ls = {
   read: <T,>(key: string): T | null => {
@@ -152,39 +159,70 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     if (revs  && revs.length > 0)  setReviews(revs);
     if (faq   && faq.length > 0)   setFaqGroups(faq);
 
-    // The rest of the CMS bundle → site_content.draft. Same fresh-browser
-    // seeding logic as categories/page-content: a browser with a local copy
-    // uses it; one without seeds from `draft` (the shared source of truth)
-    // rather than the hardcoded INIT_* defaults, so the write-through below
-    // can't overwrite the shared draft with those.
-    const hasLocalSite = !!(svcs || akt || set || lc || hero || about || revs || faq);
-    if (hasLocalSite) {
-      setSiteContentLoaded(true);
-    } else {
-      (async () => {
-        try {
-          const r = await fetch('/api/content?content=draft');
-          if (!r.ok) return; // auth/network failure — leave siteContentLoaded false
-          const res = (await r.json()) as { draft: SiteContent | null };
-          const d = res.draft;
-          if (d && Object.keys(d).length > 0) {
-            if (d.services) setServices(d.services);
-            const derivedAkt = deriveAktionen(d);
-            if (derivedAkt.length > 0) setAktionen(derivedAkt);
-            if (d.settings) setSettings(prev => ({ ...prev, ...d.settings, hours: d.settings!.hours ?? prev.hours }));
-            if (d.landingContent) setLandingContent(prev => ({ ...prev, ...d.landingContent }));
-            if (d.heroSlides && d.heroSlides.length > 0) setHeroSlides(d.heroSlides);
-            if (d.aboutValues && d.aboutValues.length > 0) setAboutValues(d.aboutValues);
-            if (d.reviews && d.reviews.length > 0) setReviews(d.reviews);
-            if (d.faqGroups && d.faqGroups.length > 0) setFaqGroups(d.faqGroups);
-          }
-          setSiteContentLoaded(true);
-        } catch {
-          // Network failure — leave siteContentLoaded false, disabling the
-          // write-through for this session rather than risking a clobber.
+    // The rest of the CMS bundle → site_content.draft. ALWAYS reconciles against
+    // the shared draft on mount now — never short-circuits on "this browser has
+    // *some* local copy". That used to gate the whole bundle on one boolean
+    // (`hasLocalSite`), so a browser whose localStorage predated a newly-shipped
+    // field (e.g. `faqGroups`, added after this browser last saved) would keep
+    // that field at its blank fresh-mount default, then the debounced
+    // write-through a few lines down would push that blank straight into the
+    // *shared* draft, wiping out real content the next "Veröffentlichen" —
+    // exactly how a homepage FAQ list and, by the same mechanism, page-content
+    // photos disappeared from production. Now: per-field, missing-locally always
+    // pulls from the server; and if the server draft is newer than the last
+    // sync this browser did at all (another device/tab published since), the
+    // server fully wins instead of the stale local copy.
+    (async () => {
+      let serverDraft: SiteContent | null = null;
+      let serverUpdatedAt: string | null = null;
+      try {
+        const r = await fetch('/api/content?content=draft');
+        if (r.ok) {
+          const res = (await r.json()) as { draft: SiteContent | null; updatedAt: string | null };
+          serverDraft = res.draft;
+          serverUpdatedAt = res.updatedAt;
         }
-      })();
-    }
+      } catch {
+        // Network failure — proceed with whatever this browser already loaded
+        // from localStorage above; nothing to reconcile against.
+      }
+
+      const localSyncedAt = ls.read<string>(LS_SITE_SYNC);
+      const serverIsNewer = !!serverUpdatedAt && (!localSyncedAt || serverUpdatedAt > localSyncedAt);
+
+      if (serverDraft && Object.keys(serverDraft).length > 0) {
+        if (serverIsNewer) {
+          // Another browser/device published after this one last synced —
+          // that shared draft is more current than anything stored here.
+          if (serverDraft.services) setServices(serverDraft.services);
+          const derivedAkt = deriveAktionen(serverDraft);
+          if (derivedAkt.length > 0) setAktionen(derivedAkt);
+          if (serverDraft.settings) setSettings(prev => ({ ...prev, ...serverDraft!.settings, hours: serverDraft!.settings!.hours ?? prev.hours }));
+          if (serverDraft.landingContent) setLandingContent(prev => ({ ...prev, ...serverDraft!.landingContent }));
+          if (serverDraft.heroSlides && serverDraft.heroSlides.length > 0) setHeroSlides(serverDraft.heroSlides);
+          if (serverDraft.aboutValues && serverDraft.aboutValues.length > 0) setAboutValues(serverDraft.aboutValues);
+          if (serverDraft.reviews && serverDraft.reviews.length > 0) setReviews(serverDraft.reviews);
+          if (serverDraft.faqGroups && serverDraft.faqGroups.length > 0) setFaqGroups(serverDraft.faqGroups);
+        } else {
+          // Local is at least as fresh — but backfill any field this browser's
+          // localStorage never had at all, instead of leaving it blank.
+          if (!svcs && serverDraft.services) setServices(serverDraft.services);
+          if (!akt || akt.length === 0) {
+            const derivedAkt = deriveAktionen(serverDraft);
+            if (derivedAkt.length > 0) setAktionen(derivedAkt);
+          }
+          if (!set && serverDraft.settings) setSettings(prev => ({ ...prev, ...serverDraft!.settings, hours: serverDraft!.settings!.hours ?? prev.hours }));
+          if (!lc && serverDraft.landingContent) setLandingContent(prev => ({ ...prev, ...serverDraft!.landingContent }));
+          if ((!hero || hero.length === 0) && serverDraft.heroSlides && serverDraft.heroSlides.length > 0) setHeroSlides(serverDraft.heroSlides);
+          if ((!about || about.length === 0) && serverDraft.aboutValues && serverDraft.aboutValues.length > 0) setAboutValues(serverDraft.aboutValues);
+          if ((!revs || revs.length === 0) && serverDraft.reviews && serverDraft.reviews.length > 0) setReviews(serverDraft.reviews);
+          if ((!faq || faq.length === 0) && serverDraft.faqGroups && serverDraft.faqGroups.length > 0) setFaqGroups(serverDraft.faqGroups);
+        }
+      }
+
+      if (serverUpdatedAt) ls.write(LS_SITE_SYNC, serverUpdatedAt);
+      setSiteContentLoaded(true);
+    })();
 
     // Reconcile the local list against code: drop stale built-ins, fill blank
     // built-in fields, and inject any built-in the stored list predates (e.g.
@@ -194,63 +232,80 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     if (mergedCats.length > 0) {
       setCategories(mergedCats);
       if (JSON.stringify(mergedCats) !== JSON.stringify(cats)) ls.write(LS_CAT, mergedCats);
-      setCategoriesLoaded(true);
-    } else {
-      // This browser has no (valid) local copy — could be a genuinely fresh
-      // admin, or just a device/profile/incognito tab that never saved one.
-      // The category list in `draft` is the real shared source of truth, so
-      // seed from there instead of the hardcoded CATEGORIES defaults: writing
-      // those 3 defaults into `draft` via the write-through below would wipe
-      // out every admin-created category for every visitor and every other
-      // browser (this was happening — reported as "database keeps resetting
-      // to 3 categories").
-      (async () => {
-        try {
-          const r = await fetch('/api/categories?content=draft');
-          if (!r.ok) return; // auth/network failure — leave categoriesLoaded false, see below
-          const res = (await r.json()) as { draft: Category[] | null };
-          if (res.draft && res.draft.length > 0) {
-            const merged = mergeCategories(res.draft);
-            setCategories(merged);
-            ls.write(LS_CAT, merged);
-          }
-          // res.draft empty/null is a real signal (nothing published yet) — safe to proceed.
-          setCategoriesLoaded(true);
-        } catch {
-          // Network failure: we genuinely don't know what's in `draft`. Leave
-          // categoriesLoaded false rather than risk it — this disables the
-          // write-through for the rest of this session (no autosave of the
-          // category list) instead of risking overwriting the shared draft
-          // with the fresh-mount CATEGORIES defaults.
-        }
-      })();
     }
+    // Always reconcile against the shared draft, even when this browser has a
+    // local copy — a local copy is only "safe to trust blindly" if nothing
+    // newer has been published elsewhere since. Fixes the same class of bug as
+    // the site-content block above: a stale local list could otherwise
+    // silently clobber a newer shared draft (e.g. a category edited/added from
+    // another device) via the debounced write-through below. When this
+    // browser has no valid local copy at all, the shared draft is the only
+    // source of truth — seeding from it (rather than the hardcoded CATEGORIES
+    // defaults) is what stopped "database keeps resetting to 3 categories".
+    (async () => {
+      let ok = false;
+      try {
+        const r = await fetch('/api/categories?content=draft');
+        if (r.ok) {
+          const res = (await r.json()) as { draft: Category[] | null; updatedAt: string | null };
+          const localSyncedAt = ls.read<string>(LS_CAT_SYNC);
+          const serverIsNewer = !!res.updatedAt && (!localSyncedAt || res.updatedAt > localSyncedAt);
+          if (mergedCats.length === 0 || serverIsNewer) {
+            if (res.draft && res.draft.length > 0) {
+              const merged = mergeCategories(res.draft);
+              setCategories(merged);
+              ls.write(LS_CAT, merged);
+            }
+          }
+          if (res.updatedAt) ls.write(LS_CAT_SYNC, res.updatedAt);
+          ok = true;
+        }
+      } catch {
+        // Network failure — fall through to the mergedCats.length check below.
+      }
+      // Enable the write-through once we either reconciled with the server or
+      // already had a valid local copy to fall back to. If neither — genuinely
+      // fresh browser AND unreachable server — leave it disabled rather than
+      // risk pushing the hardcoded CATEGORIES defaults into the shared draft.
+      if (ok || mergedCats.length > 0) setCategoriesLoaded(true);
+    })();
 
     // Page content — same draft-seeding logic as categories above. A browser
     // with a local copy uses it; one without seeds from `draft` (the shared
     // source of truth) rather than the 3 hardcoded INIT_PAGE_CONTENT defaults,
     // so the write-through below can't overwrite the shared draft — and every
     // admin-created category's Seiteninhalt — with those.
-    if (pc && Object.keys(pc).length > 0) {
-      setPageContent(pc);
-      setPageContentLoaded(true);
-    } else {
-      (async () => {
-        try {
-          const r = await fetch('/api/page-content?content=draft');
-          if (!r.ok) return; // auth/network failure — leave pageContentLoaded false
-          const res = (await r.json()) as { draft: PageContentMap | null };
-          if (res.draft && Object.keys(res.draft).length > 0) {
-            setPageContent(res.draft);
-            ls.write(LS_PC, res.draft);
+    const hasLocalPc = !!(pc && Object.keys(pc).length > 0);
+    if (hasLocalPc) setPageContent(pc!);
+    // Always reconcile against the shared draft (see the categories block
+    // above for why "has a local copy" alone isn't enough): a local
+    // Seiteninhalt copy that predates a photo/text edit published from another
+    // browser or device would otherwise get treated as current and, via the
+    // debounced write-through below, overwrite the newer shared draft with
+    // the older one — this is how uploaded Behandlungen photos went missing
+    // from production.
+    (async () => {
+      let ok = false;
+      try {
+        const r = await fetch('/api/page-content?content=draft');
+        if (r.ok) {
+          const res = (await r.json()) as { draft: PageContentMap | null; updatedAt: string | null };
+          const localSyncedAt = ls.read<string>(LS_PC_SYNC);
+          const serverIsNewer = !!res.updatedAt && (!localSyncedAt || res.updatedAt > localSyncedAt);
+          if (!hasLocalPc || serverIsNewer) {
+            if (res.draft && Object.keys(res.draft).length > 0) {
+              setPageContent(res.draft);
+              ls.write(LS_PC, res.draft);
+            }
           }
-          setPageContentLoaded(true);
-        } catch {
-          // Network failure — leave pageContentLoaded false, disabling the
-          // write-through for this session rather than risking a clobber.
+          if (res.updatedAt) ls.write(LS_PC_SYNC, res.updatedAt);
+          ok = true;
         }
-      })();
-    }
+      } catch {
+        // Network failure — fall through to the hasLocalPc check below.
+      }
+      if (ok || hasLocalPc) setPageContentLoaded(true);
+    })();
   }, []);
 
   /* ── Categories draft write-through ───────────────────
@@ -268,7 +323,10 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(categories),
-      }).catch(() => { /* best-effort — admin's localStorage copy remains the source of truth for the editing UI regardless */ });
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then(res => { if (res?.updatedAt) ls.write(LS_CAT_SYNC, res.updatedAt); })
+        .catch(() => { /* best-effort — admin's localStorage copy remains the source of truth for the editing UI regardless */ });
     }, 700);
     return () => clearTimeout(timer);
   }, [categories, categoriesLoaded]);
@@ -310,7 +368,10 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pageContent),
-      }).catch(() => { /* best-effort — admin's localStorage copy stays the source of truth for the editing UI */ });
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then(res => { if (res?.updatedAt) ls.write(LS_PC_SYNC, res.updatedAt); })
+        .catch(() => { /* best-effort — admin's localStorage copy stays the source of truth for the editing UI */ });
     }, 700);
     return () => clearTimeout(timer);
   }, [pageContent, pageContentLoaded]);
@@ -330,7 +391,10 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(bundle),
-      }).catch(() => { /* best-effort */ });
+      })
+        .then(r => r.ok ? r.json() : null)
+        .then(res => { if (res?.updatedAt) ls.write(LS_SITE_SYNC, res.updatedAt); })
+        .catch(() => { /* best-effort */ });
     }, 700);
     return () => clearTimeout(timer);
   }, [services, aktionen, settings, landingContent, heroSlides, aboutValues, reviews, faqGroups, siteContentLoaded]);

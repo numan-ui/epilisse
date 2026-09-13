@@ -37,11 +37,11 @@ export async function GET(request: Request) {
   const supabase = supabaseServer();
   const { data, error } = await supabase
     .from('site_content')
-    .select('draft')
+    .select('draft, updated_at')
     .eq('id', 1)
     .maybeSingle();
   if (error) return dbError('content', error, 500);
-  return NextResponse.json({ draft: data?.draft ?? null });
+  return NextResponse.json({ draft: data?.draft ?? null, updatedAt: data?.updated_at ?? null });
 }
 
 /** Admin only — write the admin's live-edited CMS bundle into `draft`. Never touches `published`. */
@@ -56,13 +56,14 @@ export async function PUT(request: Request) {
   }
 
   const supabase = supabaseServer();
+  const now = new Date().toISOString();
   const { error } = await supabase
     .from('site_content')
-    .update({ draft: body, updated_at: new Date().toISOString() })
+    .update({ draft: body, updated_at: now })
     .eq('id', 1);
   if (error) return dbError('content', error, 500);
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, updatedAt: now });
 }
 
 /** Admin only — "Veröffentlichen": copies `draft` -> `published`. */

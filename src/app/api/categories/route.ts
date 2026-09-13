@@ -25,11 +25,11 @@ export async function GET(request: Request) {
     const supabase = supabaseServer();
     const { data, error } = await supabase
       .from('site_categories_content')
-      .select('draft')
+      .select('draft, updated_at')
       .eq('id', 1)
       .maybeSingle();
     if (error) return dbError('categories', error, 500);
-    return NextResponse.json({ draft: data?.draft ?? null });
+    return NextResponse.json({ draft: data?.draft ?? null, updatedAt: data?.updated_at ?? null });
   }
 
   const supabase = supabaseServer();
@@ -63,13 +63,14 @@ export async function PUT(request: Request) {
   }
 
   const supabase = supabaseServer();
+  const now = new Date().toISOString();
   const { error } = await supabase
     .from('site_categories_content')
-    .update({ draft: body, updated_at: new Date().toISOString() })
+    .update({ draft: body, updated_at: now })
     .eq('id', 1);
   if (error) return dbError('categories', error, 500);
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, updatedAt: now });
 }
 
 /**
