@@ -367,10 +367,13 @@ export default function KundenPage() {
                         <span className="font-label-caps text-[9px] px-1.5 py-0.5 bg-error-container text-error">Inaktiv</span>
                       )}
                     </div>
-                    <p className="font-body-sm text-[12px] text-outline truncate mt-0.5">
-                      {[cust.phone, cust.email].filter(Boolean).join(' · ') || 'Keine Kontaktdaten'}
-                    </p>
-                    <p className="font-body-sm text-[11px] text-outline-variant truncate mt-0.5">{cust.lastService ?? 'Noch kein Besuch'} · {formatDate(cust.lastVisit)}</p>
+                    <p className="font-body-sm text-[12px] text-outline truncate mt-0.5">{cust.lastService ?? 'Noch kein Besuch'} · {formatDate(cust.lastVisit)}</p>
+                  </div>
+
+                  {/* Contact */}
+                  <div className="text-right shrink-0 hidden lg:block w-44">
+                    <p className="font-body-sm text-[12px] text-on-surface truncate">{cust.phone || '—'}</p>
+                    <p className="font-body-sm text-[12px] text-outline truncate">{cust.email || '—'}</p>
                   </div>
 
                   {/* Stats */}

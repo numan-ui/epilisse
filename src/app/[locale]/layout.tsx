@@ -8,7 +8,9 @@ import { BookingModalProvider } from "@/context/BookingModalContext";
 import { CategoriesProvider } from "@/context/CategoriesContext";
 import { PageContentProvider } from "@/context/PageContentContext";
 import { SiteContentProvider } from "@/context/SiteContentContext";
+import { Suspense } from "react";
 import BookingModal from "@/components/BookingModal";
+import BookingModalFromUrl from "@/components/BookingModalFromUrl";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 import SmoothScroll from "@/components/SmoothScroll";
 import { SITE_URL, buildMetadata } from "@/lib/seo";
@@ -139,6 +141,9 @@ export default async function LocaleLayout({
                 <BookingModalProvider>
                   {children}
                   <BookingModal />
+                  <Suspense fallback={null}>
+                    <BookingModalFromUrl />
+                  </Suspense>
                 </BookingModalProvider>
               </SiteContentProvider>
             </PageContentProvider>
