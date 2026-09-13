@@ -9,6 +9,7 @@ import { useAdminServices } from "@/hooks/useAdminServices";
 import { useBookingModal } from "@/context/BookingModalContext";
 import { FRONTEND_SLUG, PSEUDO_CATEGORY_IDS } from "@/app/[locale]/admin/behandlungen/data";
 import FloatingNav from "@/components/FloatingNav";
+import SiteFooter from "@/components/SiteFooter";
 import { discountPct } from "@/lib/price";
 
 const LOCALES = [
@@ -261,17 +262,7 @@ export default function PreisePage() {
         </div>
       </section>
 
-      {/* ── FOOTER ───────────────────────────────────────────────────────── */}
-      <footer className="bg-surface-container-highest border-t border-outline-variant w-full px-margin-mobile md:px-margin-desktop pt-12 pb-16">
-        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <Link href="/" className="font-display-lg text-headline-md tracking-widest text-primary">
-            {settings.name}
-          </Link>
-          <span className="font-body-sm text-body-sm text-secondary">
-            {settings.address}
-          </span>
-        </div>
-      </footer>
+      <SiteFooter />
 
       <FloatingNav />
 

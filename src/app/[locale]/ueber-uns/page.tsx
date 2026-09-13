@@ -10,6 +10,7 @@ import { useBookingModal } from "@/context/BookingModalContext";
 import SmartImage from "@/components/SmartImage";
 import OwnerManifesto from "@/components/OwnerManifesto";
 import FloatingNav from "@/components/FloatingNav";
+import SiteFooter from "@/components/SiteFooter";
 
 const LOCALES = [
   { code: "de", label: "DE" },
@@ -228,17 +229,7 @@ export default function UeberUnsPage() {
         </div>
       </section>
 
-      {/* ── FOOTER ───────────────────────────────────────────────────────── */}
-      <footer className="bg-surface-container-highest border-t border-outline-variant w-full px-margin-mobile md:px-margin-desktop pt-12 pb-16">
-        <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <Link href="/" className="font-display-lg text-headline-md tracking-widest text-primary">
-            {settings.name}
-          </Link>
-          <span className="font-body-sm text-body-sm text-secondary">
-            {settings.address}
-          </span>
-        </div>
-      </footer>
+      <SiteFooter />
 
       <FloatingNav />
 
