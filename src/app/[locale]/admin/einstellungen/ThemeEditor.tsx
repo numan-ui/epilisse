@@ -20,6 +20,8 @@ const FIELD_HINT: Record<ThemeField, string> = {
   text: 'Gövde metni ve başlıklar',
   accent: 'İkincil vurgular, kicker etiketleri',
   heroPanel: 'Ana sayfa hero panelinin zemini (açık ya da koyu)',
+  ctaColor: 'Sadece rezervasyon butonları (nav, hero, paket, iletişim) — FAQ sekmeleri marka renginde kalır',
+  ctaHover: 'Rezervasyon butonuna gelince / basılıyken',
 };
 
 /** Apply a derived var map as inline styles on <html> (beats @theme + any
@@ -142,7 +144,7 @@ export default function ThemeEditor() {
       <div>
         <h4 className="font-headline-sm text-headline-sm text-on-surface mb-1">Farben &amp; Theme</h4>
         <p className="font-body-sm text-on-surface-variant opacity-70">
-          8 marka rengini ayarla — kalan ~40 ton bunlardan otomatik türetilir ve
+          10 marka rengini ayarla — kalan ~40 ton bunlardan otomatik türetilir ve
           okunabilirlik için AA kontrastına çekilir. Kaydettiğinde canlı sitede
           herkes için geçerli olur.
         </p>

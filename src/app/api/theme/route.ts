@@ -18,11 +18,14 @@ const COLUMN: Record<ThemeField, keyof ThemeUpdate> = {
   text: 'body_text',
   accent: 'accent',
   heroPanel: 'hero_panel',
+  ctaColor: 'cta_color',
+  ctaHover: 'cta_hover',
 };
 
 type Row = {
   brand: string; on_brand: string; brand_hover: string; surface: string;
   card: string; body_text: string; accent: string; hero_panel: string;
+  cta_color: string; cta_hover: string;
 };
 
 function rowToInput(r: Row): ThemeInput {
@@ -30,6 +33,7 @@ function rowToInput(r: Row): ThemeInput {
     brand: r.brand, onBrand: r.on_brand, brandHover: r.brand_hover,
     surface: r.surface, card: r.card, text: r.body_text,
     accent: r.accent, heroPanel: r.hero_panel,
+    ctaColor: r.cta_color || r.brand, ctaHover: r.cta_hover || r.brand_hover,
   };
 }
 

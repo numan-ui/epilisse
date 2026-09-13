@@ -264,17 +264,17 @@ export interface Database {
         Row: {
           id: number; brand: string; on_brand: string; brand_hover: string;
           surface: string; card: string; body_text: string; accent: string;
-          hero_panel: string; updated_at: string;
+          hero_panel: string; cta_color: string; cta_hover: string; updated_at: string;
         };
         Insert: {
           id?: number; brand: string; on_brand: string; brand_hover: string;
           surface: string; card: string; body_text: string; accent: string;
-          hero_panel: string; updated_at?: string;
+          hero_panel: string; cta_color: string; cta_hover: string; updated_at?: string;
         };
         Update: Partial<{
           brand: string; on_brand: string; brand_hover: string; surface: string;
           card: string; body_text: string; accent: string; hero_panel: string;
-          updated_at: string;
+          cta_color: string; cta_hover: string; updated_at: string;
         }>;
         Relationships: [];
       };

@@ -25,6 +25,9 @@ const EXPECTED_VARS = [
   '--hero-panel-bottom',
   '--hero-on-panel',
   '--brand-glow',
+  '--color-cta',
+  '--color-on-cta',
+  '--color-cta-hover',
 ];
 
 for (const [name, input] of [
@@ -45,6 +48,13 @@ for (const [name, input] of [
     assert.equal(vars['--color-surface'].toLowerCase(), input.surface.toLowerCase());
     assert.equal(vars['--color-surface-container'].toLowerCase(), input.card.toLowerCase());
     assert.equal(vars['--color-tertiary-container'].toLowerCase(), input.accent.toLowerCase());
+    assert.equal(vars['--color-cta'].toLowerCase(), input.ctaColor.toLowerCase());
+    assert.equal(vars['--color-cta-hover'].toLowerCase(), input.ctaHover.toLowerCase());
+  });
+
+  test(`${name}: cta label clears AA on the cta button`, () => {
+    const { vars } = deriveTokens(input);
+    assert.ok(contrastRatio(vars['--color-on-cta'], vars['--color-cta']) >= 4.5);
   });
 
   test(`${name}: button label clears AA on the button`, () => {
@@ -103,6 +113,6 @@ test('presets themselves produce no correction notes', () => {
   assert.deepEqual(deriveTokens(ANTIQUE_ROSE).notes, []);
 });
 
-test('THEME_FIELDS is the 8 documented keys', () => {
-  assert.equal(THEME_FIELDS.length, 8);
+test('THEME_FIELDS is the 10 documented keys', () => {
+  assert.equal(THEME_FIELDS.length, 10);
 });

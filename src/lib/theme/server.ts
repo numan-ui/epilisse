@@ -16,6 +16,9 @@ function rowToInput(r: Row): ThemeInput {
     text: r.body_text,
     accent: r.accent,
     heroPanel: r.hero_panel,
+    // Fallback for rows saved before the cta_color/cta_hover migration ran.
+    ctaColor: r.cta_color || r.brand,
+    ctaHover: r.cta_hover || r.brand_hover,
   };
 }
 

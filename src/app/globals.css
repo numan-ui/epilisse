@@ -15,6 +15,13 @@
   --color-inverse-primary: #eac243;
   --color-surface-tint: #745b00;
 
+  /* Booking CTAs only — kept separate from --color-primary so nav/tabs
+     don't visually compete with the conversion action. Gold Lux has no
+     distinct CTA colour picked, so this matches primary exactly. */
+  --color-cta: #745b00;
+  --color-on-cta: #ffffff;
+  --color-cta-hover: #c5a021;
+
   --color-secondary: #5f5e5a;
   --color-on-secondary: #ffffff;
   --color-secondary-container: #e5e2dc;

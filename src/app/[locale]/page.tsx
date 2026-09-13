@@ -259,7 +259,7 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => booking.open()}
-            className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all scale-100 hover:scale-105 duration-200 rounded-[var(--radius-cta)]"
+            className="bg-cta text-on-cta px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-cta-hover transition-all scale-100 hover:scale-105 duration-200 rounded-[var(--radius-cta)]"
           >
             {lc.navCta || t("nav.cta")}
           </button>
@@ -453,7 +453,7 @@ export default function HomePage() {
                 animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
                 onClick={() => booking.open()}
-                className="pointer-events-auto bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-all rounded-[var(--radius-cta)]"
+                className="pointer-events-auto bg-cta text-on-cta px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-cta-hover transition-all rounded-[var(--radius-cta)]"
               >
                 {slide.cta}
               </motion.button>
@@ -662,7 +662,7 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() => booking.open()}
-                    className="bg-primary text-on-primary px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all rounded-[var(--radius-cta)]"
+                    className="bg-cta text-on-cta px-6 py-3 font-label-caps text-label-caps tracking-widest hover:bg-cta-hover transition-all rounded-[var(--radius-cta)]"
                   >
                     {b.cta || "Angebot sichern"}
                   </button>
@@ -816,7 +816,7 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => booking.open()}
-            className="bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest hover:bg-primary-container transition-all text-center lux-shadow rounded-[var(--radius-cta)]"
+            className="bg-cta text-on-cta px-10 py-5 font-label-caps text-label-caps tracking-widest hover:bg-cta-hover transition-all text-center lux-shadow rounded-[var(--radius-cta)]"
           >
             {t("contact.ctaCalendar")}
           </button>

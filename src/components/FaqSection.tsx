@@ -34,16 +34,13 @@ export default function FaqSection() {
   };
 
   return (
-    <section
-      id="faq"
-      className="py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
-    >
+    <section id="faq" className="py-section-gap bg-surface-container-low">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema).replace(/</g, '\\u003c') }}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-gutter items-start">
+      <div className="px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-gutter items-start">
         {/* ── FAQ column ─────────────────────────────── */}
         <div>
           <div className="flex items-center gap-3 mb-4">

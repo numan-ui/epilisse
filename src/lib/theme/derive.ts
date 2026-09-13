@@ -59,6 +59,15 @@ export function deriveTokens(input: ThemeInput): DeriveResult {
     );
   }
 
+  // ── cta (booking buttons only — kept separate from --color-primary
+  //    so nav/tabs/cards don't visually compete with the conversion action) ──
+  const cta = input.ctaColor;
+  const ctaHover = input.ctaHover;
+  v['--color-cta'] = cta;
+  const onCta = ensureContrast(input.onBrand, cta, 4.5);
+  v['--color-on-cta'] = onCta;
+  v['--color-cta-hover'] = ctaHover;
+
   // ── secondary (warm neutral pulled off the brand hue) ──────
   const secondary = withSL(mix(input.text, brand, 0.35), 0.08, 0.4);
   const secondaryContainer = tint(brand, 0.25, 0.9);

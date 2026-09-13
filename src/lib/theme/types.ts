@@ -1,6 +1,6 @@
 /** The colours an admin actually picks. Everything else is derived from these. */
 export const THEME_FIELDS = [
-  'brand', // → --color-primary (buttons, links, active state)
+  'brand', // → --color-primary (nav, tabs, active state)
   'onBrand', // → --color-on-primary (text on a brand-coloured button)
   'brandHover', // → --color-primary-container (hover / pressed)
   'surface', // → --color-surface / --color-background (page)
@@ -8,6 +8,8 @@ export const THEME_FIELDS = [
   'text', // → --color-on-surface (body copy, headings)
   'accent', // → --color-tertiary-container (secondary highlights, kickers)
   'heroPanel', // → hero split-panel background (light or dark)
+  'ctaColor', // → --color-cta (booking buttons only, distinct from nav/tabs)
+  'ctaHover', // → --color-cta-hover (booking button hover / pressed)
 ] as const;
 
 export type ThemeField = (typeof THEME_FIELDS)[number];
@@ -23,6 +25,8 @@ export const THEME_FIELD_LABEL: Record<ThemeField, string> = {
   text: 'Ana metin rengi',
   accent: 'Aksan',
   heroPanel: 'Hero panel zemini',
+  ctaColor: 'Rezervasyon buton rengi',
+  ctaHover: 'Rezervasyon buton hover',
 };
 
 export type DeriveResult = {
