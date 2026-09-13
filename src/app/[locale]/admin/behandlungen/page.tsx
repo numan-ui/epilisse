@@ -21,6 +21,14 @@ export default function BehandlungenPage() {
     settings, landingContent, heroSlides, aboutValues, reviews, faqGroups,
   } = useAdminData();
 
+  const [copiedCatId, setCopiedCatId] = useState<string | null>(null);
+  const copyBookingLink = (catId: string) => {
+    const url = `${window.location.origin}/${locale}/?termin=${catId}`;
+    navigator.clipboard.writeText(url);
+    setCopiedCatId(catId);
+    setTimeout(() => setCopiedCatId(c => (c === catId ? null : c)), 1500);
+  };
+
   const [addOpen, setAddOpen] = useState(false);
   const [newCat, setNewCat]   = useState<Omit<Category, 'id'>>(EMPTY_CAT);
   const [iconPickerOpen, setIconPickerOpen] = useState(false);
@@ -170,10 +178,22 @@ export default function BehandlungenPage() {
                   }`}>
                     <span className="material-symbols-outlined text-[20px]">{cat.icon}</span>
                   </div>
-                  {!cat.visible
-                    ? <span className="font-label-caps text-[9px] bg-error-container text-error px-1.5 py-0.5">Verborgen</span>
-                    : <span className="font-label-caps text-[9px] bg-primary/10 text-primary px-1.5 py-0.5">Aktiv</span>
-                  }
+                  <div className="flex items-center gap-1.5">
+                    {!cat.visible
+                      ? <span className="font-label-caps text-[9px] bg-error-container text-error px-1.5 py-0.5">Verborgen</span>
+                      : <span className="font-label-caps text-[9px] bg-primary/10 text-primary px-1.5 py-0.5">Aktiv</span>
+                    }
+                    <button
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); copyBookingLink(cat.id); }}
+                      className="p-1 rounded text-outline hover:text-primary hover:bg-primary/10 transition-colors"
+                      title="Buchungslink für diese Kategorie kopieren"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">
+                        {copiedCatId === cat.id ? 'check' : 'link'}
+                      </span>
+                    </button>
+                  </div>
                 </div>
 
                 <h4 className="font-headline-sm text-[15px] text-on-surface leading-snug">{cat.name}</h4>
