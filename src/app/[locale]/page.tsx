@@ -21,6 +21,7 @@ import VerifiedReviews from "@/components/VerifiedReviews";
 import FaqSection from "@/components/FaqSection";
 import TrustBar from "@/components/TrustBar";
 import AnnouncementBar from "@/components/AnnouncementBar";
+import FloatingNav from "@/components/FloatingNav";
 
 /* ── Image constants (Stitch AI – replace with real salon photos) ── */
 const IMG = {
@@ -959,6 +960,8 @@ export default function HomePage() {
 
       {/* Same utility strip, mirrored as a static band under the footer */}
       <AnnouncementBar variant="static" />
+
+      <FloatingNav />
 
     </main>
   );

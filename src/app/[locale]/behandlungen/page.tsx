@@ -7,6 +7,7 @@ import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useBookingModal } from "@/context/BookingModalContext";
 import { FRONTEND_SLUG, PSEUDO_CATEGORY_IDS } from "@/app/[locale]/admin/behandlungen/data";
+import FloatingNav from "@/components/FloatingNav";
 
 const LOCALES = [
   { code: "de", label: "DE" },
@@ -181,6 +182,8 @@ export default function BehandlungenPage() {
           </span>
         </div>
       </footer>
+
+      <FloatingNav />
 
     </div>
   );

@@ -9,6 +9,7 @@ import { useAdminReviews } from "@/hooks/useAdminReviews";
 import { useBookingModal } from "@/context/BookingModalContext";
 import SmartImage from "@/components/SmartImage";
 import OwnerManifesto from "@/components/OwnerManifesto";
+import FloatingNav from "@/components/FloatingNav";
 
 const LOCALES = [
   { code: "de", label: "DE" },
@@ -238,6 +239,8 @@ export default function UeberUnsPage() {
           </span>
         </div>
       </footer>
+
+      <FloatingNav />
 
     </div>
   );

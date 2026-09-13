@@ -8,6 +8,7 @@ import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useAdminServices } from "@/hooks/useAdminServices";
 import { useBookingModal } from "@/context/BookingModalContext";
 import { FRONTEND_SLUG, PSEUDO_CATEGORY_IDS } from "@/app/[locale]/admin/behandlungen/data";
+import FloatingNav from "@/components/FloatingNav";
 import { discountPct } from "@/lib/price";
 
 const LOCALES = [
@@ -271,6 +272,8 @@ export default function PreisePage() {
           </span>
         </div>
       </footer>
+
+      <FloatingNav />
 
     </div>
   );

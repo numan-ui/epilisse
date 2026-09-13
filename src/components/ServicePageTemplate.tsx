@@ -8,6 +8,7 @@ import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useBookingModal } from "@/context/BookingModalContext";
 import { PREVIEW_GRADIENT } from "@/app/[locale]/admin/behandlungen/data";
 import { discountPct } from "@/lib/price";
+import FloatingNav from "@/components/FloatingNav";
 import { countdownLabel, validityText } from "@/lib/aktion";
 
 // ── Types ─────────────────────────────────────────────────────────────────
@@ -445,6 +446,8 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
           </section>
         )}
       </main>
+
+      <FloatingNav />
 
       {/* ── FOOTER ───────────────────────────────────────────────────────── */}
       <footer className="bg-surface-container-highest w-full px-margin-mobile md:px-margin-desktop pt-12 pb-16 grid grid-cols-1 md:grid-cols-4 gap-gutter border-t border-outline-variant">
