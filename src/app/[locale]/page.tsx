@@ -332,7 +332,7 @@ export default function HomePage() {
         onMouseLeave={() => setHeroParallax({ x: 0, y: 0 })}
       >
         {/* Progress bars */}
-        <div className="absolute top-24 left-0 w-full px-margin-mobile md:px-margin-desktop z-30 flex gap-2">
+        <div className="absolute top-28 left-0 w-full px-margin-mobile md:px-margin-desktop z-30 flex gap-2">
           {heroSlides.map((slide, i) => (
             <button
               key={slide.id}

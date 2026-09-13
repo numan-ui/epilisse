@@ -40,7 +40,6 @@ const SCRUB_DISTANCE = 13000;
        public/hero-frames/f_%03d.webp
    (10 fps × 20 s = 200 frames; bump FRAME_COUNT / aspect to match.) */
 const FRAME_COUNT = 200;
-const FRAME_ASPECT = '640 / 800';
 const frameSrc = (i: number) =>
   `/hero-frames/f_${String(i + 1).padStart(3, '0')}.webp`;
 /** Static fallback for the loading gap and reduced-motion — frame 0 itself,
@@ -146,7 +145,20 @@ export default function HeroCinematicSlide({
     const img = imgs[idx];
     const ctx = canvas.getContext('2d');
     if (!img || !ctx) return;
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    // Crop the source frame to cover the canvas box exactly (object-fit:
+    // cover math) so the panel it sits in never shows a gap at its edges,
+    // whatever the panel's own aspect ratio turns out to be.
+    const srcAspect = img.naturalWidth / img.naturalHeight;
+    const destAspect = canvas.width / canvas.height;
+    let sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight;
+    if (destAspect > srcAspect) {
+      sh = sw / destAspect;
+      sy = (img.naturalHeight - sh) / 2;
+    } else {
+      sw = sh * destAspect;
+      sx = (img.naturalWidth - sw) / 2;
+    }
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
     curFrameRef.current = idx;
     canvas.dataset.frame = String(idx); // observable scrub position (e2e)
   }, []);
@@ -392,32 +404,29 @@ export default function HeroCinematicSlide({
         )}
       </AnimatePresence>
 
-      {/* Right — the scrubbed frame sequence in a 4:5 box, bottom-aligned. The
-          master is 4:5 so the box crops nothing; the equal dark margin above
-          and below it reads as a frame, not a gap. The poster still sits
-          underneath until the first frame decodes (and stays put for reduced
-          motion / when the sequence never loads). */}
+      {/* Right — the scrubbed frame sequence, cropped to fully cover the
+          panel (no letterboxing gap at the edges — the panel gradient never
+          shows through). The poster still sits underneath until the first
+          frame decodes (and stays put for reduced motion / when the
+          sequence never loads). */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 flex items-end justify-center">
-          {/* eslint-disable-next-line @next/next/no-img-element -- transient decorative poster, swapped out once the canvas paints */}
-          <img
-            src={POSTER_SRC}
-            alt=""
-            aria-hidden="true"
-            fetchPriority="high"
-            className={`absolute bottom-0 left-1/2 h-full w-auto max-w-full -translate-x-1/2 object-cover object-bottom transition-opacity duration-700 ${
-              firstReady ? 'opacity-0' : 'opacity-100'
-            }`}
-          />
-          <canvas
-            ref={canvasRef}
-            data-testid="hero-scrub-canvas"
-            className={`relative h-full w-auto max-w-full transition-opacity duration-700 ${
-              firstReady ? 'opacity-100' : 'opacity-0'
-            }`}
-            style={{ aspectRatio: FRAME_ASPECT }}
-          />
-        </div>
+        {/* eslint-disable-next-line @next/next/no-img-element -- transient decorative poster, swapped out once the canvas paints */}
+        <img
+          src={POSTER_SRC}
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+          className={`absolute inset-0 h-full w-full object-cover object-bottom transition-opacity duration-700 ${
+            firstReady ? 'opacity-0' : 'opacity-100'
+          }`}
+        />
+        <canvas
+          ref={canvasRef}
+          data-testid="hero-scrub-canvas"
+          className={`absolute inset-0 h-full w-full transition-opacity duration-700 ${
+            firstReady ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
       </div>
     </div>
   );

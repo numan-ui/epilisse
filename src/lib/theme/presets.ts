@@ -30,7 +30,7 @@ export const ANTIQUE_ROSE: ThemeInput = {
   card: '#F7E9E2',
   text: '#241A1C',
   accent: '#6B7556',
-  heroPanel: '#FDF7F2',
+  heroPanel: '#B9BCAF',
   ctaColor: '#A34E5B',
   ctaHover: '#C87D87',
 };
@@ -49,7 +49,7 @@ export const IVORY_EDITORIAL: ThemeInput = {
   card: '#F3ECE7',
   text: '#1F1619',
   accent: '#D4AF37',
-  heroPanel: '#FDF7F2',
+  heroPanel: '#B9BCAF',
   ctaColor: '#8C4356',
   ctaHover: '#743545',
 };

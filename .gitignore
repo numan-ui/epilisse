@@ -11,3 +11,4 @@ playwright/.cache/
 .vercel
 .claude
 .mcp.json
+.dev-server.log

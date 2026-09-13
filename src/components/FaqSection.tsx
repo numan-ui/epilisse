@@ -79,13 +79,13 @@ export default function FaqSection() {
             {items.map((it) => {
               const isOpen = openItem === it.id;
               return (
-                <div key={it.id}>
+                <div key={it.id} className={isOpen ? 'bg-surface-container-lowest -mx-6 px-6' : ''}>
                   <button
                     onClick={() => setOpenItem(isOpen ? null : it.id)}
                     aria-expanded={isOpen}
                     className="w-full flex items-center justify-between gap-4 py-5 text-left group"
                   >
-                    <span className="font-body-md text-on-surface group-hover:text-primary transition-colors">
+                    <span className={`font-body-md transition-colors ${isOpen ? 'text-primary' : 'text-on-surface group-hover:text-primary'}`}>
                       {it.q}
                     </span>
                     <span
@@ -97,7 +97,7 @@ export default function FaqSection() {
                     </span>
                   </button>
                   {isOpen && (
-                    <p className="font-body-sm text-body-sm text-on-surface-variant pb-5 -mt-1 max-w-prose whitespace-pre-line">
+                    <p className="font-body-sm text-body-sm text-on-surface-variant pb-6 -mt-1 max-w-prose whitespace-pre-line">
                       {it.a}
                     </p>
                   )}

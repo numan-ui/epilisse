@@ -285,7 +285,7 @@ export default function BookingFlow({ variant, active, preselectedCategory, onCl
 
   const content = (
     <>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-1">
         <h3 className="font-headline-sm text-headline-sm text-on-surface">Termin Buchen</h3>
         {variant === 'modal' && (
           <button onClick={onClose} className="text-outline hover:text-error transition-colors" aria-label="Schließen">
@@ -293,6 +293,10 @@ export default function BookingFlow({ variant, active, preselectedCategory, onCl
           </button>
         )}
       </div>
+      {variant === 'inline' && (
+        <p className="font-body-sm text-outline mb-6">Sendlinger Str. · Persönliche Beratung in München</p>
+      )}
+      {variant === 'modal' && <div className="mb-6" />}
 
       {step === 'category' && (
         <div className="space-y-2">
@@ -306,7 +310,7 @@ export default function BookingFlow({ variant, active, preselectedCategory, onCl
                   setSelectedServiceIds(new Set());
                   setStep('services');
                 }}
-                className="flex flex-col items-center gap-2 p-5 border border-outline-variant hover:border-primary hover:bg-primary/5 transition-all text-center"
+                className="flex flex-col items-center gap-2 p-5 rounded-lg bg-surface-container-low border border-transparent hover:border-primary/40 hover:bg-primary/5 transition-all text-center"
               >
                 <span
                   className="material-symbols-outlined text-primary text-[28px] category-icon-glow"
@@ -528,7 +532,11 @@ export default function BookingFlow({ variant, active, preselectedCategory, onCl
   );
 
   if (variant === 'inline') {
-    return <div className="bg-surface border border-outline-variant p-6 sm:p-8">{content}</div>;
+    return (
+      <div className="bg-surface-container-lowest border border-outline-variant/60 rounded-xl lux-shadow p-6 sm:p-8">
+        {content}
+      </div>
+    );
   }
 
   return (
