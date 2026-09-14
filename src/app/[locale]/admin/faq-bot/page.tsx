@@ -24,15 +24,32 @@ A: Nächste Antwort.`;
 export default function FaqBotAdminPage() {
   const [content, setContent] = useState<FaqChatContent>({});
   const [locale, setLocale] = useState<'de' | 'en' | 'tr'>('de');
+  const [enabled, setEnabled] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [status, setStatus] = useState<string>('');
 
   useEffect(() => {
     fetch('/api/faq-chat?content=draft')
       .then((r) => r.json())
-      .then((data) => setContent((data?.draft as FaqChatContent) ?? {}))
+      .then((data) => {
+        setContent((data?.draft as FaqChatContent) ?? {});
+        setEnabled(data?.enabled ?? true);
+      })
       .finally(() => setLoaded(true));
   }, []);
+
+  const toggleEnabled = async () => {
+    const next = !enabled;
+    setEnabled(next);
+    setStatus(next ? 'Aktiviere...' : 'Deaktiviere...');
+    const res = await fetch('/api/faq-chat', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled: next }),
+    });
+    if (!res.ok) { setEnabled(!next); setStatus('Fehler.'); return; }
+    setStatus(next ? 'Chatbot ist jetzt live aktiv.' : 'Chatbot ist jetzt deaktiviert — verschwindet sofort von der Webseite.');
+  };
 
   const setSection = (sectionId: string, value: string) => {
     setContent((prev) => ({ ...prev, [locale]: { ...prev[locale], [sectionId]: value } }));
@@ -59,12 +76,24 @@ export default function FaqBotAdminPage() {
 
   return (
     <div className="p-8 max-w-3xl mx-auto space-y-8 overflow-y-auto">
-      <div>
-        <h1 className="font-headline-sm text-headline-sm text-primary font-bold uppercase tracking-wide">FAQ-Chatbot</h1>
-        <p className="text-on-surface-variant text-body-sm mt-2">
-          Pro Bereich ein Textfeld. Format: eine Zeile mit <code>F: Frage</code>, danach eine Zeile mit <code>A: Antwort</code> (Antwort darf mehrzeilig sein).
-          Deutsch und Englisch sind im Chat als Umschalter sichtbar; Türkisch wird nur im Hintergrund erkannt — schreibt ein Kunde auf Türkisch, antwortet der Bot trotzdem auf Türkisch.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-headline-sm text-headline-sm text-primary font-bold uppercase tracking-wide">FAQ-Chatbot</h1>
+          <p className="text-on-surface-variant text-body-sm mt-2">
+            Pro Bereich ein Textfeld. Format: eine Zeile mit <code>F: Frage</code>, danach eine Zeile mit <code>A: Antwort</code> (Antwort darf mehrzeilig sein).
+            Deutsch und Englisch sind im Chat als Umschalter sichtbar; Türkisch wird nur im Hintergrund erkannt — schreibt ein Kunde auf Türkisch, antwortet der Bot trotzdem auf Türkisch.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={toggleEnabled}
+          className={`shrink-0 flex items-center gap-2 rounded-full px-4 py-2 font-label-caps text-[11px] uppercase tracking-wide transition-colors ${
+            enabled ? 'bg-primary text-on-primary' : 'border border-outline-variant text-on-surface-variant hover:text-primary'
+          }`}
+        >
+          <span className={`w-2 h-2 rounded-full ${enabled ? 'bg-on-primary' : 'bg-outline'}`} />
+          {enabled ? 'Chatbot aktiv' : 'Chatbot deaktiviert'}
+        </button>
       </div>
 
       <div className="flex gap-2 border-b border-outline-variant/40 pb-3">

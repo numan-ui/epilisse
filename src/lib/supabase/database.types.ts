@@ -325,15 +325,15 @@ export interface Database {
       };
       faq_chat_content: {
         Row: {
-          id: number; draft: unknown; published: unknown;
+          id: number; draft: unknown; published: unknown; enabled: boolean;
           updated_at: string; published_at: string | null;
         };
         Insert: {
-          id?: number; draft?: unknown; published?: unknown;
+          id?: number; draft?: unknown; published?: unknown; enabled?: boolean;
           updated_at?: string; published_at?: string | null;
         };
         Update: Partial<{
-          draft: unknown; published: unknown;
+          draft: unknown; published: unknown; enabled: boolean;
           updated_at: string; published_at: string | null;
         }>;
         Relationships: [];

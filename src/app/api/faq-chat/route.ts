@@ -30,11 +30,11 @@ export async function GET(request: Request) {
   const supabase = supabaseServer();
   const { data, error } = await supabase
     .from('faq_chat_content')
-    .select('draft, updated_at')
+    .select('draft, enabled, updated_at')
     .eq('id', 1)
     .maybeSingle();
   if (error) return dbError('faq-chat', error, 500);
-  return NextResponse.json({ draft: data?.draft ?? null, updatedAt: data?.updated_at ?? null });
+  return NextResponse.json({ draft: data?.draft ?? null, enabled: data?.enabled ?? true, updatedAt: data?.updated_at ?? null });
 }
 
 /** Admin only — write the admin's edited FAQ text into `draft`. Never touches `published`. */
@@ -57,6 +57,27 @@ export async function PUT(request: Request) {
   if (error) return dbError('faq-chat', error, 500);
 
   return NextResponse.json({ ok: true, updatedAt: now });
+}
+
+/** Admin only — instant on/off switch, independent of draft/publish. Applies immediately, no "Veröffentlichen" needed. */
+export async function PATCH(request: Request) {
+  if (!(await getAdminSession())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const body = await request.json().catch(() => null);
+  if (typeof body?.enabled !== 'boolean') {
+    return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
+  }
+
+  const supabase = supabaseServer();
+  const { error } = await supabase
+    .from('faq_chat_content')
+    .update({ enabled: body.enabled })
+    .eq('id', 1);
+  if (error) return dbError('faq-chat', error, 500);
+
+  return NextResponse.json({ ok: true, enabled: body.enabled });
 }
 
 /** Admin only — "Veröffentlichen": copies `draft` -> `published`. */

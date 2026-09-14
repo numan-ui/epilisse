@@ -13,9 +13,15 @@ export type { FaqChatContent };
  * the widget falls back to INIT_FAQ_CHAT_CONTENT exactly like a fresh browser.
  */
 export async function getServerFaqChatContent(): Promise<FaqChatContent> {
+  const { content } = await getServerFaqChatState();
+  return content;
+}
+
+/** Same read, plus the instant on/off switch (defaults to enabled if unreachable). */
+export async function getServerFaqChatState(): Promise<{ content: FaqChatContent; enabled: boolean }> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return {};
+  if (!url || !key) return { content: {}, enabled: true };
 
   try {
     const sb = createClient<Database>(url, key, {
@@ -24,15 +30,15 @@ export async function getServerFaqChatContent(): Promise<FaqChatContent> {
     });
     const { data, error } = await sb
       .from('faq_chat_content')
-      .select('draft, published')
+      .select('draft, published, enabled')
       .eq('id', 1)
       .maybeSingle();
-    if (error || !data) return {};
+    if (error || !data) return { content: {}, enabled: true };
 
     const column = process.env.CONTENT_PREVIEW === '1' ? data.draft : data.published;
-    if (!column || typeof column !== 'object' || Array.isArray(column)) return {};
-    return column as FaqChatContent;
+    const content = column && typeof column === 'object' && !Array.isArray(column) ? (column as FaqChatContent) : {};
+    return { content, enabled: data.enabled ?? true };
   } catch {
-    return {};
+    return { content: {}, enabled: true };
   }
 }

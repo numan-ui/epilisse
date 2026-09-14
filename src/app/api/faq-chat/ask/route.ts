@@ -15,7 +15,7 @@ import { INIT_FAQ_CHAT_CONTENT } from '@/lib/content/faqChatTypes';
  */
 
 const NOT_FOUND = 'NOT_FOUND';
-const MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
 
 function buildContext(content: Record<string, Record<string, string>>): string {
   const sections: string[] = [];

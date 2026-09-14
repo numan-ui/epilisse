@@ -17,7 +17,7 @@ import { SITE_URL, buildMetadata } from "@/lib/seo";
 import { getServerCategories } from "@/lib/content/categories";
 import { getServerPageContent } from "@/lib/content/pageContent";
 import { getServerSiteContent } from "@/lib/content/site";
-import { getServerFaqChatContent } from "@/lib/content/faqChat";
+import { getServerFaqChatState } from "@/lib/content/faqChat";
 import FaqChatWidget from "@/components/FaqChatWidget";
 import { INIT_FAQ_CHAT_CONTENT } from "@/lib/content/faqChatTypes";
 import { getServerTheme } from "@/lib/theme/server";
@@ -105,12 +105,13 @@ export default async function LocaleLayout({
     ? null
     : themeVarsToCss(deriveTokens(theme).vars);
 
-  const [categories, pageContent, siteContent, faqChatContent] = await Promise.all([
+  const [categories, pageContent, siteContent, faqChatState] = await Promise.all([
     getServerCategories(),
     getServerPageContent(),
     getServerSiteContent(),
-    getServerFaqChatContent(),
+    getServerFaqChatState(),
   ]);
+  const faqChatContent = faqChatState.content;
 
   return (
     <html
@@ -148,14 +149,16 @@ export default async function LocaleLayout({
                   <Suspense fallback={null}>
                     <BookingModalFromUrl />
                   </Suspense>
-                  <FaqChatWidget
-                    content={{
-                      de: { ...INIT_FAQ_CHAT_CONTENT.de, ...faqChatContent.de },
-                      en: { ...INIT_FAQ_CHAT_CONTENT.en, ...faqChatContent.en },
-                      tr: { ...INIT_FAQ_CHAT_CONTENT.tr, ...faqChatContent.tr },
-                    }}
-                    initialLocale={locale === 'en' ? 'en' : 'de'}
-                  />
+                  {faqChatState.enabled && (
+                    <FaqChatWidget
+                      content={{
+                        de: { ...INIT_FAQ_CHAT_CONTENT.de, ...faqChatContent.de },
+                        en: { ...INIT_FAQ_CHAT_CONTENT.en, ...faqChatContent.en },
+                        tr: { ...INIT_FAQ_CHAT_CONTENT.tr, ...faqChatContent.tr },
+                      }}
+                      initialLocale={locale === 'en' ? 'en' : 'de'}
+                    />
+                  )}
                 </BookingModalProvider>
               </SiteContentProvider>
             </PageContentProvider>
