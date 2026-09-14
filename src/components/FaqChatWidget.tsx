@@ -58,6 +58,7 @@ export default function FaqChatWidget({ content, initialLocale = 'de' }: { conte
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [peeking, setPeeking] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
   const t = UI_TEXT[lang];
 
@@ -130,23 +131,43 @@ export default function FaqChatWidget({ content, initialLocale = 'de' }: { conte
     <>
       <motion.button
         type="button"
-        onClick={() => setIsOpen((v) => !v)}
+        onClick={() => {
+          if (dismissed) { setDismissed(false); setIsOpen(true); return; }
+          setIsOpen((v) => !v);
+        }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         onFocus={() => setHovered(true)}
         onBlur={() => setHovered(false)}
         aria-label={isOpen ? t.closeLabel : t.openLabel}
-        animate={{ x: revealed ? 0 : 22 }}
+        // Raised on mobile so the closed launcher clears the bottom
+        // FloatingNav pill instead of sitting on top of it. Rest position:
+        // mostly tucked at the edge but never fully invisible (see the
+        // pulsing dot) unless the visitor explicitly dismisses it below,
+        // which pushes it further aside (`dismissed`) until they tap it again.
+        animate={{ x: dismissed ? 46 : revealed ? 0 : 22 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center lux-shadow hover:brightness-90 active:scale-95"
+        className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 rounded-full bg-primary text-on-primary flex items-center justify-center lux-shadow hover:brightness-90 active:scale-95"
       >
         <span className="material-symbols-outlined text-[26px]">{isOpen ? 'close' : 'smart_toy'}</span>
-        {!isOpen && (
+        {!isOpen && !dismissed && (
           <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-on-primary/90 ring-2 ring-primary">
             <span className="absolute inset-0 rounded-full bg-on-primary/90 animate-ping" />
           </span>
         )}
       </motion.button>
+
+      {!isOpen && !dismissed && (
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); setDismissed(true); }}
+          aria-label={lang === 'de' ? 'Beiseite schieben' : 'Push aside'}
+          title={lang === 'de' ? 'Beiseite schieben' : 'Push aside'}
+          className="fixed bottom-[7.5rem] right-3 sm:bottom-[5.25rem] sm:right-5 z-50 w-5 h-5 rounded-full bg-surface border border-outline-variant/60 text-on-surface-variant flex items-center justify-center hover:text-primary hover:border-primary transition-colors"
+        >
+          <span className="material-symbols-outlined text-[13px] leading-none">close</span>
+        </button>
+      )}
 
       <AnimatePresence>
         {isOpen && (
@@ -155,7 +176,7 @@ export default function FaqChatWidget({ content, initialLocale = 'de' }: { conte
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-50 w-[calc(100vw-2rem)] max-w-sm h-[28rem] max-h-[70vh] flex flex-col bg-surface border border-outline-variant/40 rounded-2xl lux-shadow overflow-hidden"
+            className="fixed bottom-[9.5rem] right-4 sm:bottom-24 sm:right-6 z-50 w-[calc(100vw-2rem)] max-w-sm h-[28rem] max-h-[70vh] flex flex-col bg-surface border border-outline-variant/40 rounded-2xl lux-shadow overflow-hidden"
           >
             <div className="px-4 py-3 border-b border-outline-variant/40 bg-surface-container-low flex items-center justify-between">
               <p className="font-label-caps text-[11px] tracking-wide uppercase text-on-surface-variant">{t.title}</p>
