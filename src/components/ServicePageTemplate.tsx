@@ -31,6 +31,7 @@ export interface Campaign {
   imagePosition?: "top" | "center" | "bottom";
   price?: string;
   oldPrice?: string;
+  duration?: string;
   startDate?: string;
   endDate?: string;
 }
@@ -363,6 +364,11 @@ export default function ServicePageTemplate({ locale, categoryId, categoryImage,
                           </span>
                         )}
                       </div>
+                      {banner.duration && (
+                        <span className={`font-body-sm text-[12px] block mt-1 ${dark ? "text-white/60" : "text-on-surface-variant opacity-80"}`}>
+                          Behandlungsdauer: ca. {banner.duration}
+                        </span>
+                      )}
                     </div>
                   )}
                   <div>

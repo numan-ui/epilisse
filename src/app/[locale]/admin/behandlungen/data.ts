@@ -18,7 +18,7 @@ export type Aktion = {
   id: string;
   category: string;            // CATEGORIES[].id — 'laser' | 'gesicht' | 'mani' | 'cat-*'
   label: string; title: string; desc: string;
-  price: string; oldPrice?: string;
+  price: string; oldPrice?: string; duration?: string;
   cta: string; icon: string; image: string; imagePosition?: ImagePosition;
   startDate?: string; endDate?: string;
   activeInCategory: boolean;

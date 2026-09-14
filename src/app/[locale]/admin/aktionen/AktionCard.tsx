@@ -49,6 +49,11 @@ export function AktionCard({
           <input className="w-full bg-transparent text-[13px] text-outline line-through focus:outline-none"
             value={a.oldPrice ?? ''} onChange={e => onField('oldPrice', e.target.value)} placeholder="0,00€" />
         </label>
+        <label className="flex items-center gap-1 border border-outline-variant/50 px-2 py-1 w-32">
+          <span className="font-label-caps text-[10px] text-outline shrink-0">Dauer</span>
+          <input className="w-full bg-transparent text-[13px] text-on-surface-variant focus:outline-none"
+            value={a.duration ?? ''} onChange={e => onField('duration', e.target.value)} placeholder="z.B. 60 min" />
+        </label>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

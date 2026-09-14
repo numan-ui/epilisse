@@ -23,6 +23,7 @@ export function aktionToCampaign(a: Aktion): FrontendCampaign {
     imagePosition: a.imagePosition,
     price: a.price,
     oldPrice: a.oldPrice,
+    duration: a.duration,
     startDate: a.startDate,
     endDate: a.endDate,
   };

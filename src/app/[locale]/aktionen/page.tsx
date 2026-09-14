@@ -24,7 +24,7 @@ export default function AktionenPage() {
     list.length > 0
       ? list.map((a) => ({
           name: a.title,
-          duration: '',
+          duration: a.duration || '',
           price: a.price || 'Auf Anfrage',
           ...(a.oldPrice ? { oldPrice: a.oldPrice } : {}),
         }))
