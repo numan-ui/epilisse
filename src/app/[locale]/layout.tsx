@@ -125,15 +125,15 @@ export default async function LocaleLayout({
             dangerouslySetInnerHTML={{ __html: themeCss }}
           />
         )}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        {/* Material Symbols is now self-hosted (see globals.css) — no more
+            fonts.googleapis.com/fonts.gstatic.com round trips. Preload since
+            it's used above the fold (nav icons) on every page. */}
         <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
+          rel="preload"
+          href="/fonts/material-symbols-outlined.woff2"
+          as="font"
+          type="font/woff2"
           crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=swap"
-          rel="stylesheet"
         />
         <LocalBusinessSchema />
       </head>
