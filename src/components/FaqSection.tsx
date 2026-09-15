@@ -39,7 +39,7 @@ export default function FaqSection() {
       />
 
       <div className="px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
-        <div className="max-w-[874px] mx-auto text-center">
+        <div className="max-w-[739px] mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <span className="w-2.5 h-2.5 rounded-full bg-primary" />
             <span className="font-label-caps text-label-caps text-primary tracking-[0.2em]">
@@ -76,7 +76,7 @@ export default function FaqSection() {
             {items.map((it) => {
               const isOpen = openItem === it.id;
               return (
-                <div key={it.id} className={isOpen ? 'bg-surface-container-lowest' : ''}>
+                <div key={it.id} className={isOpen ? 'bg-surface-container-lowest -mx-5 px-5' : ''}>
                   <button
                     onClick={() => setOpenItem(isOpen ? null : it.id)}
                     aria-expanded={isOpen}
@@ -94,7 +94,7 @@ export default function FaqSection() {
                     </span>
                   </button>
                   {isOpen && (
-                    <p className="font-body-sm text-body-sm text-on-surface-variant pb-6 -mt-1 max-w-prose whitespace-pre-line">
+                    <p className="font-body-sm text-body-sm text-on-surface-variant pb-6 -mt-1 whitespace-pre-line">
                       {it.a}
                     </p>
                   )}
