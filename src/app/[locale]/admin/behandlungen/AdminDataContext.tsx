@@ -44,6 +44,24 @@ const ls = {
   },
 };
 
+/**
+ * `a` is chronologically after `b`. Postgres/PostgREST trims trailing-zero
+ * fractional seconds from timestamptz JSON (".300" -> ".3", ".000" -> none),
+ * while `res.updatedAt` written by the PUT/POST handlers always carries JS's
+ * full 3-digit `toISOString()` format. Comparing those two shapes with plain
+ * string `>` silently gets the ordering wrong whenever a save happens to land
+ * on a round millisecond — which is how a stale browser's localStorage won a
+ * "who's newer" check it should have lost and clobbered the shared draft.
+ * Parse to actual instants instead.
+ */
+const isNewer = (a: string, b: string | null): boolean => {
+  if (!b) return true;
+  const ta = Date.parse(a);
+  const tb = Date.parse(b);
+  if (Number.isNaN(ta) || Number.isNaN(tb)) return a > b;
+  return ta > tb;
+};
+
 const defaultServices    = (): ServicesMap     =>
   Object.fromEntries(Object.entries(INIT_SERVICES).map(([k, v]) => [k, v.map(s => ({ ...s }))]));
 const defaultPageContent = (): PageContentMap  =>
@@ -188,7 +206,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       }
 
       const localSyncedAt = ls.read<string>(LS_SITE_SYNC);
-      const serverIsNewer = !!serverUpdatedAt && (!localSyncedAt || serverUpdatedAt > localSyncedAt);
+      const serverIsNewer = !!serverUpdatedAt && isNewer(serverUpdatedAt, localSyncedAt);
 
       if (serverDraft && Object.keys(serverDraft).length > 0) {
         if (serverIsNewer) {
@@ -249,7 +267,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         if (r.ok) {
           const res = (await r.json()) as { draft: Category[] | null; updatedAt: string | null };
           const localSyncedAt = ls.read<string>(LS_CAT_SYNC);
-          const serverIsNewer = !!res.updatedAt && (!localSyncedAt || res.updatedAt > localSyncedAt);
+          const serverIsNewer = !!res.updatedAt && isNewer(res.updatedAt, localSyncedAt);
           if (mergedCats.length === 0 || serverIsNewer) {
             if (res.draft && res.draft.length > 0) {
               const merged = mergeCategories(res.draft);
@@ -291,7 +309,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         if (r.ok) {
           const res = (await r.json()) as { draft: PageContentMap | null; updatedAt: string | null };
           const localSyncedAt = ls.read<string>(LS_PC_SYNC);
-          const serverIsNewer = !!res.updatedAt && (!localSyncedAt || res.updatedAt > localSyncedAt);
+          const serverIsNewer = !!res.updatedAt && isNewer(res.updatedAt, localSyncedAt);
           if (!hasLocalPc || serverIsNewer) {
             if (res.draft && Object.keys(res.draft).length > 0) {
               setPageContent(res.draft);
