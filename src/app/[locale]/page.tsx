@@ -393,7 +393,7 @@ export default function HomePage() {
                   className={`brand-photo object-cover ${i === currentSlide ? "kenburns" : ""}`}
                   style={i === currentSlide ? { animationDuration: `${(slide.duration || 10) + 2}s` } : undefined}
                   sizes="100vw"
-                  priority={i === currentSlide}
+                  priority={i === currentSlide && i !== 0}
                 />
               </div>
             ) : (
