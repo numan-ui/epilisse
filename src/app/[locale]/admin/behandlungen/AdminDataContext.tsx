@@ -193,12 +193,14 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
     (async () => {
       let serverDraft: SiteContent | null = null;
       let serverUpdatedAt: string | null = null;
+      let ok = false;
       try {
         const r = await fetch('/api/content?content=draft');
         if (r.ok) {
           const res = (await r.json()) as { draft: SiteContent | null; updatedAt: string | null };
           serverDraft = res.draft;
           serverUpdatedAt = res.updatedAt;
+          ok = true;
         }
       } catch {
         // Network failure — proceed with whatever this browser already loaded
@@ -239,7 +241,17 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       }
 
       if (serverUpdatedAt) ls.write(LS_SITE_SYNC, serverUpdatedAt);
-      setSiteContentLoaded(true);
+      // Only arm the write-through once we either reconciled with the server
+      // or this browser already had *some* real local copy to fall back on.
+      // Previously this ran unconditionally, so a browser with empty
+      // localStorage (fresh/cleared) hitting a failed or empty fetch would
+      // enable the write-through with nothing but fresh-mount INIT_* defaults
+      // in state — pushing those straight into the shared draft and wiping
+      // real Aktionen/hero/services content (the incident this fixes).
+      const hasLocalSite = !!(svcs || (akt && akt.length > 0) || set || lc
+        || (hero && hero.length > 0) || (about && about.length > 0)
+        || (revs && revs.length > 0) || (faq && faq.length > 0));
+      if (ok || hasLocalSite) setSiteContentLoaded(true);
     })();
 
     // Reconcile the local list against code: drop stale built-ins, fill blank
