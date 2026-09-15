@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
@@ -15,7 +16,12 @@ import { countdownLabel, validityText } from "@/lib/aktion";
 import { useBookingModal } from "@/context/BookingModalContext";
 import SmartImage from "@/components/SmartImage";
 import GoldDustEffect from "@/components/GoldDustEffect";
-import HeroCinematicSlide from "@/components/HeroCinematicSlide";
+
+// Pulls in gsap/ScrollTrigger — code-split into its own chunk so it loads in
+// parallel instead of bloating the main bundle. Keeps ssr:true (the default):
+// the LCP poster <img fetchpriority="high"> inside it must be in the initial
+// HTML or the browser can't discover it until this chunk hydrates.
+const HeroCinematicSlide = dynamic(() => import("@/components/HeroCinematicSlide"));
 import OwnerManifesto from "@/components/OwnerManifesto";
 import VerifiedReviews from "@/components/VerifiedReviews";
 import FaqSection from "@/components/FaqSection";
