@@ -1,4 +1,4 @@
-import FloatingNav from "@/components/FloatingNav";
+import FloatingNav from "@/components/LazyFloatingNav";
 import SiteFooter from "@/components/SiteFooter";
 
 export default function DatenschutzPage() {

@@ -8,7 +8,7 @@ import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useBookingModal } from "@/context/BookingModalContext";
 import { PREVIEW_GRADIENT } from "@/app/[locale]/admin/behandlungen/data";
 import { discountPct } from "@/lib/price";
-import FloatingNav from "@/components/FloatingNav";
+import FloatingNav from "@/components/LazyFloatingNav";
 import SiteFooter from "@/components/SiteFooter";
 import { countdownLabel, validityText } from "@/lib/aktion";
 

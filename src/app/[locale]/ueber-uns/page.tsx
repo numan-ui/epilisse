@@ -9,7 +9,7 @@ import { useAdminReviews } from "@/hooks/useAdminReviews";
 import { useBookingModal } from "@/context/BookingModalContext";
 import SmartImage from "@/components/SmartImage";
 import OwnerManifesto from "@/components/OwnerManifesto";
-import FloatingNav from "@/components/FloatingNav";
+import FloatingNav from "@/components/LazyFloatingNav";
 import SiteFooter from "@/components/SiteFooter";
 
 const LOCALES = [

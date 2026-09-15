@@ -27,7 +27,7 @@ import VerifiedReviews from "@/components/VerifiedReviews";
 import FaqSection from "@/components/FaqSection";
 import TrustBar from "@/components/TrustBar";
 import AnnouncementBar from "@/components/AnnouncementBar";
-import FloatingNav from "@/components/FloatingNav";
+import FloatingNav from "@/components/LazyFloatingNav";
 import SiteFooter from "@/components/SiteFooter";
 
 /* ── Image constants (Stitch AI – replace with real salon photos) ── */

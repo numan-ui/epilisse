@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useAdminSettings } from "@/hooks/useAdminSettings";
 import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useBookingModal } from "@/context/BookingModalContext";
-import FloatingNav from "@/components/FloatingNav";
+import FloatingNav from "@/components/LazyFloatingNav";
 import SiteFooter from "@/components/SiteFooter";
 
 const LOCALES = [

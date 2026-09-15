@@ -7,7 +7,7 @@ import { useAdminLandingContent } from "@/hooks/useAdminLandingContent";
 import { useAdminCategories } from "@/hooks/useAdminCategories";
 import { useBookingModal } from "@/context/BookingModalContext";
 import { FRONTEND_SLUG, PSEUDO_CATEGORY_IDS } from "@/app/[locale]/admin/behandlungen/data";
-import FloatingNav from "@/components/FloatingNav";
+import FloatingNav from "@/components/LazyFloatingNav";
 import SiteFooter from "@/components/SiteFooter";
 
 const LOCALES = [
