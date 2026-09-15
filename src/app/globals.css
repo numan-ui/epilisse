@@ -51,6 +51,12 @@
   direction: ltr;
   -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
+  /* Before the font loads, the ligature name (e.g. "location_on") renders as
+     literal text — much wider than the eventual 1-glyph icon, which shifts
+     surrounding layout when the font swaps in. Clipping to a fixed 1em box
+     keeps that swap invisible instead of a visible reflow. */
+  width: 1em;
+  overflow: hidden;
 }
 
 @theme {
