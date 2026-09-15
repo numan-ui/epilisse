@@ -130,16 +130,10 @@ export default async function LocaleLayout({
             dangerouslySetInnerHTML={{ __html: themeCss }}
           />
         )}
-        {/* Material Symbols is now self-hosted (see globals.css) — no more
-            fonts.googleapis.com/fonts.gstatic.com round trips. Preload since
-            it's used above the fold (nav icons) on every page. */}
-        <link
-          rel="preload"
-          href="/fonts/material-symbols-outlined.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
+        {/* Material Symbols is self-hosted (see globals.css), font-display:
+            swap. No preload: icons aren't the LCP element, and a forced
+            high-priority 451KB fetch was competing with the actual LCP
+            image/HTML on slow mobile connections. */}
         <LocalBusinessSchema />
       </head>
       <body className="bg-surface text-on-surface font-body-md overflow-x-hidden">

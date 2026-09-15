@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { PREVIEW_GRADIENT, FRONTEND_SLUG, AKTION_CATEGORY_LIMIT, AKTION_HOME_LIMIT, type Service, type PageBanner } from '../data';
 import { useAdminData } from '../AdminDataContext';
 import ImageUpload from '../ImageUpload';
+import { uploadImage } from '@/lib/uploadImage';
 import { AktionCard } from '../../aktionen/AktionCard';
 
 const EMPTY_SERVICE: Omit<Service, 'id'> = { name: '', price: '', duration: '', active: true, oldPrice: '' };
@@ -474,11 +475,11 @@ export default function CategoryDetailPage() {
                 className="hidden"
                 onChange={e => {
                   const file = e.target.files?.[0];
-                  if (!file) return;
-                  const reader = new FileReader();
-                  reader.onload = () => updateCategory(catId, 'image', reader.result as string);
-                  reader.readAsDataURL(file);
                   e.target.value = '';
+                  if (!file) return;
+                  uploadImage(file)
+                    .then(url => updateCategory(catId, 'image', url))
+                    .catch(() => {});
                 }}
               />
               <p className="font-body-sm text-[12px] italic text-outline mt-3">Ohne eigenes Bild wird das Standardfoto verwendet.</p>

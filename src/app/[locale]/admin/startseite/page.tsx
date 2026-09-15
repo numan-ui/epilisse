@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useAdminData } from '../behandlungen/AdminDataContext';
+import { uploadImage } from '@/lib/uploadImage';
 import { HERO_SLIDE_LIMIT, ABOUT_VALUE_LIMIT, REVIEW_LIMIT, FAQ_GROUP_LIMIT, FAQ_ITEM_LIMIT, FRONTEND_SLUG, type LandingContent } from '../behandlungen/data';
 
 const SECTIONS = ['Navigation', 'Hero-Slider', 'Behandlungs-Titel', 'Aktionen', 'Über Uns', 'FAQ', 'Kontakt-Texte', 'Footer'] as const;
@@ -74,13 +75,21 @@ function DurationInput({ value, onCommit }: { value: number; onCommit: (v: numbe
 
 function ImageUpload({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const ref = useRef<HTMLInputElement>(null);
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => onChange(reader.result as string);
-    reader.readAsDataURL(file);
     e.target.value = '';
+    if (!file) return;
+    setUploading(true);
+    setError(null);
+    try {
+      onChange(await uploadImage(file));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Upload fehlgeschlagen.');
+    } finally {
+      setUploading(false);
+    }
   };
   return (
     <div>
@@ -100,13 +109,19 @@ function ImageUpload({ value, onChange }: { value: string; onChange: (v: string)
       ) : (
         <button
           type="button"
+          disabled={uploading}
           onClick={() => ref.current?.click()}
-          className="w-full border border-dashed border-outline-variant/50 hover:border-primary/60 py-5 flex flex-col items-center gap-1 transition-colors group"
+          className="w-full border border-dashed border-outline-variant/50 hover:border-primary/60 py-5 flex flex-col items-center gap-1 transition-colors group disabled:opacity-60"
         >
-          <span className="material-symbols-outlined text-[24px] text-outline group-hover:text-primary transition-colors">cloud_upload</span>
-          <span className="font-label-caps text-[10px] text-outline group-hover:text-primary transition-colors">Bild hochladen</span>
+          <span className={`material-symbols-outlined text-[24px] text-outline group-hover:text-primary transition-colors ${uploading ? 'animate-spin' : ''}`}>
+            {uploading ? 'progress_activity' : 'cloud_upload'}
+          </span>
+          <span className="font-label-caps text-[10px] text-outline group-hover:text-primary transition-colors">
+            {uploading ? 'Wird hochgeladen…' : 'Bild hochladen'}
+          </span>
         </button>
       )}
+      {error && <p className="font-label-caps text-[9px] text-error mt-1">{error}</p>}
     </div>
   );
 }
