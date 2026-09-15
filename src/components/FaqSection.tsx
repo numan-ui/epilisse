@@ -1,13 +1,11 @@
 'use client';
 import { useState } from 'react';
 import { useAdminFaqGroups } from '@/hooks/useAdminFaqGroups';
-import BookingFlow from './BookingFlow';
 
 /**
- * Homepage FAQ block: admin-named category tabs on the left with a
- * question/answer accordion, and the real booking wizard embedded inline on
- * the right (same flow as the modal, see BookingFlow). Renders nothing until
- * the admin adds at least one FAQ group with a question.
+ * Homepage FAQ block: admin-named category tabs with a centered
+ * question/answer accordion. Renders nothing until the admin adds at least
+ * one FAQ group with a question.
  */
 export default function FaqSection() {
   const groups = useAdminFaqGroups().filter((g) => g.items.some((i) => i.q.trim() && i.a.trim()));
@@ -40,10 +38,9 @@ export default function FaqSection() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema).replace(/</g, '\\u003c') }}
       />
 
-      <div className="px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-gutter items-start">
-        {/* ── FAQ column ─────────────────────────────── */}
-        <div>
-          <div className="flex items-center gap-3 mb-4">
+      <div className="px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="flex items-center justify-center gap-3 mb-4">
             <span className="w-2.5 h-2.5 rounded-full bg-primary" />
             <span className="font-label-caps text-label-caps text-primary tracking-[0.2em]">
               HÄUFIGE FRAGEN
@@ -55,7 +52,7 @@ export default function FaqSection() {
           </h2>
 
           {groups.length > 1 && (
-            <div className="flex flex-wrap gap-2 mb-6">
+            <div className="flex flex-wrap justify-center gap-2 mb-6">
               {groups.map((g, i) => (
                 <button
                   key={g.id}
@@ -75,7 +72,7 @@ export default function FaqSection() {
             </div>
           )}
 
-          <div className="divide-y divide-outline-variant/50 border-y border-outline-variant/50">
+          <div className="divide-y divide-outline-variant/50 border-y border-outline-variant/50 text-left">
             {items.map((it) => {
               const isOpen = openItem === it.id;
               return (
@@ -105,17 +102,6 @@ export default function FaqSection() {
               );
             })}
           </div>
-        </div>
-
-        {/* ── Inline booking column ──────────────────── */}
-        <div className="lg:sticky lg:top-28">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-            <span className="font-label-caps text-label-caps text-primary tracking-[0.2em]">
-              ONLINE TERMINPLANER
-            </span>
-          </div>
-          <BookingFlow variant="inline" active preselectedCategory={null} />
         </div>
       </div>
     </section>
