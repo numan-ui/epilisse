@@ -22,8 +22,11 @@ export async function getServerPageContent(): Promise<PageContentMap> {
     const sb = createClient<Database>(url, key, {
       auth: { persistSession: false },
       global: {
-        // Admin publishes must show up immediately, not after a CDN/browser cache window.
-        fetch: (u, o) => fetch(u, { ...o, cache: 'no-store' }),
+        // Revalidated every 60s (Next.js data cache) rather than no-store: every
+        // page request was paying a live Supabase round-trip, which was the
+        // dominant cost in a ~1.5-2.5s TTFB. Admin publishes now appear within
+        // 60s instead of instantly — acceptable tradeoff for the TTFB win.
+        fetch: (u, o) => fetch(u, { ...o, cache: undefined, next: { revalidate: 60 } }),
       },
     });
     const { data, error } = await sb
