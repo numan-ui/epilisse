@@ -436,9 +436,13 @@ export default function HomePage() {
                 but must not swallow clicks; only the CTA re-enables pointer
                 events. */}
             <div className={`pointer-events-none absolute inset-0 z-20 flex flex-col justify-center items-start px-margin-mobile md:px-margin-desktop ${i === 0 ? "lg:hidden" : ""}`}>
+              {/* Slide 0 (mobile) holds the LCP text — it must paint in the
+                  first server-rendered frame, not wait for JS to hydrate and
+                  animate opacity 0→1. `initial={false}` skips that gate only
+                  for slide 0; every other slide still animates in on switch. */}
               <motion.h1
                 key={`h-${slideKey}`}
-                initial={{ opacity: 0, y: 24 }}
+                initial={i === 0 ? false : { opacity: 0, y: 24 }}
                 animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, ease: "easeOut" }}
                 className="font-display-lg text-display-lg md:text-[80px] font-bold leading-none text-white max-w-2xl mb-6"
@@ -447,7 +451,7 @@ export default function HomePage() {
               </motion.h1>
               <motion.p
                 key={`p-${slideKey}`}
-                initial={{ opacity: 0, y: 24 }}
+                initial={i === 0 ? false : { opacity: 0, y: 24 }}
                 animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
                 className="font-body-lg text-body-lg text-white/90 max-w-lg mb-10"
@@ -457,7 +461,7 @@ export default function HomePage() {
               <motion.button
                 key={`b-${slideKey}`}
                 type="button"
-                initial={{ opacity: 0, y: 24 }}
+                initial={i === 0 ? false : { opacity: 0, y: 24 }}
                 animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
                 onClick={() => booking.open()}
@@ -468,7 +472,7 @@ export default function HomePage() {
               {i === 0 && (
                 <motion.div
                   key={`trust-${slideKey}`}
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={false}
                   animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
                   className="pointer-events-auto mt-8"

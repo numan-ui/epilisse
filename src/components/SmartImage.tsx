@@ -24,7 +24,11 @@ export default function SmartImage({
   priority?: boolean;
   onError?: React.ReactEventHandler<HTMLImageElement>;
 }) {
-  if (src.startsWith("/")) {
+  // Local assets (`/images/...`) and Supabase Storage URLs both go through
+  // next/image — the storage host is whitelisted in next.config.ts
+  // (images.remotePatterns), so these get resized/re-encoded (WebP/AVIF)
+  // instead of shipping the admin's original upload at full resolution.
+  if (src.startsWith("/") || src.includes("supabase.co/storage/")) {
     return (
       <Image
         src={src}
@@ -39,8 +43,9 @@ export default function SmartImage({
     );
   }
 
-  // Admin-uploaded images are base64 data URLs (FileReader.readAsDataURL), which land here since
-  // they don't start with "/". Unlike next/image's `fill`, a bare <img> has no intrinsic sizing —
+  // Admin-uploaded images can still be base64 data URLs (FileReader.readAsDataURL) from
+  // before the storage-upload migration — those land here since they're not a URL
+  // next/image can optimize. Unlike next/image's `fill`, a bare <img> has no intrinsic sizing —
   // without explicit absolute/inset/w-full/h-full it renders at its natural pixel size instead of
   // filling the parent box, leaving the rest of the box showing whatever is behind it.
   // eslint-disable-next-line @next/next/no-img-element

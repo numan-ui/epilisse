@@ -48,7 +48,20 @@ const securityHeaders = [
   { key: 'Content-Security-Policy-Report-Only', value: csp },
 ];
 
+const supabaseHostname = (() => {
+  try {
+    return supabaseOrigin ? new URL(supabaseOrigin).hostname : "";
+  } catch {
+    return "";
+  }
+})();
+
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: supabaseHostname
+      ? [{ protocol: "https", hostname: supabaseHostname, pathname: "/storage/v1/object/public/**" }]
+      : [],
+  },
   async headers() {
     return [{ source: '/(.*)', headers: securityHeaders }];
   },
