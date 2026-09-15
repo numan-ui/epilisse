@@ -94,23 +94,28 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  const messages = await getMessages();
+  // All independent — run concurrently instead of one sequential await chain.
+  // Was: messages, then theme, then this Promise.all, each waiting on the
+  // last for no reason. The body (LCP image included) can't stream to the
+  // browser until every one of these resolves, so the waterfall directly
+  // padded PageSpeed's "resource load delay".
+  const [messages, theme, categories, pageContent, siteContent, faqChatState] =
+    await Promise.all([
+      getMessages(),
+      getServerTheme(),
+      getServerCategories(),
+      getServerPageContent(),
+      getServerSiteContent(),
+      getServerFaqChatState(),
+    ]);
 
   // Site theme. While the saved theme matches the Gold Lux preset the site
   // renders straight from globals.css @theme; only a customised theme injects
   // an override block (html:root, so it beats @theme's :root regardless of
   // stylesheet order).
-  const theme = await getServerTheme();
   const themeCss = sameTheme(theme, GOLD_LUX)
     ? null
     : themeVarsToCss(deriveTokens(theme).vars);
-
-  const [categories, pageContent, siteContent, faqChatState] = await Promise.all([
-    getServerCategories(),
-    getServerPageContent(),
-    getServerSiteContent(),
-    getServerFaqChatState(),
-  ]);
   const faqChatContent = faqChatState.content;
 
   return (
