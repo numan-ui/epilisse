@@ -240,7 +240,7 @@ export default function StartseitePage() {
                     <input className={INPUT_CLS} value={lc.announceLocation} onChange={e => set('announceLocation', e.target.value)} placeholder="Sendlinger Str. · Altstadt München" />
                   </Field>
                   <Field label="Verfügbarkeits-Text (grün)">
-                    <input className={INPUT_CLS} value={lc.announceAvailability} onChange={e => set('announceAvailability', e.target.value)} placeholder="Termine diese Woche verfügbar" />
+                    <input className={INPUT_CLS} value={lc.announceAvailability} onChange={e => set('announceAvailability', e.target.value)} placeholder="Termine verfügbar" />
                   </Field>
                 </div>
               </div>

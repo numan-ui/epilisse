@@ -162,7 +162,7 @@ export type LandingContent = {
 
 export const INIT_LANDING_CONTENT: LandingContent = {
   navBehandlungen: 'Behandlungen', navPreise: 'Preise', navUeberUns: 'Über Uns', navKontakt: 'Kontakt', navCta: 'TERMIN BUCHEN', navAktionen: 'Aktionen',
-  announceLocation: 'Sendlinger Str. · Altstadt München', announceAvailability: 'Termine diese Woche verfügbar',
+  announceLocation: 'Sendlinger Str. · Altstadt München', announceAvailability: 'Termine verfügbar',
   servicesSectionLabel: 'UNSER ANGEBOT', servicesSectionTitle: 'Exklusive Behandlungen',
   aktionenSectionLabel: 'AKTUELLE ANGEBOTE', aktionenSectionTitle: 'Kombi-Pakete & Aktionen',
   aktionenSectionText: 'Beliebte Behandlungen im Paket – für kurze Zeit zum Vorzugspreis.',
