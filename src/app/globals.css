@@ -5,13 +5,31 @@
 /* ── Material Symbols icon font ───────────────────────────────────────────
    Self-hosted (was Google Fonts) — that external stylesheet + gstatic file
    was a 2-hop cross-origin chain sitting on the LCP critical path. Same
-   static instance Google was serving us (wght 400, opsz 24, no FILL axis —
-   the upstream file has no fvar table either, so this isn't a regression),
-   just same-origin now with no extra round trips. Re-fetch with:
-     curl -A "Mozilla/5.0 ... Chrome/120" \
-       "https://fonts.gstatic.com/s/materialsymbolsoutlined/v372/<id>.woff2" \
-       -o public/fonts/material-symbols-outlined.woff2
-   (get <id> from https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=swap) */
+   instance Google was serving us (wght 400, opsz 24, FILL 0..1 variable —
+   two spots use fontVariationSettings: "'FILL' 1"), just same-origin now
+   with no extra round trips.
+
+   2026-09-15: subsetted from the full ~2500-icon set (451 KB) down to only
+   the icon names actually used across the codebase (~15 KB). This font uses
+   GSUB ligature substitution (features `rlig`/`rclt`, NOT `liga`) to turn an
+   ASCII name like "close" into the icon glyph — glyph names in the raw font
+   do NOT match icon names 1:1 (e.g. the "phone" icon is a differently-named
+   base glyph reached only via the ligature rule), so subsetting by glyph
+   name or naive pyftsubset --text both produced broken or barely-smaller
+   fonts. Google's own CSS2 API subsets correctly by icon name and preserves
+   the FILL axis. To regenerate after adding/removing icon names anywhere in
+   the app:
+     1. Collect every icon name used (grep for `material-symbols-outlined`
+        usages, ICON_OPTIONS/VALUE_ICONS/BANNER_ICONS arrays, `icon: '...'`
+        fields — some names are illustrated dynamically via CMS `icon`
+        fields, so check those admin picker arrays too).
+     2. curl -A "Mozilla/5.0 ... Chrome/120" \
+          "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&icon_names=close,arrow_back,...&display=swap"
+        → read the woff2 URL out of the returned @font-face block, curl that
+        with the same UA, save to public/fonts/material-symbols-outlined.woff2
+     3. Visually verify icons on the homepage, a service page, and the admin
+        (icon names not in the subset render as blank boxes, not visible
+        errors — screenshot and check, don't just trust file size). */
 @font-face {
   font-family: 'Material Symbols Outlined';
   font-style: normal;
