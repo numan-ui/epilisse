@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Manrope } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { BookingModalProvider } from "@/context/BookingModalContext";
@@ -81,6 +81,10 @@ export async function generateMetadata({
   };
 }
 
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
 export default async function LocaleLayout({
   children,
   params,
@@ -93,6 +97,13 @@ export default async function LocaleLayout({
   if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
     notFound();
   }
+
+  // Opts this (and every page under it) into next-intl's static-rendering
+  // path instead of the default per-request dynamic mode — without this,
+  // getMessages() below reads a header set by the i18n middleware and that
+  // alone marks the whole route tree dynamic, which is what was blocking
+  // Next from prerendering/inlining CSS for these pages.
+  setRequestLocale(locale);
 
   // All independent — run concurrently instead of one sequential await chain.
   // Was: messages, then theme, then this Promise.all, each waiting on the

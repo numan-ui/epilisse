@@ -57,9 +57,6 @@ const supabaseHostname = (() => {
 })();
 
 const nextConfig: NextConfig = {
-  experimental: {
-    optimizeCss: true,
-  },
   images: {
     remotePatterns: supabaseHostname
       ? [{ protocol: "https", hostname: supabaseHostname, pathname: "/storage/v1/object/public/**" }]
