@@ -435,7 +435,11 @@ export default function HomePage() {
                 own copy) and keeps it on mobile. The wrapper spans the slide
                 but must not swallow clicks; only the CTA re-enables pointer
                 events. */}
-            <div className={`pointer-events-none absolute inset-0 z-20 flex flex-col justify-center items-start px-margin-mobile md:px-margin-desktop ${i === 0 ? "lg:hidden" : ""}`}>
+            {/* pt/pb asymmetry (rather than plain centering) nudges the block
+                up a notch on every breakpoint — the lg values match
+                HeroCinematicSlide's own pt-36/pb-10 exactly, so slide 1's
+                button sits at the same height as every other slide's. */}
+            <div className={`pointer-events-none absolute inset-0 z-20 flex flex-col justify-center items-start pt-16 pb-6 md:pt-24 lg:pt-36 lg:pb-10 [@media(max-height:800px)]:lg:pt-28 [@media(max-height:800px)]:lg:pb-6 px-margin-mobile md:px-margin-desktop ${i === 0 ? "lg:hidden" : ""}`}>
               {/* Slide 0 (mobile) holds the LCP text — it must paint in the
                   first server-rendered frame, not wait for JS to hydrate and
                   animate opacity 0→1. `initial={false}` skips that gate only
@@ -445,7 +449,12 @@ export default function HomePage() {
                 initial={i === 0 ? false : { opacity: 0, y: 24 }}
                 animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, ease: "easeOut" }}
-                className="font-display-lg text-display-lg md:text-[80px] [@media(max-height:700px)]:text-[34px] font-bold leading-none text-white max-w-2xl mb-6 [@media(max-height:700px)]:mb-2"
+                // lg+ matches HeroCinematicSlide's own headline size exactly
+                // (42px/52px) instead of the mobile/tablet 80px display size —
+                // slide 1's copy uses that smaller scale for its split-hero
+                // layout, so every other slide has to match it there, or the
+                // CTA/TrustBar below sit at a different height than slide 1's.
+                className="font-display-lg text-display-lg md:text-[80px] lg:text-[42px] xl:text-[52px] max-lg:[@media(max-height:700px)]:text-[34px] font-bold leading-none text-white max-w-2xl mb-6 max-lg:[@media(max-height:700px)]:mb-2"
               >
                 {slide.headline}
               </motion.h1>
@@ -454,7 +463,7 @@ export default function HomePage() {
                 initial={i === 0 ? false : { opacity: 0, y: 24 }}
                 animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
-                className="font-body-lg text-body-lg text-white/90 max-w-lg mb-10 [@media(max-height:700px)]:hidden"
+                className="font-body-lg text-body-lg text-white/90 max-w-lg mb-10 max-lg:[@media(max-height:700px)]:hidden"
               >
                 {slide.sub}
               </motion.p>
@@ -469,17 +478,15 @@ export default function HomePage() {
               >
                 {slide.cta}
               </motion.button>
-              {i === 0 && (
-                <motion.div
-                  key={`trust-${slideKey}`}
-                  initial={false}
-                  animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
-                  className="pointer-events-auto mt-8 [@media(max-height:700px)]:hidden"
-                >
-                  <TrustBar scope="slider" />
-                </motion.div>
-              )}
+              <motion.div
+                key={`trust-${slideKey}`}
+                initial={i === 0 ? false : { opacity: 0, y: 24 }}
+                animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
+                className="pointer-events-auto mt-8 [@media(max-height:700px)]:mt-4"
+              >
+                <TrustBar scope={`slider-${i}`} />
+              </motion.div>
             </div>
           </div>
         ))}

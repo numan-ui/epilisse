@@ -435,7 +435,12 @@ export default function HeroCinematicSlide({
           block, stacked in a single grid cell so the outgoing beat cross-
           fades with the incoming one (they can't desync) and a brief
           focus-pull blur hides sub-pixel jitter at the phase boundary. */}
-      <div className="relative flex flex-col justify-center px-margin-desktop pt-36 pb-10 [@media(max-height:800px)]:pt-28 [@media(max-height:800px)]:pb-6">
+      {/* items-start (not the flex-column default of stretch) so TrustBar
+          shrink-wraps to its cards' own content width here too — a
+          stretching parent was forcing it out to its full max-w-440 cap,
+          rendering visibly larger/wider than the same component on every
+          other slide, which all use items-start. */}
+      <div className="relative flex flex-col justify-center items-start px-margin-desktop pt-36 pb-10 [@media(max-height:800px)]:pt-28 [@media(max-height:800px)]:pb-6">
         {/* Fixed min-height reserves room for the longest headline (2 lines)
             so a shorter one-line beat doesn't shrink this block and shift
             the CTA/trust cards below it up. Shrinks on short viewports
@@ -475,12 +480,12 @@ export default function HeroCinematicSlide({
           type="button"
           onClick={onCtaClick}
           animate={{
-            opacity: ctaMode === 'full' ? 1 : ctaMode === 'soft' ? 0.72 : 0,
+            opacity: ctaMode === 'hidden' ? 0 : 1,
           }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
           style={{ pointerEvents: ctaMode === 'hidden' ? 'none' : 'auto' }}
           aria-hidden={ctaMode === 'hidden'}
-          className="mt-8 w-fit bg-primary text-on-primary px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-primary-container transition-colors rounded-[var(--radius-cta)]"
+          className="mt-8 w-fit bg-cta text-on-cta px-10 py-5 font-label-caps text-label-caps tracking-widest lux-shadow hover:bg-cta-hover transition-colors rounded-[var(--radius-cta)]"
         >
           {cta}
         </motion.button>
