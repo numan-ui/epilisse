@@ -408,7 +408,7 @@ export default function HomePage() {
                 <SmartImage
                   src="/images/hero-mobile.webp"
                   alt=""
-                  className="object-cover object-[50%_35%]"
+                  className="object-cover object-top"
                   sizes="100vw"
                   priority={i === currentSlide}
                 />
@@ -445,7 +445,7 @@ export default function HomePage() {
                 initial={i === 0 ? false : { opacity: 0, y: 24 }}
                 animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, ease: "easeOut" }}
-                className="font-display-lg text-display-lg md:text-[80px] font-bold leading-none text-white max-w-2xl mb-6"
+                className="font-display-lg text-display-lg md:text-[80px] [@media(max-height:700px)]:text-[34px] font-bold leading-none text-white max-w-2xl mb-6 [@media(max-height:700px)]:mb-2"
               >
                 {slide.headline}
               </motion.h1>
@@ -454,7 +454,7 @@ export default function HomePage() {
                 initial={i === 0 ? false : { opacity: 0, y: 24 }}
                 animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.15, ease: "easeOut" }}
-                className="font-body-lg text-body-lg text-white/90 max-w-lg mb-10"
+                className="font-body-lg text-body-lg text-white/90 max-w-lg mb-10 [@media(max-height:700px)]:hidden"
               >
                 {slide.sub}
               </motion.p>
@@ -475,9 +475,9 @@ export default function HomePage() {
                   initial={false}
                   animate={i === currentSlide ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
-                  className="pointer-events-auto mt-8"
+                  className="pointer-events-auto mt-8 [@media(max-height:700px)]:hidden"
                 >
-                  <TrustBar />
+                  <TrustBar scope="slider" />
                 </motion.div>
               )}
             </div>

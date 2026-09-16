@@ -1,6 +1,5 @@
 'use client';
 
-import { useId } from 'react';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 
 /**
@@ -62,9 +61,20 @@ function Stars({ rating, uid }: { rating: number; uid: string }) {
   );
 }
 
-export default function TrustBar({ className = '' }: { className?: string }) {
+export default function TrustBar({
+  className = '',
+  scope = 'default',
+}: {
+  className?: string;
+  /** Distinguishes this instance's SVG gradient ids from other TrustBar
+   *  instances rendered on the same page (there are several) — a plain
+   *  per-render counter (React's `useId`) isn't safe here because one of
+   *  the instances sits behind a `next/dynamic` boundary, and any other
+   *  instance's server/client structure drift shifts every `useId` count
+   *  downstream, which showed up as a hydration mismatch on the SVG ids. */
+  scope?: string;
+}) {
   const s = useAdminSettings();
-  const uid = useId();
 
   // Count line only shows when a number is actually set — no bare "Rezensionen".
   const gCount = s.googleReviewCount?.trim();
@@ -114,7 +124,7 @@ export default function TrustBar({ className = '' }: { className?: string }) {
                   {p.rating}
                   <span className="font-body-sm font-medium text-[11px] text-[#9A9188] ml-1">/5</span>
                 </span>
-                <Stars rating={toNum(p.rating)} uid={`${uid}-${p.label}`} />
+                <Stars rating={toNum(p.rating)} uid={`${scope}-${p.label}`} />
               </span>
               {/* Always rendered so both cards keep the same height even when
                   one provider has no count set. */}

@@ -19,6 +19,16 @@ export default function SmoothScroll() {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+    // The browser restores scroll position natively on reload, but that
+    // restore lands after this effect mounts and Lenis has already started
+    // rendering from 0 — the native jump then gets smoothed away by Lenis'
+    // own easing, which reads as the whole page sliding on refresh. Owning
+    // restoration ourselves (instant, before Lenis's first frame) removes
+    // the fight between the two.
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
     gsap.registerPlugin(ScrollTrigger);
 
     const lenis = new Lenis({

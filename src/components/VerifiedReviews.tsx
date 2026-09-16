@@ -53,7 +53,7 @@ export default function VerifiedReviews() {
               Was Münchnerinnen über unsere Behandlungen sagen
             </h2>
           </div>
-          <TrustBar className="lg:shrink-0" />
+          <TrustBar className="lg:shrink-0" scope="reviews" />
         </div>
 
         <div className="mt-9 mb-6 flex items-center gap-4">
