@@ -426,6 +426,7 @@ export default function HomePage() {
               <HeroCinematicSlide
                 cta={slide.cta}
                 active={i === currentSlide}
+                idleTimeoutMs={(slide.duration || 10) * 1000}
                 onCtaClick={() => booking.open()}
                 onDone={() => setCinematicDone(true)}
               />

@@ -14,6 +14,10 @@ type Props = {
   cta: string;
   /** True while slide 1 is the visible slide. */
   active: boolean;
+  /** Admin-configured seconds for this slide (from heroSlides[0].duration),
+   *  in ms. If the visitor hasn't scrolled at all by then, skip straight to
+   *  slide 2 instead of holding the pin forever. */
+  idleTimeoutMs: number;
   onCtaClick: () => void;
   /**
    * Fires once the reveal is finished (scrolled past) or was skipped
@@ -144,6 +148,7 @@ function phaseFor(progress: number) {
 export default function HeroCinematicSlide({
   cta,
   active,
+  idleTimeoutMs,
   onCtaClick,
   onDone,
 }: Props) {
@@ -373,6 +378,14 @@ export default function HeroCinematicSlide({
       let lastIdx = -1;
       let lastNearTop = true;
 
+      // If the visitor never scrolls, the pin holds forever and the slider
+      // never advances. Give it one second — if the scrub still hasn't
+      // budged from frame 0 by then, skip straight to slide 2 instead of
+      // waiting on an interaction that may never come.
+      const idleTimer = window.setTimeout(() => {
+        if (st.progress === 0) fireDone();
+      }, idleTimeoutMs);
+
       const st = ScrollTrigger.create({
         trigger: section,
         start: 'top top',
@@ -391,6 +404,7 @@ export default function HeroCinematicSlide({
         anticipatePin: 0,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
+          if (self.progress > 0) window.clearTimeout(idleTimer);
           draw(self.progress * (FRAME_COUNT - 1));
           const idx = phaseFor(self.progress);
           if (idx !== lastIdx) {
@@ -415,8 +429,9 @@ export default function HeroCinematicSlide({
         },
       });
       draw(st.progress * (FRAME_COUNT - 1));
+      return () => window.clearTimeout(idleTimer);
     },
-    { scope: rootRef, dependencies: [active], revertOnUpdate: true },
+    { scope: rootRef, dependencies: [active, idleTimeoutMs], revertOnUpdate: true },
   );
 
   const ctaMode = PHASES[phase].cta;
