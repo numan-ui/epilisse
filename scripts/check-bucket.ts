@@ -35,14 +35,14 @@ async function checkBucket() {
   if (webpFiles.length > 0) {
     console.log('✅ WebP files:');
     webpFiles.forEach(f => {
-      console.log(`   ${f.name} (${(f.metadata?.size / 1024).toFixed(1)} KB)`);
+      console.log(`   ${f.name} (${((f.metadata?.size ?? 0) / 1024).toFixed(1)} KB)`);
     });
   }
 
   if (otherFiles.length > 0) {
     console.log('\n⚠️  Non-WebP files:');
     otherFiles.forEach(f => {
-      console.log(`   ${f.name} (${(f.metadata?.size / 1024).toFixed(1)} KB)`);
+      console.log(`   ${f.name} (${((f.metadata?.size ?? 0) / 1024).toFixed(1)} KB)`);
     });
   }
 

@@ -1,8 +1,3 @@
-import { STATIC_PAGE_CONFIG } from "@/lib/pageConfig";
-
-export const dynamic = STATIC_PAGE_CONFIG.dynamic;
-export const revalidate = STATIC_PAGE_CONFIG.revalidate;
-
 "use client";
 
 import { useState, useEffect, useCallback } from "react";

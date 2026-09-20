@@ -1,6 +1,4 @@
-import { STATIC_PAGE_CONFIG } from "@/lib/pageConfig";
-
-export const revalidate = STATIC_PAGE_CONFIG.revalidate;
+export const revalidate = 3600;
 
 import { Suspense } from 'react';
 import ConsentForm from './ConsentForm';

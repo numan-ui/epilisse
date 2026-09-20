@@ -67,7 +67,6 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   // Production optimizations
-  swcMinify: true,
   productionBrowserSourceMaps: false,
   // Precompute static params at build time
   staticPageGenerationTimeout: 120,
