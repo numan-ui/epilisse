@@ -287,9 +287,11 @@ export function consentConfirmedEmail({
 // epilisse.de address exists.
 export const CONSENT_BCC_EMAIL = process.env.CONSENT_BCC_EMAIL || undefined;
 
-// Hidden copy of every outgoing mail. Set ARCHIVE_BCC_EMAIL="" to disable, or to
-// another address to redirect it.
-const ARCHIVE_BCC = process.env.ARCHIVE_BCC_EMAIL ?? 'numandegirmenci@gmail.com';
+// Optional hidden copy of every outgoing mail. OFF unless ARCHIVE_BCC_EMAIL is
+// set in the environment — mails carry customer data (incl. Einwilligung), so a
+// copy must be an explicit per-deployment decision, never a code default.
+// Prefer an epilisse.de business inbox over a personal address (DSGVO).
+const ARCHIVE_BCC = process.env.ARCHIVE_BCC_EMAIL || undefined;
 
 export async function sendEmail(to: string, content: { subject: string; html: string }, options?: { bcc?: string }) {
   const resend = getResend();
