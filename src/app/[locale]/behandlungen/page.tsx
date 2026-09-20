@@ -18,10 +18,10 @@ const LOCALES = [
 /* Fallback images (Stitch AI – replace with real salon photos before launch) */
 const IMG: Record<string, string> = {
   laser:
-    "/images/laser-hair-removal.png",
+    "/images/laser-hair-removal.webp",
   gesicht:
-    "/images/gesichtsaesthetik.png",
-  mani: "/images/manikure-pedikure.png",
+    "/images/gesichtsaesthetik.webp",
+  mani: "/images/manikure-pedikure.webp",
 };
 
 export default function BehandlungenPage() {

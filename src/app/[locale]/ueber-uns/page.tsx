@@ -18,7 +18,7 @@ const LOCALES = [
 ] as const;
 
 const FALLBACK_ABOUT_IMAGE =
-  "/images/about-studio.png";
+  "/images/about-studio.webp";
 
 export default function UeberUnsPage() {
   const t = useTranslations();

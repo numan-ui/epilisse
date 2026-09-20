@@ -94,7 +94,7 @@ export const INIT_AKTIONEN: Aktion[] = [
   // former homepage promo banner (promo1) — home-active, category best-guess 'gesicht'
   a('promo1', 'gesicht', 'EXKLUSIVES ANGEBOT', 'Winter Glow\nKombi-Paket',
     'Erhalten Sie 20 % Rabatt auf unsere exklusive Kombination aus Gesichtshydrierung und Maniküre. Gültig bis Ende der Saison.',
-    '', '', true, true, 'ANGEBOT SICHERN', 'auto_awesome', '/images/promo-winter-glow.png'),
+    '', '', true, true, 'ANGEBOT SICHERN', 'auto_awesome', '/images/promo-winter-glow.webp'),
 ];
 
 export type OpeningDay = { day: string; open: string; close: string; closed: boolean };
@@ -193,7 +193,7 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
     sub: 'Entdecken Sie die Kunst der ästhetischen Perfektion in unserem Exklusiv-Studio in München.',
     cta: 'TERMIN BUCHEN',
     ctaLink: '',
-    image: '/images/hero-1.png',
+    image: '/images/hero-1.webp',
   },
   {
     id: 'hero2', duration: 10,
@@ -201,7 +201,7 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
     sub: 'Präzise Laser-Haarentfernung für ein seidiges Hautgefühl, das bleibt. Schmerzfrei und effektiv.',
     cta: 'ERFAHREN SIE MEHR',
     ctaLink: '/laser-haarentfernung',
-    image: '/images/hero-2.png',
+    image: '/images/hero-2.webp',
   },
   {
     id: 'hero3', duration: 10,
@@ -209,7 +209,7 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
     sub: 'Individuelle Behandlungen für eine strahlende Haut und natürliche Verjüngung.',
     cta: 'ZUM ANGEBOT',
     ctaLink: '/gesichtsaesthetik',
-    image: '/images/about-studio.png',
+    image: '/images/about-studio.webp',
   },
   {
     id: 'hero4', duration: 10,
@@ -217,7 +217,7 @@ export const INIT_HERO_SLIDES: HeroSlide[] = [
     sub: 'Maniküre & Pediküre auf höchstem Niveau für Ihre Hände und Füße.',
     cta: 'JETZT BUCHEN',
     ctaLink: '',
-    image: '/images/hero-4.png',
+    image: '/images/hero-4.webp',
   },
 ];
 
@@ -322,7 +322,7 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
     label: 'Signature Treatment',
     h1: 'Laser-Haarentfernung',
     heroDesc: 'Erleben Sie modernste Technologie für dauerhaft glatte Haut. Schmerzarm, hocheffektiv und perfekt auf Ihren Hauttyp abgestimmt.',
-    heroImage: '/images/laser-hair-removal.png',
+    heroImage: '/images/laser-hair-removal.webp',
     infoTitle: 'Die Zukunft der Hautpflege',
     infoParagraphs: [
       'Unsere Laser-Haarentfernung nutzt die innovative Diodenlaser-Technologie, um Haarwurzeln gezielt und nachhaltig zu deaktivieren. Im Gegensatz zu herkömmlichen Methoden ist unser Verfahren besonders hautschonend und auch für sensible Bereiche geeignet.',
@@ -335,14 +335,14 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
       'Hautbildverfeinerung und Reduktion von Pigmentflecken',
       'Langfristige Zeitersparnis und reduzierter Wasserverbrauch',
     ],
-    campaign1: { label: 'Limited Edition Offer', title: 'Kombi-Paket Kampagne', body: 'Buchen Sie ein Paket aus 3 Behandlungszonen und erhalten Sie die günstigste Zone komplett kostenfrei. Gültig für alle Laser-Treatments in diesem Monat.', cta: 'JETZT SICHERN', icon: 'auto_awesome', image: '/images/campaign-generic-1.png' },
-    campaign2: { label: 'Exklusives Treue-Special', title: 'Freunde-Werben-Programm', body: 'Empfehlen Sie uns weiter und erhalten Sie beide 20% Rabatt auf Ihre nächste Laser-Sitzung. Geteilte Schönheit ist doppelte Freude.', cta: 'MEHR ERFAHREN', icon: 'loyalty', image: '/images/campaign-laser-2.png' },
+    campaign1: { label: 'Limited Edition Offer', title: 'Kombi-Paket Kampagne', body: 'Buchen Sie ein Paket aus 3 Behandlungszonen und erhalten Sie die günstigste Zone komplett kostenfrei. Gültig für alle Laser-Treatments in diesem Monat.', cta: 'JETZT SICHERN', icon: 'auto_awesome', image: '/images/campaign-generic-1.webp' },
+    campaign2: { label: 'Exklusives Treue-Special', title: 'Freunde-Werben-Programm', body: 'Empfehlen Sie uns weiter und erhalten Sie beide 20% Rabatt auf Ihre nächste Laser-Sitzung. Geteilte Schönheit ist doppelte Freude.', cta: 'MEHR ERFAHREN', icon: 'loyalty', image: '/images/campaign-laser-2.webp' },
   },
   gesicht: {
     label: 'Premium Skin Care',
     h1: 'Gesichtsästhetik',
     heroDesc: 'Individuelle Gesichtsbehandlungen auf höchstem Niveau. Von HydraFacial über Microneedling bis zu chemischen Peelings – für strahlendes, jugendliches Hautbild.',
-    heroImage: '/images/gesichtsaesthetik.png',
+    heroImage: '/images/gesichtsaesthetik.webp',
     infoTitle: 'Wissenschaft trifft Schönheit',
     infoParagraphs: [
       'Unsere Gesichtsästhetik-Behandlungen vereinen medizinische Expertise mit ästhetischem Feingefühl. Jede Therapie beginnt mit einer präzisen Hautdiagnose – wir analysieren Feuchtigkeitsgehalt, Talgproduktion, Pigmentverteilung und Hautalterung, um das optimale Behandlungsprotokoll zu entwickeln.',
@@ -355,14 +355,14 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
       'Reduktion von Hyperpigmentierungen, Falten und unebenmäßiger Textur',
       'Langanhaltende Hydratation durch tief eindringende Wirkstoffkomplexe',
     ],
-    campaign1: { label: 'Seasonal Special', title: 'Frühlingsfrische Haut', body: 'Starten Sie mit strahlender Haut in den Frühling: Buchen Sie HydraFacial Deluxe und erhalten Sie ein Chemical Peeling Ihrer Wahl zum Sonderpreis. Gültig bis Ende März.', cta: 'JETZT SICHERN', icon: 'spa', image: '/images/campaign-generic-1.png' },
-    campaign2: { label: 'Exklusives Membership', title: 'HydraFacial Membership', body: 'Werden Sie Teil unserer exklusiven Mitgliedergemeinschaft und genießen Sie monatliche HydraFacial-Behandlungen zu Vorzugspreisen. Dauerhaft strahlende Haut als Lifestyle.', cta: 'MEHR ERFAHREN', icon: 'diamond', image: '/images/gesichtsaesthetik.png' },
+    campaign1: { label: 'Seasonal Special', title: 'Frühlingsfrische Haut', body: 'Starten Sie mit strahlender Haut in den Frühling: Buchen Sie HydraFacial Deluxe und erhalten Sie ein Chemical Peeling Ihrer Wahl zum Sonderpreis. Gültig bis Ende März.', cta: 'JETZT SICHERN', icon: 'spa', image: '/images/campaign-generic-1.webp' },
+    campaign2: { label: 'Exklusives Membership', title: 'HydraFacial Membership', body: 'Werden Sie Teil unserer exklusiven Mitgliedergemeinschaft und genießen Sie monatliche HydraFacial-Behandlungen zu Vorzugspreisen. Dauerhaft strahlende Haut als Lifestyle.', cta: 'MEHR ERFAHREN', icon: 'diamond', image: '/images/gesichtsaesthetik.webp' },
   },
   mani: {
     label: 'Esthetic Care',
     h1: 'Maniküre & Pediküre',
     heroDesc: 'Höchste Perfektion und luxuriöse Entspannung für Hände und Füße. Medizinische Sorgfalt trifft ästhetische Meisterschaft – für ein Erscheinungsbild, das überzeugt.',
-    heroImage: '/images/manikure-pedikure.png',
+    heroImage: '/images/manikure-pedikure.webp',
     infoTitle: 'Nail Art trifft Wellness',
     infoParagraphs: [
       'Unsere Maniküre- und Pediküre-Behandlungen verbinden medizinische Sorgfalt mit ästhetischer Meisterschaft. Jede Behandlung beginnt mit einem warmen Einweichbad und einer sorgfältigen Analyse des Nagelzustands – für ein Ergebnis, das Ihre Persönlichkeit unterstreicht.',
@@ -375,8 +375,8 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
       'Langanhaltende Shellac-Ergebnisse bis zu 4 Wochen ohne Absplittern',
       'Spa-Atmosphäre mit aromatischen Bädern und Handmassage',
     ],
-    campaign1: { label: 'Limited Edition', title: 'Velvet Touch Combo', body: 'Das ultimative Duo: Spa-Maniküre & Spa-Pediküre inkl. Shellac und einem Glas Champagner während der Behandlung. Normaler Einzelpreis: 180 € – jetzt 145 €.', cta: 'ANGEBOT SICHERN', icon: 'favorite', image: '/images/promo-winter-glow.png' },
-    campaign2: { label: 'Exklusives Membership', title: 'Nail Membership', body: 'Monatliche Shellac-Maniküre zum exklusiven Vorzugspreis. Als Mitglied profitieren Sie von Premium-Service, Prioritätsbuchung und 10% Rabatt auf alle Zusatzleistungen.', cta: 'MEHR ERFAHREN', icon: 'card_membership', image: '/images/manikure-pedikure.png' },
+    campaign1: { label: 'Limited Edition', title: 'Velvet Touch Combo', body: 'Das ultimative Duo: Spa-Maniküre & Spa-Pediküre inkl. Shellac und einem Glas Champagner während der Behandlung. Normaler Einzelpreis: 180 € – jetzt 145 €.', cta: 'ANGEBOT SICHERN', icon: 'favorite', image: '/images/promo-winter-glow.webp' },
+    campaign2: { label: 'Exklusives Membership', title: 'Nail Membership', body: 'Monatliche Shellac-Maniküre zum exklusiven Vorzugspreis. Als Mitglied profitieren Sie von Premium-Service, Prioritätsbuchung und 10% Rabatt auf alle Zusatzleistungen.', cta: 'MEHR ERFAHREN', icon: 'card_membership', image: '/images/manikure-pedikure.webp' },
   },
   // "Aktionen" service page (hero / info / benefits). The price list and the
   // banners on /aktionen are generated from the active Aktionen themselves, so
@@ -386,7 +386,7 @@ export const INIT_PAGE_CONTENT: PageContentMap = {
     label: 'Limitierte Angebote',
     h1: 'Aktionen & Kombi-Pakete',
     heroDesc: 'Unsere laufenden Angebote auf einen Blick – ausgewählte Behandlungen zu Vorzugspreisen, solange sie gültig sind.',
-    heroImage: '/images/promo-winter-glow.png',
+    heroImage: '/images/promo-winter-glow.webp',
     infoTitle: 'Schönheit zum Vorzugspreis',
     infoParagraphs: [
       'In unseren Aktionen bündeln wir beliebte Behandlungen zu Paketen mit spürbarem Preisvorteil – ideal, um eine neue Behandlung kennenzulernen oder Ihre gewohnte Pflege aufzufrischen.',

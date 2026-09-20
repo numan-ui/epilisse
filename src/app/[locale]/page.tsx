@@ -33,12 +33,12 @@ import SiteFooter from "@/components/SiteFooter";
 /* ── Image constants (Stitch AI – replace with real salon photos) ── */
 const IMG = {
   laser:
-    "/images/laser-hair-removal.png",
+    "/images/laser-hair-removal.webp",
   facial:
-    "/images/gesichtsaesthetik.png",
-  mani: "/images/manikure-pedikure.png",
+    "/images/gesichtsaesthetik.webp",
+  mani: "/images/manikure-pedikure.webp",
   about:
-    "/images/about-studio.png",
+    "/images/about-studio.webp",
 };
 
 /* ── Hero slide overlays ────────────────────────────────────── */
