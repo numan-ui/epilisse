@@ -61,9 +61,24 @@ const nextConfig: NextConfig = {
     remotePatterns: supabaseHostname
       ? [{ protocol: "https", hostname: supabaseHostname, pathname: "/storage/v1/object/public/**" }]
       : [],
+    // Aggressive image optimization — WebP default, responsive sizing
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
+  // Production optimizations
+  swcMinify: true,
+  productionBrowserSourceMaps: false,
+  // Precompute static params at build time
+  staticPageGenerationTimeout: 120,
   async headers() {
-    return [{ source: '/(.*)', headers: securityHeaders }];
+    return [
+      { source: '/(.*)', headers: securityHeaders },
+      // Cache WebP images aggressively
+      { source: '/images/:path*\\.webp', headers: [
+        { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }
+      ]},
+    ];
   },
 };
 

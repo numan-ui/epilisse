@@ -1,3 +1,7 @@
+import { STATIC_PAGE_CONFIG } from "@/lib/pageConfig";
+
+export const revalidate = STATIC_PAGE_CONFIG.revalidate;
+
 import FloatingNav from "@/components/LazyFloatingNav";
 import SiteFooter from "@/components/SiteFooter";
 

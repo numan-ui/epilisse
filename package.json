@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
-    "build": "next build",
+    "build": "next build && npm run validate:build",
+    "validate:build": "tsx scripts/validate-build.ts",
     "start": "next start",
     "lint": "next lint",
     "test:unit": "node --import tsx --test \"src/**/*.test.ts\"",

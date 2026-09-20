@@ -1,3 +1,7 @@
+import { STATIC_PAGE_CONFIG } from "@/lib/pageConfig";
+
+export const revalidate = STATIC_PAGE_CONFIG.revalidate;
+
 import { Suspense } from 'react';
 import ConsentForm from './ConsentForm';
 import FloatingNav from "@/components/LazyFloatingNav";

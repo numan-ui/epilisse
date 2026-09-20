@@ -8,12 +8,21 @@ const intlMiddleware = createMiddleware(routing);
 export default async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isAdminPath = /^\/(de|en)\/admin(\/|$)/.test(path);
+  const isApiPath = /^\/api(\/|$)/.test(path);
 
   // Public pages (homepage, service pages, ...) never need the Supabase
   // auth-cookie refresh — skip it so they aren't gated on that network
   // round-trip. Only /admin/* pays for it.
   if (!isAdminPath) {
-    return intlMiddleware(request);
+    const response = intlMiddleware(request);
+    // Cache static pages for 1 hour + stale-while-revalidate for 24h
+    if (!isApiPath) {
+      response.headers.set(
+        'Cache-Control',
+        'public, s-maxage=3600, stale-while-revalidate=86400'
+      );
+    }
+    return response;
   }
 
   const { response, user, role } = await updateSession(request);
