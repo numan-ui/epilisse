@@ -12,3 +12,4 @@ playwright/.cache/
 .claude
 .mcp.json
 .dev-server.log
+scripts/_backup-*/

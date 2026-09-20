@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
 import { dbError } from '@/lib/apiError';
 import { getAdminSession } from '@/lib/supabase/authServer';
+import { externalizeDataImages } from '@/lib/content/externalizeImages';
 import type { Category } from '@/app/[locale]/admin/behandlungen/data';
 
 /**
@@ -66,7 +67,7 @@ export async function PUT(request: Request) {
   const now = new Date().toISOString();
   const { error } = await supabase
     .from('site_categories_content')
-    .update({ draft: body, updated_at: now })
+    .update({ draft: await externalizeDataImages(body), updated_at: now })
     .eq('id', 1);
   if (error) return dbError('categories', error, 500);
 
