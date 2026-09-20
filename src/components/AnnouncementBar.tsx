@@ -93,7 +93,7 @@ export default function AnnouncementBar({ variant = 'fixed' }: { variant?: 'fixe
             className="inline-flex items-center gap-1.5 text-white/80"
             aria-label="NISV-zertifizierter Betrieb"
           >
-            <span className="material-symbols-outlined text-[16px] text-[--color-primary-fixed-dim] shrink-0">
+            <span className="material-symbols-outlined text-[16px] text-[var(--color-primary-fixed-dim)] shrink-0">
               workspace_premium
             </span>
             <span className="font-body-sm text-[12px] whitespace-nowrap">
