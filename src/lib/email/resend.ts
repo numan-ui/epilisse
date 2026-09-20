@@ -5,6 +5,9 @@ import { Resend } from 'resend';
 // is verified there, set RESEND_FROM_EMAIL to Resend's sandbox sender
 // (onboarding@resend.dev) so sends succeed during testing.
 const FROM = process.env.RESEND_FROM_EMAIL || 'EPILISSE <no-reply@epilisse.de>';
+// Mails go out from the verified no-reply@ address; customer replies land here
+// instead. Override with REPLY_TO_EMAIL (e.g. once info@epilisse.de exists).
+const REPLY_TO = process.env.REPLY_TO_EMAIL || 'epilisse.beauty@gmail.com';
 
 const GOLD = '#745b00';
 const CREAM = '#faf6f0';
@@ -288,6 +291,7 @@ export async function sendEmail(to: string, content: { subject: string; html: st
   const resend = getResend();
   const result = await resend.emails.send({
     from: FROM,
+    replyTo: REPLY_TO,
     to,
     subject: content.subject,
     html: content.html,
