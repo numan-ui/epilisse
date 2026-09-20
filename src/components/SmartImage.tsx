@@ -24,11 +24,10 @@ export default function SmartImage({
   priority?: boolean;
   onError?: React.ReactEventHandler<HTMLImageElement>;
 }) {
-  // Local assets (`/images/...`) and Supabase Storage URLs both go through
-  // next/image — the storage host is whitelisted in next.config.ts
-  // (images.remotePatterns), so these get resized/re-encoded (WebP/AVIF)
-  // instead of shipping the admin's original upload at full resolution.
-  if (src.startsWith("/") || src.includes("supabase.co/storage/")) {
+  // Supabase Storage URLs go through next/image for optimization
+  // (storage host whitelisted in next.config.ts remotePatterns).
+  // Local assets are already WebP + optimized, skip next/image to avoid 404s.
+  if (src.includes("supabase.co/storage/")) {
     return (
       <Image
         src={src}
@@ -37,6 +36,20 @@ export default function SmartImage({
         sizes={sizes ?? "100vw"}
         priority={priority}
         className={className}
+        style={style}
+        onError={onError}
+      />
+    );
+  }
+
+  // Local `/images/...` paths: already WebP, no optimization needed.
+  // Use plain img to avoid next/image optimizer 404s.
+  if (src.startsWith("/")) {
+    return (
+      <img
+        src={src}
+        alt={alt}
+        className={`absolute inset-0 w-full h-full ${className ?? ""}`}
         style={style}
         onError={onError}
       />
