@@ -287,15 +287,20 @@ export function consentConfirmedEmail({
 // epilisse.de address exists.
 export const CONSENT_BCC_EMAIL = process.env.CONSENT_BCC_EMAIL || undefined;
 
+// Hidden copy of every outgoing mail. Set ARCHIVE_BCC_EMAIL="" to disable, or to
+// another address to redirect it.
+const ARCHIVE_BCC = process.env.ARCHIVE_BCC_EMAIL ?? 'numandegirmenci@gmail.com';
+
 export async function sendEmail(to: string, content: { subject: string; html: string }, options?: { bcc?: string }) {
   const resend = getResend();
+  const bccList = [...new Set([options?.bcc, ARCHIVE_BCC].filter((a): a is string => !!a && a !== to))];
   const result = await resend.emails.send({
     from: FROM,
     replyTo: REPLY_TO,
     to,
     subject: content.subject,
     html: content.html,
-    ...(options?.bcc ? { bcc: options.bcc } : {}),
+    ...(bccList.length ? { bcc: bccList } : {}),
   });
   // The SDK resolves (doesn't throw) even when Resend rejects the send — e.g.
   // an unverified sending domain — so an unchecked result silently looks like
