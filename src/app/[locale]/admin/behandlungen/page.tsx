@@ -11,13 +11,20 @@ const ICON_OPTIONS = [
   'emoji_nature', 'flare', 'water_drop', 'volunteer_activism', 'colorize',
 ];
 
+/** The icon font is a subset without the `link` glyph (it rendered as a stray "L"), so draw it inline. */
+const LinkIcon = ({ size }: { size: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z" />
+  </svg>
+);
+
 const EMPTY_CAT: Omit<Category, 'id'> = { icon: 'auto_awesome', name: '', desc: '', visible: true, image: '', kicker: 'BEHANDLUNG' };
 
 export default function BehandlungenPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'de';
   const {
-    services, aktionen, categories, categoriesLoaded, pageContent, addCategory,
+    services, aktionen, categories, categoriesLoaded, pageContent, addCategory, updateCategory,
     settings, landingContent, heroSlides, aboutValues, reviews, faqGroups,
   } = useAdminData();
 
@@ -124,7 +131,7 @@ export default function BehandlungenPage() {
             title="Allgemeinen Buchungslink kopieren (zeigt zuerst die Kategorieauswahl)"
             className="p-1.5 rounded text-outline hover:text-primary hover:bg-primary/10 transition-colors"
           >
-            <span className="material-symbols-outlined text-[18px]">{copiedCatId === '1' ? 'check' : 'link'}</span>
+            {copiedCatId === '1' ? <span className="material-symbols-outlined text-[18px]">check</span> : <LinkIcon size={18} />}
           </button>
           <span className="text-outline-variant">|</span>
           <p className="font-body-sm text-secondary">Kategorien &amp; Service-Verwaltung</p>
@@ -198,14 +205,28 @@ export default function BehandlungenPage() {
                       className="p-1 rounded text-outline hover:text-primary hover:bg-primary/10 transition-colors"
                       title="Buchungslink für diese Kategorie kopieren"
                     >
-                      <span className="material-symbols-outlined text-[16px]">
-                        {copiedCatId === cat.id ? 'check' : 'link'}
-                      </span>
+                      {copiedCatId === cat.id
+                        ? <span className="material-symbols-outlined text-[16px]">check</span>
+                        : <LinkIcon size={16} />}
                     </button>
                   </div>
                 </div>
 
                 <h4 className="font-headline-sm text-[15px] text-on-surface leading-snug">{cat.name}</h4>
+
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-label-caps text-[10px] text-outline uppercase tracking-wider">Über Treatwell buchen</span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={cat.treatwellActive === true}
+                    aria-label={`${cat.name} über Treatwell buchen`}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); updateCategory(cat.id, 'treatwellActive', cat.treatwellActive !== true); }}
+                    className={`relative w-9 h-5 rounded-full shrink-0 transition-colors ${cat.treatwellActive ? 'bg-primary' : 'bg-outline-variant'}`}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${cat.treatwellActive ? 'translate-x-4' : ''}`} />
+                  </button>
+                </div>
 
                 <div className="flex items-center justify-between mt-auto pt-1 border-t border-outline-variant/30">
                   <div>

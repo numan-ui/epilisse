@@ -39,6 +39,7 @@ export function mergeCategories(stored: Category[]): Category[] {
       visible: c.visible,
       image: c.image ?? '',
       kicker: str(c.kicker, def.kicker),
+      treatwellActive: c.treatwellActive === true,
     };
   });
   const customs = stored.filter((c) => c.id.startsWith('cat-'));

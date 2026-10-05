@@ -5,7 +5,8 @@ export type ImagePosition = 'top' | 'center' | 'bottom';
 export type Service  = { id: string; name: string; price: string; duration: string; active: boolean; oldPrice?: string };
 /** @deprecated superseded by `Aktion` — retained only to type the legacy `SiteContent.campaigns` blob during the 0023 migration window. */
 export type Campaign = { id: string; label: string; title: string; desc: string; price: string; oldPrice?: string; cta: string; icon: string; image: string; imagePosition?: ImagePosition; active: boolean };
-export type Category = { id: string; icon: string; name: string; desc: string; visible: boolean; image: string; kicker: string };
+/** treatwellActive: when true the booking modal sends this category to Treatwell (`SiteSettings.treatwellBookingUrl`) instead of the own slot system. Undefined = off. */
+export type Category = { id: string; icon: string; name: string; desc: string; visible: boolean; image: string; kicker: string; treatwellActive?: boolean };
 
 /**
  * Unified offer model — replaces the homepage `PromoBanner` and the per-category
@@ -104,6 +105,8 @@ export type SiteSettings = {
   calendarUrl: string; whatsappMsg: string; bookingActive: boolean; whatsappActive: boolean;
   instagram: string; facebook: string; tiktok: string; google: string;
   treatwellUrl: string;
+  /** Target of the booking modal's "über Treatwell" channel (categories with treatwellActive). Separate from treatwellUrl, which is the public profile/reviews link. */
+  treatwellBookingUrl: string;
   aboutImage: string;
   /** Owner portrait for the manifesto block (homepage + /ueber-uns). Empty → monogram fallback. */
   ownerImage: string;
@@ -129,6 +132,7 @@ export const INIT_SETTINGS: SiteSettings = {
   tiktok: '@epilisse',
   google: '',
   treatwellUrl: 'https://www.treatwell.de/ort/studio-adisa-the-beauty-experience/',
+  treatwellBookingUrl: 'https://buchung.treatwell.de/ort/543368/menue/',
   aboutImage: '',
   ownerImage: '',
   googleRating: '4,9', googleReviewCount: '180+',

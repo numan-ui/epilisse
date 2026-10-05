@@ -433,6 +433,21 @@ export default function CategoryDetailPage() {
                   onChange={e => updateCategory(catId, 'kicker', e.target.value)}
                 />
               </div>
+              <div className="flex items-center justify-between gap-4 pt-2 border-t border-outline-variant/30">
+                <div>
+                  <label className="font-label-caps text-[9px] text-outline uppercase tracking-wider block mb-1">Über Treatwell buchen</label>
+                  <p className="font-body-sm text-[12px] text-on-surface-variant">Im Termin-Fenster wird diese Kategorie zu Treatwell weitergeleitet statt in den eigenen Kalender.</p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={category.treatwellActive === true}
+                  onClick={() => updateCategory(catId, 'treatwellActive', category.treatwellActive !== true)}
+                  className={`relative w-11 h-6 rounded-full shrink-0 transition-colors ${category.treatwellActive ? 'bg-primary' : 'bg-outline-variant'}`}
+                >
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${category.treatwellActive ? 'translate-x-5' : ''}`} />
+                </button>
+              </div>
             </section>
 
             {/* Category image (used for the tile on the landing page) */}

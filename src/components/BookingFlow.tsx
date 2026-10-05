@@ -3,8 +3,11 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { useAdminCategories } from '@/hooks/useAdminCategories';
 import { useCategoryServices, parseDurationMin } from '@/hooks/useCategoryServices';
+import { useAdminSettings } from '@/hooks/useAdminSettings';
 
-type Step = 'category' | 'services' | 'details' | 'success';
+/** 'channel' (own calendar vs. Treatwell) only exists while at least one category is routed to Treatwell. 'treatwell' = preselected Treatwell category, one explicit click to leave. */
+type Step = 'channel' | 'category' | 'treatwell' | 'services' | 'details' | 'success';
+type Channel = 'own' | 'treatwell';
 
 interface AvailabilitySlot {
   time: string;
@@ -85,7 +88,16 @@ export interface BookingFlowProps {
  * markup-identical to the pre-extraction modal — the booking e2e suite covers it.
  */
 export default function BookingFlow({ variant, active, preselectedCategory, onClose }: BookingFlowProps) {
-  const categories = useAdminCategories().filter((c) => c.visible);
+  const allCategories = useAdminCategories().filter((c) => c.visible);
+  const { treatwellBookingUrl } = useAdminSettings();
+  const treatwellUrl = treatwellBookingUrl.trim();
+  const treatwellCategories = treatwellUrl ? allCategories.filter((c) => c.treatwellActive) : [];
+  const hasTreatwellChannel = treatwellCategories.length > 0;
+  const preselectedIsTreatwell = !!preselectedCategory && treatwellCategories.some((c) => c.id === preselectedCategory);
+  const [channel, setChannel] = useState<Channel>('own');
+  const categories = hasTreatwellChannel
+    ? allCategories.filter((c) => (channel === 'treatwell') === !!c.treatwellActive)
+    : allCategories;
   const params = useParams();
   const locale = (params?.locale as string) || 'de';
 
@@ -117,7 +129,8 @@ export default function BookingFlow({ variant, active, preselectedCategory, onCl
 
   const reset = useCallback(() => {
     setSelectedCategory(preselectedCategory);
-    setStep(preselectedCategory ? 'services' : 'category');
+    setChannel('own');
+    setStep(preselectedIsTreatwell ? 'treatwell' : preselectedCategory ? 'services' : hasTreatwellChannel ? 'channel' : 'category');
     setSelectedServiceIds(new Set());
     setName('');
     setEmail('');
@@ -132,7 +145,7 @@ export default function BookingFlow({ variant, active, preselectedCategory, onCl
     setConsentMarketing(false);
     setPriorConsent(null);
     setError(null);
-  }, [preselectedCategory]);
+  }, [preselectedCategory, preselectedIsTreatwell, hasTreatwellChannel]);
 
   useEffect(() => {
     if (step !== 'details') return;
@@ -203,8 +216,8 @@ export default function BookingFlow({ variant, active, preselectedCategory, onCl
   }, [step, email, phone]);
 
   const selectedCategoryName = useMemo(
-    () => categories.find((c) => c.id === selectedCategory)?.name ?? '',
-    [categories, selectedCategory]
+    () => allCategories.find((c) => c.id === selectedCategory)?.name ?? '',
+    [allCategories, selectedCategory]
   );
 
   // Behandlungseinwilligung is only legally relevant for Laser-Haarentfernung —
@@ -298,37 +311,147 @@ export default function BookingFlow({ variant, active, preselectedCategory, onCl
       )}
       {variant === 'modal' && <div className="mb-6" />}
 
-      {step === 'category' && (
-        <div className="space-y-2">
-          <p className="font-body-sm text-secondary mb-4">Wählen Sie eine Kategorie</p>
-          <div className="grid grid-cols-2 gap-3">
-            {categories.map((c, i) => (
-              <button
-                key={c.id}
-                onClick={() => {
-                  setSelectedCategory(c.id);
-                  setSelectedServiceIds(new Set());
-                  setStep('services');
-                }}
-                className="flex flex-col items-center gap-2 p-5 rounded-lg bg-surface-container-low border border-transparent hover:border-primary/40 hover:bg-primary/5 transition-all text-center"
-              >
-                <span
-                  className="material-symbols-outlined text-primary text-[28px] category-icon-glow"
-                  style={{ animationDelay: `${0.3 + i * 0.15}s` }}
-                >
-                  {c.icon}
-                </span>
-                <span className="font-body-sm text-on-surface">{c.name}</span>
-              </button>
+      {step === 'channel' && (
+        <div>
+          <p className="font-body-sm text-secondary mb-3">Wählen Sie, wo Sie buchen möchten</p>
+          <div className="space-y-3">
+            {([
+              { id: 'own', icon: 'spa', label: 'Bei Epilisse', sub: 'Termin direkt hier wählen', cats: allCategories.filter((c) => !c.treatwellActive) },
+              { id: 'treatwell', icon: 'open_in_new', label: 'Bei Epilisse über Treatwell', sub: 'Weiterleitung zu Treatwell', cats: treatwellCategories },
+            ] as const).map((o) => (
+              <section key={o.id} className="rounded-xl bg-surface-container-lowest border border-outline-variant/60 overflow-hidden">
+                <div className="flex items-center gap-2.5 px-3.5 py-2.5 bg-primary/[0.06] border-b border-outline-variant/40">
+                  <span className="shrink-0 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[16px]">{o.icon}</span>
+                  </span>
+                  <div className="min-w-0">
+                    <h4 className="font-headline-sm text-[16px] text-on-surface leading-tight">{o.label}</h4>
+                    <p className="font-body-sm text-[10.5px] text-outline">{o.sub}</p>
+                  </div>
+                </div>
+                <ul className="grid grid-cols-2 [&>li:nth-child(even)>*]:border-r-0">
+                  {o.cats.map((c, ci) => {
+                    const cellClass = 'group w-full h-full flex items-center gap-2 px-3 py-2.5 hover:bg-primary/5 transition-colors text-left border-b border-r border-outline-variant/30';
+                    const inner = (
+                      <>
+                        <span className="shrink-0 w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span
+                            className="material-symbols-outlined text-primary text-[16px] category-icon-glow"
+                            style={{ animationDelay: `${0.3 + ci * 0.12}s` }}
+                          >
+                            {c.icon}
+                          </span>
+                        </span>
+                        <span className="min-w-0 font-body-sm text-[12.5px] leading-tight text-on-surface">{c.name}</span>
+                      </>
+                    );
+                    return (
+                      <li key={c.id}>
+                        {o.id === 'treatwell' ? (
+                          <a href={treatwellUrl} target="_blank" rel="noopener noreferrer" onClick={dismiss} className={cellClass}>
+                            {inner}
+                          </a>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setChannel('own');
+                              setSelectedCategory(c.id);
+                              setSelectedServiceIds(new Set());
+                              setStep('services');
+                            }}
+                            className={cellClass}
+                          >
+                            {inner}
+                          </button>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
             ))}
           </div>
+        </div>
+      )}
+
+      {step === 'category' && (
+        <div className="space-y-2">
+          {hasTreatwellChannel && (
+            <button
+              onClick={() => setStep('channel')}
+              className="font-label-caps text-[11px] text-outline hover:text-primary transition-colors mb-2 flex items-center gap-1"
+            >
+              <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+              Zurück
+            </button>
+          )}
+          <p className="font-body-sm text-secondary mb-4">Wählen Sie eine Kategorie</p>
+          <div className="grid grid-cols-2 gap-3">
+            {categories.map((c, i) => {
+              const tileClass = 'flex flex-col items-center gap-2 p-5 rounded-lg bg-surface-container-low border border-transparent hover:border-primary/40 hover:bg-primary/5 transition-all text-center';
+              const inner = (
+                <>
+                  <span
+                    className="material-symbols-outlined text-primary text-[28px] category-icon-glow"
+                    style={{ animationDelay: `${0.3 + i * 0.15}s` }}
+                  >
+                    {c.icon}
+                  </span>
+                  <span className="font-body-sm text-on-surface">{c.name}</span>
+                </>
+              );
+              // A real link (not window.open) so popup blockers never swallow it.
+              return hasTreatwellChannel && channel === 'treatwell' ? (
+                <a key={c.id} href={treatwellUrl} target="_blank" rel="noopener noreferrer" onClick={dismiss} className={tileClass}>
+                  {inner}
+                </a>
+              ) : (
+                <button
+                  key={c.id}
+                  onClick={() => {
+                    setSelectedCategory(c.id);
+                    setSelectedServiceIds(new Set());
+                    setStep('services');
+                  }}
+                  className={tileClass}
+                >
+                  {inner}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {step === 'treatwell' && (
+        <div className="space-y-4">
+          <button
+            onClick={dismiss}
+            className="font-label-caps text-[11px] text-outline hover:text-primary transition-colors mb-2 flex items-center gap-1"
+          >
+            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            Abbrechen
+          </button>
+          <p className="font-body-sm text-secondary">
+            {selectedCategoryName || 'Diese Behandlung'} buchen Sie bei Epilisse über Treatwell.
+          </p>
+          <a
+            href={treatwellUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={dismiss}
+            className="flex items-center justify-center gap-2 w-full bg-cta text-on-cta py-3 font-label-caps text-label-caps tracking-widest hover:bg-cta-hover transition-all rounded-[var(--radius-cta)]"
+          >
+            Weiter zu Treatwell
+            <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+          </a>
         </div>
       )}
 
       {step === 'services' && selectedCategory && (
         <div>
           <button
-            onClick={() => (preselectedCategory ? dismiss() : setStep('category'))}
+            onClick={() => (preselectedCategory ? dismiss() : setStep(hasTreatwellChannel ? 'channel' : 'category'))}
             className="font-label-caps text-[11px] text-outline hover:text-primary transition-colors mb-4 flex items-center gap-1"
           >
             <span className="material-symbols-outlined text-[16px]">arrow_back</span>
