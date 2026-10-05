@@ -8,10 +8,13 @@ import { useEffect, useRef } from 'react';
  *
  *  1. Gather — the droplets fall out of the hero's bottom edge and close in on
  *     the section title.
- *  2. Pass — as they arrive, a single thin band of light sweeps once across
- *     the title's letters.
+ *  2. Pass — as they arrive, a thin band of light crosses the title's
+ *     letters and comes back (on the clock, so it never parks mid-word).
  *  3. Scatter — they part outward from the title and dissolve. Nothing lingers
  *     over the cards or in the margins.
+ *
+ * Droplet progress is tied to the scroll; a slow float is layered on top so
+ * they hang and sway rather than freeze when the visitor stops.
  *
  * Drop it inside a `relative` section as the first child, and mark the title
  * with `data-gold-title`. Purely decorative: no pointer events, hidden from
@@ -89,8 +92,17 @@ const GATHER_FROM = 1.06;
 const GATHER_TO = 0.6;
 const SCATTER_FROM = 0.52;
 const SCATTER_TO = 0.14;
-const SWEEP_FROM = 0.8;
-const SWEEP_TO = 0.44;
+/** The title sweep starts once the title's centre is this far up the
+ *  viewport, runs for SWEEP_SECONDS (there and back), and re-arms when the title has gone back
+ *  below the fold. */
+const SWEEP_AT = 0.72;
+const SWEEP_REARM = 1.02;
+const SWEEP_SECONDS = 12;
+/** How far past each end of the text the band travels, as a share of the
+ *  text width — just enough for it to clear the first and last letter. */
+const SWEEP_OVERSHOOT = 0.06;
+/** Idle float radius (px). */
+const FLOAT = 7;
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const easeInOut = (v: number) => v * v * (3 - 2 * v);
@@ -144,8 +156,10 @@ export default function GoldDriftParticles() {
     measureTitle();
 
     let raf = 0;
-    const update = () => {
+    let sweepStart: number | null = null;
+    const update = (now: number) => {
       raf = 0;
+      const t = now / 1000;
       const rect = section.getBoundingClientRect();
       const tr = title.getBoundingClientRect();
       const vh = window.innerHeight;
@@ -156,7 +170,8 @@ export default function GoldDriftParticles() {
 
       const gather = clamp01((GATHER_FROM - u) / (GATHER_FROM - GATHER_TO));
       const scatter = clamp01((SCATTER_FROM - u) / (SCATTER_FROM - SCATTER_TO));
-      layer.style.opacity = gather > 0 && scatter < 1 ? '1' : '0';
+      const showing = gather > 0 && scatter < 1;
+      layer.style.opacity = showing ? '1' : '0';
 
       for (let i = 0; i < dots.length; i++) {
         const p = PARTICLES[i];
@@ -174,19 +189,37 @@ export default function GoldDriftParticles() {
         const bow = Math.sin(Math.PI * g) * p.arc;
         // Then on outward along the same direction, easing to a stop.
         const out = easeOut(s) * p.reach;
-        const x = spawnX + (meetX - spawnX) * g + bow + dirX * out;
-        const y = spawnY + (meetY - spawnY) * g + dirY * out;
+        // A slow float on top, so they hang and sway in the air when the
+        // scroll stops instead of freezing in place.
+        const phase = p.delay * Math.PI * 2;
+        const floatX = Math.sin(t * 0.55 + phase) * FLOAT * g;
+        const floatY = Math.cos(t * 0.43 + phase * 1.7) * FLOAT * g;
+        const x = spawnX + (meetX - spawnX) * g + bow + dirX * out + floatX;
+        const y = spawnY + (meetY - spawnY) * g + dirY * out + floatY;
 
         const el = dots[i];
         el.style.transform = `translate3d(${x.toFixed(1)}px, ${(y + OVERHANG).toFixed(1)}px, 0)`;
         el.style.opacity = (p.alpha * clamp01(g * 3) * (1 - s * s)).toFixed(3);
       }
 
-      // One pass of light, left to right across the letters, as they arrive.
-      const sweep = clamp01((SWEEP_FROM - u) / (SWEEP_FROM - SWEEP_TO));
+      // A band of light crosses the letters left to right, then comes back,
+      // as the droplets arrive. Triggered by the scroll but played on the clock — tied to the scroll
+      // position it parked on whichever letter the visitor stopped at.
+      if (u > SWEEP_REARM) sweepStart = null;
+      else if (sweepStart === null && u < SWEEP_AT && u > 0) sweepStart = t;
+      const sweep = sweepStart === null ? 0 : clamp01((t - sweepStart) / SWEEP_SECONDS);
       const textLeft = (tr.width - titleW) / 2;
-      title.style.setProperty('--gold-x', `${(textLeft + (-0.15 + 1.3 * sweep) * titleW).toFixed(1)}px`);
-      title.style.setProperty('--gold-a', (Math.sin(Math.PI * sweep) * 0.9).toFixed(3));
+      // There and back at a constant speed, turning around just past the last
+      // letter. An eased leg spent ~40% of its time crawling off the text at
+      // either end, which read as the band waiting rather than moving slowly.
+      const leg = sweep < 0.5 ? sweep * 2 : 2 - sweep * 2;
+      title.style.setProperty('--gold-x', `${(textLeft + (-SWEEP_OVERSHOOT + (1 + 2 * SWEEP_OVERSHOOT) * leg) * titleW).toFixed(1)}px`);
+      title.style.setProperty('--gold-a', (Math.min(1, sweep * 30, (1 - sweep) * 30) * 0.9).toFixed(3));
+
+      // Keep ticking (float, sweep) only while there is something on screen
+      // to move; otherwise the next scroll event wakes it up again.
+      const sweeping = sweepStart !== null && sweep < 1;
+      if (sweeping || (showing && rect.top < vh + OVERHANG && rect.bottom > 0)) schedule();
     };
     const schedule = () => {
       if (!raf) raf = requestAnimationFrame(update);
@@ -196,7 +229,7 @@ export default function GoldDriftParticles() {
       schedule();
     };
 
-    update();
+    schedule();
     document.fonts?.ready.then(remeasure).catch(() => {});
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', remeasure);
