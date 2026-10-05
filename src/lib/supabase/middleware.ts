@@ -31,7 +31,8 @@ export async function updateSession(request: NextRequest) {
   );
 
   const { data: { user } } = await supabase.auth.getUser();
-  const role = (user?.app_metadata?.role as AdminRole | undefined) ?? null;
+  const rawRole = user?.app_metadata?.role;
+  const role: AdminRole | null = rawRole === 'admin' || rawRole === 'super_admin' ? rawRole : null;
 
   return { response, user, role };
 }

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getServerFaqChatContent } from '@/lib/content/faqChat';
 import { INIT_FAQ_CHAT_CONTENT } from '@/lib/content/faqChatTypes';
+import { supabaseServer } from '@/lib/supabase/server';
+import { checkFaqAskRateLimit, getClientIp } from '@/lib/rateLimit';
 
 /**
  * Grounded (RAG-style) fallback for questions the local keyword matcher
@@ -34,6 +36,12 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   const message = typeof body?.message === 'string' ? body.message.trim().slice(0, 500) : '';
   if (!message) return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
+
+  // Over the limit → same shape as "no answer", so the widget shows its
+  // generic fallback + booking CTA instead of an error.
+  if (!(await checkFaqAskRateLimit(supabaseServer(), getClientIp(request)))) {
+    return NextResponse.json({ answer: null }, { status: 429 });
+  }
 
   const stored = await getServerFaqChatContent();
   const content = {

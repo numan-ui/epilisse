@@ -31,13 +31,17 @@ export default async function middleware(request: NextRequest) {
   const isTeamPath = /^\/(de|en)\/admin\/team(\/|$)/.test(path);
   const locale = path.match(/^\/(de|en)\//)?.[1] ?? "de";
 
-  if (!isLoginPath && !user) {
+  // A session alone isn't enough — the account must carry an admin role
+  // (see getAdminSession). A role-less account is treated as logged out.
+  const isAdmin = !!user && !!role;
+
+  if (!isLoginPath && !isAdmin) {
     return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url));
   }
   if (isTeamPath && role !== "super_admin") {
     return NextResponse.redirect(new URL(`/${locale}/admin`, request.url));
   }
-  if (isLoginPath && user) {
+  if (isLoginPath && isAdmin) {
     return NextResponse.redirect(new URL(`/${locale}/admin`, request.url));
   }
 

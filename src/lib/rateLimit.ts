@@ -39,5 +39,10 @@ export const checkPasswordResetRateLimit = (supabase: SupabaseClient<Database>, 
 export const checkConsentStatusRateLimit = (supabase: SupabaseClient<Database>, ip: string) =>
   checkRateLimit(supabase, 'consent_status', ip, { windowMs: 10 * 60 * 1000, maxAttempts: 20 });
 
+// Each call is forwarded to the Gemini API on the salon's key — cap it so the
+// endpoint can't be used as a free public LLM proxy / quota drain.
+export const checkFaqAskRateLimit = (supabase: SupabaseClient<Database>, ip: string) =>
+  checkRateLimit(supabase, 'faq_ask', ip, { windowMs: 10 * 60 * 1000, maxAttempts: 15 });
+
 export const checkAvailabilityRateLimit = (supabase: SupabaseClient<Database>, ip: string) =>
   checkRateLimit(supabase, 'availability', ip, { windowMs: 5 * 60 * 1000, maxAttempts: 80 });

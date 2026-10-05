@@ -29,6 +29,11 @@ export async function getAdminSession() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const role = (user.app_metadata?.role as AdminRole | undefined) ?? 'admin';
+  // A logged-in Supabase user is NOT an admin by default: anyone can create an
+  // account against the public anon key while sign-ups are enabled on the
+  // project. Only a role written into app_metadata (service-role only — see
+  // /api/admin/team) grants access.
+  const role = user.app_metadata?.role as AdminRole | undefined;
+  if (role !== 'admin' && role !== 'super_admin') return null;
   return { user, role };
 }
