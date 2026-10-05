@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useCallback, useEffect, type React
 import {
   INIT_SERVICES, INIT_AKTIONEN, AKTION_CATEGORY_LIMIT, INIT_PAGE_CONTENT, CATEGORIES, INIT_SETTINGS, INIT_LANDING_CONTENT,
   INIT_HERO_SLIDES, HERO_SLIDE_LIMIT, INIT_ABOUT_VALUES, ABOUT_VALUE_LIMIT,
-  INIT_REVIEWS, REVIEW_LIMIT,
+  INIT_REVIEWS, REVIEW_LIMIT, MAX_PAGE_BANNERS,
   INIT_FAQ_GROUPS, FAQ_GROUP_LIMIT, FAQ_ITEM_LIMIT,
   type Service, type Aktion, type Category, type PageContent, type PageContentMap,
   type PageBanner, type SiteSettings, type LandingContent, type HeroSlide, type AboutValue, type Review,
@@ -101,12 +101,15 @@ interface AdminDataCtx {
   updateAktion:         (id: string, field: keyof Aktion, value: string | boolean) => void;
   addAktion:            (category: string) => void;
   removeAktion:         (id: string) => void;
-  updatePageField:      (catId: string, field: keyof Omit<PageContent, 'infoParagraphs' | 'benefits' | 'campaign1' | 'campaign2'>, value: string) => void;
+  updatePageField:      (catId: string, field: keyof Omit<PageContent, 'infoParagraphs' | 'benefits' | 'campaign1' | 'campaign2' | 'extraBanners'>, value: string) => void;
   updatePageParagraph:  (catId: string, index: 0 | 1, value: string) => void;
   updatePageBenefit:    (catId: string, index: number, value: string) => void;
   addPageBenefit:       (catId: string) => void;
   removePageBenefit:    (catId: string, index: number) => void;
-  updatePageBanner:     (catId: string, which: 1 | 2, field: keyof PageBanner, value: string) => void;
+  updatePageBanner:     (catId: string, which: number, field: keyof PageBanner, value: string) => void;
+  patchPageBanner:      (catId: string, which: number, patch: Partial<PageBanner>) => void;
+  addExtraBanner:       (catId: string) => void;
+  removeExtraBanner:    (catId: string, which: number) => void;
   addCategory:    (cat: Omit<Category, 'id'>, templateCatId?: string) => void;
   updateCategory: (id: string, field: keyof Category, value: string | boolean) => void;
   deleteCategory: (id: string) => void;
@@ -483,7 +486,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       ls.write(LS_PC, next); return next;
     }), [categories]);
 
-  const updatePageField = useCallback((catId: string, field: keyof Omit<PageContent, 'infoParagraphs' | 'benefits' | 'campaign1' | 'campaign2'>, value: string) =>
+  const updatePageField = useCallback((catId: string, field: keyof Omit<PageContent, 'infoParagraphs' | 'benefits' | 'campaign1' | 'campaign2' | 'extraBanners'>, value: string) =>
     _pcUpdate(catId, pc => ({ ...pc, [field]: value })), [_pcUpdate]);
 
   const updatePageParagraph = useCallback((catId: string, index: 0 | 1, value: string) =>
@@ -505,11 +508,36 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const removePageBenefit = useCallback((catId: string, index: number) =>
     _pcUpdate(catId, pc => ({ ...pc, benefits: pc.benefits.filter((_, i) => i !== index) })), [_pcUpdate]);
 
-  const updatePageBanner = useCallback((catId: string, which: 1 | 2, field: keyof PageBanner, value: string) =>
+  const updatePageBanner = useCallback((catId: string, which: number, field: keyof PageBanner, value: string) =>
     _pcUpdate(catId, pc => {
+      if (which >= 3) {
+        const extras = [...(pc.extraBanners ?? [])];
+        if (!extras[which - 3]) return pc;
+        extras[which - 3] = { ...extras[which - 3], [field]: value };
+        return { ...pc, extraBanners: extras };
+      }
       const key = which === 1 ? 'campaign1' : 'campaign2';
       return { ...pc, [key]: { ...pc[key], [field]: value } };
     }), [_pcUpdate]);
+
+  const patchPageBanner = useCallback((catId: string, which: number, patch: Partial<PageBanner>) =>
+    _pcUpdate(catId, pc => {
+      if (which >= 3) {
+        const extras = [...(pc.extraBanners ?? [])];
+        if (!extras[which - 3]) return pc;
+        extras[which - 3] = { ...extras[which - 3], ...patch };
+        return { ...pc, extraBanners: extras };
+      }
+      const key = which === 1 ? 'campaign1' : 'campaign2';
+      return { ...pc, [key]: { ...pc[key], ...patch } };
+    }), [_pcUpdate]);
+
+  const addExtraBanner = useCallback((catId: string) =>
+    _pcUpdate(catId, pc => (2 + (pc.extraBanners?.length ?? 0) >= MAX_PAGE_BANNERS ? pc
+      : { ...pc, extraBanners: [...(pc.extraBanners ?? []), emptyPageBanner()] })), [_pcUpdate]);
+
+  const removeExtraBanner = useCallback((catId: string, which: number) =>
+    _pcUpdate(catId, pc => ({ ...pc, extraBanners: (pc.extraBanners ?? []).filter((_, i) => i !== which - 3) })), [_pcUpdate]);
 
   /* ── Categories ──────────────────────────────────── */
   /** templateCatId: clone an existing category's page content, sample services and images as a starting point. */
@@ -777,7 +805,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       services, aktionen, pageContent, categories, categoriesLoaded, settings, landingContent, heroSlides, aboutValues, reviews, faqGroups,
       updateService, deleteService, addService,
       updateAktion, addAktion, removeAktion,
-      updatePageField, updatePageParagraph, updatePageBenefit, addPageBenefit, removePageBenefit, updatePageBanner,
+      updatePageField, updatePageParagraph, updatePageBenefit, addPageBenefit, removePageBenefit, updatePageBanner, patchPageBanner, addExtraBanner, removeExtraBanner,
       addCategory, updateCategory, deleteCategory,
       updateSetting, updateSettingHours, updateLandingField,
       updateHeroSlide, addHeroSlide, removeHeroSlide, reorderHeroSlide,

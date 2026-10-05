@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { PREVIEW_GRADIENT, FRONTEND_SLUG, AKTION_CATEGORY_LIMIT, AKTION_HOME_LIMIT, type Service, type PageBanner } from '../data';
+import { PREVIEW_GRADIENT, FRONTEND_SLUG, AKTION_CATEGORY_LIMIT, AKTION_HOME_LIMIT, MAX_PAGE_BANNERS, type Service, type PageBanner } from '../data';
 import { useAdminData } from '../AdminDataContext';
 import ImageUpload from '../ImageUpload';
 import { uploadImage } from '@/lib/uploadImage';
@@ -22,7 +22,7 @@ export default function CategoryDetailPage() {
     services: allServices, aktionen: allAktionen, pageContent: allPageContent,
     updateService: ctxUpdateService, deleteService: ctxDeleteService, addService: ctxAddService,
     updateAktion, addAktion: ctxAddAktion, removeAktion,
-    updatePageField, updatePageParagraph, updatePageBenefit, addPageBenefit, removePageBenefit, updatePageBanner,
+    updatePageField, updatePageParagraph, updatePageBenefit, addPageBenefit, removePageBenefit, updatePageBanner, patchPageBanner, addExtraBanner, removeExtraBanner,
     categories, updateCategory, deleteCategory,
     settings, landingContent, heroSlides, aboutValues, reviews, faqGroups,
   } = useAdminData();
@@ -642,14 +642,51 @@ export default function CategoryDetailPage() {
                   {/* ── Kampagnen-Banner tab ── */}
                   {contentTab === 'banners' && (
                     <div className="space-y-8">
-                      {([1, 2] as const).map(which => {
-                        const banner: PageBanner = which === 1 ? pc.campaign1 : pc.campaign2;
+                      {[1, 2, ...(pc.extraBanners ?? []).map((_, i) => i + 3)].map(which => {
+                        const banner: PageBanner = which === 1 ? pc.campaign1 : which === 2 ? pc.campaign2 : (pc.extraBanners ?? [])[which - 3];
                         const bgClass = which === 1 ? 'bg-primary-container/30' : 'bg-surface-container-low';
+                        const isActive = banner.active !== false;
+                        if (banner.deleted) {
+                          return (
+                            <div key={which} className="p-5 border border-dashed border-outline-variant/60 flex items-center justify-between gap-4">
+                              <span className="font-label-caps text-[10px] text-outline">BANNER {which} · GELÖSCHT</span>
+                              <button
+                                onClick={() => patchPageBanner(catId, which, { deleted: false, active: true })}
+                                className="font-label-caps text-[10px] px-3 py-1.5 border border-primary text-primary hover:bg-primary/5 transition-colors"
+                              >
+                                Neu hinzufügen
+                              </button>
+                            </div>
+                          );
+                        }
                         return (
-                          <div key={which} className={`p-5 border border-outline-variant/40 ${bgClass} space-y-4`}>
+                          <div key={which} className={`p-5 border border-outline-variant/40 ${bgClass} space-y-4 ${isActive ? '' : 'opacity-70'}`}>
                             <div className="flex items-center gap-2 mb-1">
                               <span className="material-symbols-outlined text-primary text-[16px]">{banner.icon || 'campaign'}</span>
                               <span className="font-label-caps text-[10px] text-primary">BANNER {which}</span>
+                              <span className={`font-label-caps text-[9px] ${isActive ? 'text-primary' : 'text-outline'}`}>
+                                {isActive ? 'AKTIV' : 'INAKTIV'}
+                              </span>
+                              <div className="ml-auto flex items-center gap-4">
+                                <button
+                                  onClick={() => patchPageBanner(catId, which, { active: !isActive })}
+                                  className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors shrink-0 ${isActive ? 'bg-primary' : 'bg-outline-variant'}`}
+                                  aria-label={isActive ? 'Deaktivieren' : 'Aktivieren'}
+                                >
+                                  <div className={`absolute top-1 left-1 w-3 h-3 bg-white rounded-full transition-transform ${isActive ? 'translate-x-5' : 'translate-x-0'}`} />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (!window.confirm(`Banner ${which} wirklich löschen?`)) return;
+                                    if (which >= 3) removeExtraBanner(catId, which);
+                                    else patchPageBanner(catId, which, { deleted: true, active: false, label: '', title: '', body: '', image: '' });
+                                  }}
+                                  className="text-outline hover:text-error transition-colors"
+                                  aria-label="Löschen"
+                                >
+                                  <span className="material-symbols-outlined text-[20px]">delete_outline</span>
+                                </button>
+                              </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <Field label="Label">
@@ -720,6 +757,15 @@ export default function CategoryDetailPage() {
                           </div>
                         );
                       })}
+                      {2 + (pc.extraBanners?.length ?? 0) < MAX_PAGE_BANNERS && (
+                        <button
+                          onClick={() => addExtraBanner(catId)}
+                          className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-primary/50 text-primary font-label-caps text-[11px] hover:bg-primary/5 transition-colors"
+                        >
+                          <span className="material-symbols-outlined text-[18px]">add_circle</span>
+                          Banner hinzufügen ({2 + (pc.extraBanners?.length ?? 0)}/{MAX_PAGE_BANNERS})
+                        </button>
+                      )}
                     </div>
                   )}
 

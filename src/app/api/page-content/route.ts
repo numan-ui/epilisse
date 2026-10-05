@@ -57,7 +57,8 @@ function isPageContent(v: unknown): v is PageContent {
     x.infoParagraphs.every((p) => typeof p === 'string') &&
     typeof x.benefitsTitle === 'string' &&
     Array.isArray(x.benefits) && x.benefits.every((b) => typeof b === 'string') &&
-    isBanner(x.campaign1) && isBanner(x.campaign2)
+    isBanner(x.campaign1) && isBanner(x.campaign2) &&
+    (x.extraBanners === undefined || (Array.isArray(x.extraBanners) && x.extraBanners.length <= 3 && x.extraBanners.every(isBanner)))
   );
 }
 

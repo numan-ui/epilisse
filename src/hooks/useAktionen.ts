@@ -36,9 +36,9 @@ export function useCategoryCampaigns(catId: string): FrontendCampaign[] {
 
 /** If the admin has Aktionen for this category, show those; otherwise fall back to the 2 fixed Seiteninhalt banners. */
 export function resolveCampaigns(
-  pageContent: Pick<PageContent, 'campaign1' | 'campaign2'>,
+  pageContent: Pick<PageContent, 'campaign1' | 'campaign2' | 'extraBanners'>,
   categoryCampaigns: FrontendCampaign[],
 ): FrontendCampaign[] {
   if (categoryCampaigns.length > 0) return categoryCampaigns;
-  return [pageContent.campaign1, pageContent.campaign2].filter((b) => b.title.trim() !== '');
+  return [pageContent.campaign1, pageContent.campaign2, ...(pageContent.extraBanners ?? [])].filter((b) => !b.deleted && b.active !== false && b.title.trim() !== '');
 }

@@ -15,6 +15,8 @@ function mergeBanner(stored: PageBanner | undefined, fallback: PageBanner): Page
     icon:  str(stored.icon, fallback.icon),
     image: str(stored.image, fallback.image),
     imagePosition: stored.imagePosition ?? fallback.imagePosition,
+    active: stored.active,
+    deleted: stored.deleted,
   };
 }
 
@@ -35,6 +37,7 @@ function mergeContent(stored: PageContent, fallback: PageContent): PageContent {
     benefits: benefits.length > 0 ? benefits : fallback.benefits,
     campaign1: mergeBanner(stored.campaign1, fallback.campaign1),
     campaign2: mergeBanner(stored.campaign2, fallback.campaign2),
+    extraBanners: (stored.extraBanners ?? []).slice(0, 3),
   };
 }
 

@@ -300,6 +300,10 @@ export const PREVIEW_GRADIENT: Record<string, string> = {
 
 export type PageBanner = {
   label: string; title: string; body: string; cta: string; icon: string; image: string; imagePosition?: ImagePosition;
+  /** Absent/true = shown on the site; false = hidden (content kept). */
+  active?: boolean;
+  /** true = admin deleted this banner slot; hidden everywhere until re-added. */
+  deleted?: boolean;
 };
 
 export type PageContent = {
@@ -313,7 +317,12 @@ export type PageContent = {
   benefits: string[];
   campaign1: PageBanner;
   campaign2: PageBanner;
+  /** Banners 3..MAX_PAGE_BANNERS (admin-added). Absent = none. */
+  extraBanners?: PageBanner[];
 };
+
+/** Max banners per category page (campaign1 + campaign2 + extraBanners). */
+export const MAX_PAGE_BANNERS = 5;
 
 export type PageContentMap = Record<string, PageContent>;
 
