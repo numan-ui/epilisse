@@ -77,8 +77,10 @@ const nextConfig: NextConfig = {
       { source: '/images/:path*\\.webp', headers: [
         { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }
       ]},
-      // Hero scrub frames (200 × ~22 KB) — previously uncached, re-fetched by every visit
-      { source: '/hero-frames/:path*', headers: [
+      // Hero scrub frames (240 × ~18 KB) — previously uncached, re-fetched by every visit.
+      // A re-extract goes to a new versioned folder (immutable URLs can't be overwritten) —
+      // add its entry here.
+      { source: '/hero-frames-v2/:path*', headers: [
         { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }
       ]},
       { source: '/fonts/:path*', headers: [

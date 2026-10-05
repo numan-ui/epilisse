@@ -1,11 +1,12 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import TrustBar from '@/components/TrustBar';
+import { jumpScrollTo, isSmoothScrolling } from '@/components/SmoothScroll';
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -15,14 +16,14 @@ type Props = {
   /** True while slide 1 is the visible slide. */
   active: boolean;
   /** Admin-configured seconds for this slide (from heroSlides[0].duration),
-   *  in ms. If the visitor hasn't scrolled at all by then, skip straight to
-   *  slide 2 instead of holding the pin forever. */
+   *  in ms. Once the visitor has left the scrub alone for this long, the
+   *  slide hands over to slide 2 instead of holding the pin forever. */
   idleTimeoutMs: number;
   onCtaClick: () => void;
   /**
-   * Fires once the reveal is finished (scrolled past) or was skipped
-   * (mobile / reduced motion). The landing page holds the story-slider
-   * auto-advance until then.
+   * "Advance to the next slide now." This slide times itself (see the hold
+   * timer in useGSAP) — the landing page's own slide timer skips slide 1 and
+   * waits for this. Fires once per time the slide is shown.
    */
   onDone: () => void;
 };
@@ -30,22 +31,26 @@ type Props = {
 const DESKTOP_QUERY = '(min-width: 1024px)';
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 /** Scroll the hero holds while the four beats play out. Shortened from an
- *  earlier 13000px (~26 wheel scrolls) — felt exhausting before users reached
- *  the CTA. */
-const SCRUB_DISTANCE = 6000;
+ *  earlier 13000px (~26 wheel scrolls), then 6000px — at 6000px / 200 frames
+ *  the picture only changed every 30px of scroll, which read as a flip-book.
+ *  4000px / 240 frames is ~17px per frame. */
+const SCRUB_DISTANCE = 4000;
 
 /* ── Frame sequence ──────────────────────────────────────────────────────
    The reveal is a pre-extracted WebP frame sequence drawn to <canvas>,
    indexed by scroll progress — no per-frame `video.currentTime` seek, so no
    decoder stutter. Regenerate on a new master with:
-     ffmpeg -i public/videos/beauty-scrub.mp4 \
-       -vf "fps=10,scale=640:800:flags=lanczos" \
-       -c:v libwebp -quality 56 -compression_level 6 -preset picture \
-       public/hero-frames/f_%03d.webp
-   (10 fps × 20 s = 200 frames; bump FRAME_COUNT / aspect to match.) */
-const FRAME_COUNT = 200;
+     node_modules/ffmpeg-static/ffmpeg.exe -i docs/design/video/v2_4x5.mp4 -an \
+       -vf "fps=12,scale=864:1080,hqdn3d=1.2:1.2:5:5,eq=contrast=1.04:saturation=1.05,scale=640:800:flags=lanczos" \
+       -c:v libwebp -quality 44 -compression_level 6 -preset picture \
+       public/hero-frames-v2/f_%03d.webp
+   (12 fps = every 2nd frame of the 24 fps master, evenly spaced × 20 s = 240
+   frames, ~4.4 MB; bump FRAME_COUNT / aspect to match.) The folder is served
+   `immutable` (next.config.ts) — a re-extract must go to a NEW folder name,
+   never overwrite these URLs. */
+const FRAME_COUNT = 240;
 const frameSrc = (i: number) =>
-  `/hero-frames/f_${String(i + 1).padStart(3, '0')}.webp`;
+  `/hero-frames-v2/f_${String(i + 1).padStart(3, '0')}.webp`;
 
 /** The master clip has its own baked-in camera push-in/pull-back — measured
  *  by tracking the crown's pixel width (a rigid reference) as a fraction of
@@ -54,50 +59,52 @@ const frameSrc = (i: number) =>
  *  ~72% by frame 199. That swing is what read as the whole panel "stretching"
  *  while scrubbing — our crop math samples a fixed fraction of the source
  *  every frame, so it just inherits whatever zoom the footage already has.
- *  Keyed by 0-indexed frame; interpolated between points in zoomCorrectionFor. */
-const ZOOM_KEYFRAMES: [frame: number, crownRatio: number][] = [
-  [0, 0.527],
-  [24, 0.605],
-  [49, 0.617],
-  [74, 0.725],
-  [99, 0.723],
-  [124, 0.838],
-  [149, 0.841],
-  [174, 0.792],
-  [199, 0.719],
-];
+ *  Nine evenly spaced samples across the clip (first → last frame), so the
+ *  table is independent of FRAME_COUNT. */
+const ZOOM_SAMPLES = [0.527, 0.605, 0.617, 0.725, 0.723, 0.838, 0.841, 0.792, 0.719];
 // Correcting all the way to either extreme (fully matching the widest or
 // the tightest natural moment) turned out to swing too far once the crop's
 // own aspect-ratio branching (MIN_DEST_ASPECT / topAnchored) interacted
 // with it on narrower panel sizes — frame 0 went from "too wide" to
 // "nose-to-hairline crop" on some viewports. So this only nudges toward the
-// midpoint, and the nudge itself is capped, instead of fully normalizing —
-// bounded, so a viewport quirk can misfire by at most ±12%, not blow up.
-const ZOOM_MIDPOINT =
-  (Math.min(...ZOOM_KEYFRAMES.map(([, r]) => r)) +
-    Math.max(...ZOOM_KEYFRAMES.map(([, r]) => r))) /
-  2;
+// midpoint, and the nudge itself is bounded, instead of fully normalizing —
+// a viewport quirk can misfire by at most ±12%, not blow up.
+const ZOOM_MIDPOINT = (Math.min(...ZOOM_SAMPLES) + Math.max(...ZOOM_SAMPLES)) / 2;
 const MAX_CORRECTION_DELTA = 0.12;
-/** How much to nudge frame `i`'s crop toward the sequence's midpoint
- *  framing, clamped to a small range so it damps the source's baked-in
- *  push-in/pull-back without ever producing a wild crop on any viewport. */
-function zoomCorrectionFor(i: number): number {
-  let lo = ZOOM_KEYFRAMES[0];
-  let hi = ZOOM_KEYFRAMES[ZOOM_KEYFRAMES.length - 1];
-  for (let k = 0; k < ZOOM_KEYFRAMES.length - 1; k++) {
-    if (i >= ZOOM_KEYFRAMES[k][0] && i <= ZOOM_KEYFRAMES[k + 1][0]) {
-      lo = ZOOM_KEYFRAMES[k];
-      hi = ZOOM_KEYFRAMES[k + 1];
-      break;
-    }
-  }
-  const [loF, loR] = lo;
-  const [hiF, hiR] = hi;
-  const t = hiF === loF ? 0 : (i - loF) / (hiF - loF);
-  const ratio = loR + (hiR - loR) * t;
-  const raw = ratio / ZOOM_MIDPOINT;
-  return Math.max(1 - MAX_CORRECTION_DELTA, Math.min(1 + MAX_CORRECTION_DELTA, raw));
-}
+// The bound is applied by scaling the whole deviation curve down to fit, not
+// by clamping it: a hard clamp left the correction flat for long stretches
+// and then kicked in abruptly, which read as the figure "breathing".
+const ZOOM_DAMPING =
+  MAX_CORRECTION_DELTA /
+  Math.max(...ZOOM_SAMPLES.map((r) => Math.abs(r / ZOOM_MIDPOINT - 1)));
+/** How much to nudge each frame's crop toward the sequence's midpoint
+ *  framing — Catmull-Rom through the samples, so the correction has no
+ *  velocity kink at a sample point either. Precomputed per frame. */
+const ZOOM_CORRECTION = Array.from({ length: FRAME_COUNT }, (_, i) => {
+  const last = ZOOM_SAMPLES.length - 1;
+  const pos = (i / (FRAME_COUNT - 1)) * last;
+  const k = Math.min(last - 1, Math.floor(pos));
+  const t = pos - k;
+  const p0 = ZOOM_SAMPLES[Math.max(0, k - 1)];
+  const p1 = ZOOM_SAMPLES[k];
+  const p2 = ZOOM_SAMPLES[k + 1];
+  const p3 = ZOOM_SAMPLES[Math.min(last, k + 2)];
+  const ratio =
+    0.5 *
+    (2 * p1 +
+      (p2 - p0) * t +
+      (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t +
+      (3 * p1 - p0 - 3 * p2 + p3) * t * t * t);
+  return 1 + (ratio / ZOOM_MIDPOINT - 1) * ZOOM_DAMPING;
+});
+/** How many frames ahead of the scrub (in its direction of travel) to
+ *  pre-decode — see draw(). */
+const DECODE_AHEAD = 8;
+/** Cross-fade resolution between two adjacent frames — see draw(). */
+const BLEND_STEPS = 8;
+/** Once the reveal has played through, how long the last beat (and its CTA)
+ *  holds before the story slider moves on. */
+const END_HOLD_MS = 4000;
 /** Static fallback for the loading gap and reduced-motion — frame 0 itself,
  *  so it's never a mismatched photo, just the sequence's own opening beat. */
 const POSTER_SRC = frameSrc(0);
@@ -157,6 +164,7 @@ export default function HeroCinematicSlide({
   const framesRef = useRef<HTMLImageElement[]>([]);
   const loadedRef = useRef<boolean[]>([]);
   const curFrameRef = useRef(0);
+  const paintedRef = useRef(-1); // frame index currently on the canvas
   const [firstReady, setFirstReady] = useState(false);
   const [phase, setPhase] = useState(0);
   const [nearTop, setNearTop] = useState(true); // scroll hint shows only at the very start
@@ -197,7 +205,7 @@ export default function HeroCinematicSlide({
   }, []);
 
   /** Crop-and-paint one already-decoded frame at the given opacity. */
-  const paintFrame = useCallback((idx: number, alpha: number) => {
+  const paintFrame = useCallback((idx: number, alpha: number, zoomCorrection: number) => {
     const canvas = canvasRef.current;
     const img = framesRef.current[idx];
     const ctx = canvas?.getContext('2d');
@@ -229,10 +237,9 @@ export default function HeroCinematicSlide({
     // Sample a larger area at the same aspect ratio (zoom out) — still
     // fills the canvas with no distortion, just shows more of the frame.
     // zoomCorrection crops the WIDE frames further in to match the
-    // sequence's tightest natural moment (see ZOOM_KEYFRAMES above) — the
+    // sequence's tightest natural moment (see ZOOM_SAMPLES above) — the
     // tight frames are already at the native-resolution clamp, so that's
     // the only direction with pixels to spare.
-    const zoomCorrection = zoomCorrectionFor(idx);
     sw = Math.min(img.naturalWidth, (sw / ZOOM_OUT) * zoomCorrection);
     sh = Math.min(img.naturalHeight, (sh / ZOOM_OUT) * zoomCorrection);
     sx = (img.naturalWidth - sw) / 2;
@@ -251,27 +258,62 @@ export default function HeroCinematicSlide({
     ctx.globalAlpha = 1;
   }, []);
 
-  /** Paint scrub position `i` (may be fractional — rounded to the nearest
-   *  decoded frame). A cross-fade between adjacent frames was tried here to
-   *  soften the 10fps source's flip-book stepping, but it double-exposed
-   *  two frames at slightly different crops whenever the correction above
-   *  differed between them — read as the figure's shoulders pulsing wider
-   *  and narrower. Reverted; plain single-frame draw has no such artifact. */
-  const draw = useCallback((i: number) => {
+  /** Paint scrub position `i` (fractional). Between two frames the next one
+   *  is cross-faded over the current by the fractional part, so the picture
+   *  moves on every scroll tick instead of stepping once per frame. An
+   *  earlier cross-fade was reverted because it double-exposed the two
+   *  frames at slightly different crops (each used its own zoom correction)
+   *  — the shoulders pulsed wider and narrower. Here both frames are drawn
+   *  with ONE correction, interpolated for the fractional position. */
+  const draw = useCallback((i: number, force = false) => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
     const clamped = Math.max(0, Math.min(FRAME_COUNT - 1, i));
-    const idx = resolveLoaded(Math.round(clamped));
-    if (idx < 0) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    paintFrame(idx, 1);
+    const target = Math.round(clamped);
+    const direction = clamped >= curFrameRef.current ? 1 : -1;
+    // Recorded even when nothing is loaded yet, so the frame that arrives
+    // first paints the position the scrub is actually at.
     curFrameRef.current = clamped;
-    canvas.dataset.frame = String(Math.round(clamped)); // observable scrub position (e2e)
+    const idx = resolveLoaded(target);
+    if (idx < 0) return;
+    if (canvas.dataset.frame !== String(target)) {
+      canvas.dataset.frame = String(target); // observable scrub position (e2e)
+    }
+    // Repaint only when the position moved by a visible amount — steps of
+    // 1/BLEND_STEPS of a frame. `force` is for a resized (i.e. cleared)
+    // backing store or a frame that just finished loading.
+    const key = Math.round(clamped * BLEND_STEPS);
+    if (!force && key === paintedRef.current) return;
+    paintedRef.current = key;
+    const lo = Math.floor(clamped);
+    const hi = Math.min(FRAME_COUNT - 1, lo + 1);
+    const frac = key / BLEND_STEPS - lo;
+    const loaded = loadedRef.current;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (frac > 0 && frac < 1 && loaded[lo] && loaded[hi]) {
+      const zoom = ZOOM_CORRECTION[lo] + (ZOOM_CORRECTION[hi] - ZOOM_CORRECTION[lo]) * frac;
+      paintFrame(lo, 1, zoom);
+      paintFrame(hi, frac, zoom);
+    } else {
+      // Neighbour not loaded yet (or exactly on a frame) → nearest single frame.
+      paintFrame(idx, 1, ZOOM_CORRECTION[idx]);
+    }
+    // An <img> that has merely loaded isn't decoded yet — the first
+    // drawImage of each frame would decode it synchronously, mid-scroll.
+    // Warm the next few in the direction of travel off the main thread.
+    for (let n = 1; n <= DECODE_AHEAD; n++) {
+      const ahead = idx + n * direction;
+      if (ahead < 0 || ahead >= FRAME_COUNT) break;
+      if (loadedRef.current[ahead]) framesRef.current[ahead]?.decode().catch(() => {});
+    }
   }, [resolveLoaded, paintFrame]);
 
   /* Preload the sequence: frame 0 first (reveals the canvas), then the rest
-     through a small concurrency pool so we don't fire 200 requests at once. */
+     through a small concurrency pool so we don't fire 240 requests at once.
+     Every 2nd frame goes first, so the whole range is scrubbable at half
+     density early (resolveLoaded falls back to the nearest loaded frame)
+     instead of a fast scroller freezing on the last frame that arrived. */
   useEffect(() => {
     if (!active) return;
     if (
@@ -294,7 +336,11 @@ export default function HeroCinematicSlide({
           loaded[i] = true;
           if (!cancelled && i === 0) {
             setFirstReady(true);
-            draw(0);
+            draw(curFrameRef.current, true);
+          } else if (!cancelled && Math.abs(curFrameRef.current - i) < 1) {
+            // A frame the scrub is parked on just arrived — swap out the
+            // nearest-neighbour stand-in.
+            draw(curFrameRef.current, true);
           }
           resolve();
         };
@@ -303,11 +349,15 @@ export default function HeroCinematicSlide({
         imgs[i] = img;
       });
 
+    const order: number[] = [];
+    for (let i = 2; i < FRAME_COUNT; i += 2) order.push(i);
+    for (let i = 1; i < FRAME_COUNT; i += 2) order.push(i);
+
     (async () => {
       await loadOne(0);
-      let next = 1;
+      let next = 0;
       const worker = async () => {
-        while (!cancelled && next < FRAME_COUNT) await loadOne(next++);
+        while (!cancelled && next < order.length) await loadOne(order[next++]);
       };
       await Promise.all(Array.from({ length: 6 }, worker));
     })();
@@ -337,7 +387,7 @@ export default function HeroCinematicSlide({
       lastH = h;
       canvas.width = w;
       canvas.height = h;
-      draw(curFrameRef.current);
+      draw(curFrameRef.current, true);
     };
     // Deferred one frame: measuring synchronously on mount can catch the
     // box mid-layout (before fonts/CMS content settle it to final size),
@@ -360,31 +410,73 @@ export default function HeroCinematicSlide({
     };
   }, [draw, firstReady]);
 
+  /* The pin adds SCRUB_DISTANCE of spacer to the document, and it only exists
+     while this slide is the active one. When the story slider moves on, the
+     spacer is torn down and everything below the hero jumps up by that much —
+     a visitor parked mid-pin got clamped to wherever the shorter page ended.
+     So: note where they were right before the teardown (this cleanup runs
+     ahead of useGSAP's, being declared first), then once the spacer is gone
+     put them back on the same content. The reverse — the slider looping back
+     to slide 1 and the spacer reappearing — is handled inside useGSAP. */
+  const pinRef = useRef<ScrollTrigger | null>(null);
+  const teardownRef = useRef<{ y: number; start: number; end: number } | null>(null);
+  const wasTornDownRef = useRef(false);
+  useLayoutEffect(() => {
+    const pending = teardownRef.current;
+    teardownRef.current = null;
+    if (pending && !active) {
+      wasTornDownRef.current = true;
+      const { y, start, end } = pending;
+      if (y >= end) jumpScrollTo(y - (end - start));
+      else if (y > start) jumpScrollTo(start);
+    }
+    return () => {
+      const st = pinRef.current;
+      if (st) teardownRef.current = { y: window.scrollY, start: st.start, end: st.end };
+    };
+  }, [active]);
+
   useGSAP(
     () => {
+      pinRef.current = null;
       const root = rootRef.current;
       if (!root || !active) return;
+      doneFiredRef.current = false; // one onDone per time this slide is shown
 
-      // Not eligible → show beat 1 as a still and let the slider proceed.
+      // This slide owns its own auto-advance (the landing page's slide timer
+      // skips slide 1): `onDone` means "move on now". One rolling hold timer,
+      // re-armed on every scrub movement — so the slider advances a slide's
+      // worth of time after the visitor stops interacting, wherever they
+      // stopped: never scrolled, abandoned halfway, or played to the end
+      // (shorter hold there). Previously only "never scrolled" and "reached
+      // the end" signalled at all, and the page then waited a second full
+      // slide duration on top.
+      let holdTimer = 0;
+      const armHold = (ms: number) => {
+        window.clearTimeout(holdTimer);
+        holdTimer = window.setTimeout(() => {
+          // Handing over tears the pin down and re-seats the scroll position
+          // (see the layout effect above) — never do that mid-scroll, it
+          // would cut the visitor's momentum. Wait for the page to settle.
+          if (isSmoothScrolling()) armHold(300);
+          else fireDone();
+        }, ms);
+      };
+
+      // Not eligible → show beat 1 as a still for the slide's normal duration.
       if (
         window.matchMedia(REDUCED_MOTION_QUERY).matches ||
         !window.matchMedia(DESKTOP_QUERY).matches
       ) {
-        fireDone();
-        return;
+        armHold(idleTimeoutMs);
+        return () => window.clearTimeout(holdTimer);
       }
 
       const section = root.closest('section') ?? root;
       let lastIdx = -1;
       let lastNearTop = true;
-
-      // If the visitor never scrolls, the pin holds forever and the slider
-      // never advances. Give it one second — if the scrub still hasn't
-      // budged from frame 0 by then, skip straight to slide 2 instead of
-      // waiting on an interaction that may never come.
-      const idleTimer = window.setTimeout(() => {
-        if (st.progress === 0) fireDone();
-      }, idleTimeoutMs);
+      const yBeforePin = window.scrollY;
+      armHold(idleTimeoutMs);
 
       const st = ScrollTrigger.create({
         trigger: section,
@@ -404,7 +496,7 @@ export default function HeroCinematicSlide({
         anticipatePin: 0,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
-          if (self.progress > 0) window.clearTimeout(idleTimer);
+          armHold(self.progress > 0.95 ? Math.min(idleTimeoutMs, END_HOLD_MS) : idleTimeoutMs);
           draw(self.progress * (FRAME_COUNT - 1));
           const idx = phaseFor(self.progress);
           if (idx !== lastIdx) {
@@ -418,9 +510,7 @@ export default function HeroCinematicSlide({
             lastNearTop = nt;
             setNearTop(nt);
           }
-          if (self.progress > 0.95) fireDone();
         },
-        onLeave: fireDone,
         onRefresh: (self) => {
           // Paint the frame for wherever the restored scroll position
           // lands, instead of leaving the stale frame 0 up until the next
@@ -428,8 +518,16 @@ export default function HeroCinematicSlide({
           draw(self.progress * (FRAME_COUNT - 1));
         },
       });
+      pinRef.current = st;
+      // Slider looped back to slide 1 while the visitor is further down the
+      // page: the spacer just reappeared above them, so push them down by
+      // the same amount to stay on the content they were reading.
+      if (wasTornDownRef.current && yBeforePin > st.start) {
+        jumpScrollTo(yBeforePin + (st.end - st.start));
+      }
+      wasTornDownRef.current = false;
       draw(st.progress * (FRAME_COUNT - 1));
-      return () => window.clearTimeout(idleTimer);
+      return () => window.clearTimeout(holdTimer);
     },
     { scope: rootRef, dependencies: [active, idleTimeoutMs], revertOnUpdate: true },
   );
@@ -448,8 +546,9 @@ export default function HeroCinematicSlide({
     >
       {/* Left — the advancing copy. Headline + subline live in ONE keyed
           block, stacked in a single grid cell so the outgoing beat cross-
-          fades with the incoming one (they can't desync) and a brief
-          focus-pull blur hides sub-pixel jitter at the phase boundary. */}
+          fades with the incoming one (they can't desync). Opacity + transform
+          only — an animated blur() on the headline repainted every frame,
+          right while the canvas was scrubbing. */}
       {/* items-start (not the flex-column default of stretch) so TrustBar
           shrink-wraps to its cards' own content width here too — a
           stretching parent was forcing it out to its full max-w-440 cap,
@@ -465,10 +564,10 @@ export default function HeroCinematicSlide({
           <AnimatePresence>
             <motion.div
               key={phase}
-              initial={{ opacity: 0, y: 20, filter: 'blur(6px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -14, filter: 'blur(6px)' }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -14 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               className="[grid-area:1/1]"
             >
               <h1 className="font-display-lg text-[36px] md:text-[42px] xl:text-[52px] font-bold leading-[1.1] tracking-[-0.015em] text-[var(--hero-on-panel)]">

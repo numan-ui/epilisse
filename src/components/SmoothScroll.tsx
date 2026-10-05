@@ -15,6 +15,21 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
  * fight over the same frames, so in-page anchor jumps are routed through
  * `lenis.scrollTo` here instead.
  */
+let activeLenis: Lenis | null = null;
+
+/** Jump the page to `y` with no easing. Goes through Lenis when it's running
+ *  — a bare window.scrollTo would be eased back by Lenis' own rAF loop, which
+ *  still holds the old target. */
+export function jumpScrollTo(y: number) {
+  if (activeLenis) activeLenis.scrollTo(y, { immediate: true, force: true });
+  else window.scrollTo(0, y);
+}
+
+/** True while Lenis is still easing toward its scroll target. */
+export function isSmoothScrolling() {
+  return !!activeLenis?.isScrolling;
+}
+
 export default function SmoothScroll() {
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -38,6 +53,7 @@ export default function SmoothScroll() {
       wheelMultiplier: 1,
       touchMultiplier: 1.5,
     });
+    activeLenis = lenis;
 
     lenis.on('scroll', ScrollTrigger.update);
 
@@ -62,6 +78,7 @@ export default function SmoothScroll() {
     return () => {
       document.removeEventListener('click', onAnchorClick);
       gsap.ticker.remove(onTick);
+      activeLenis = null;
       lenis.destroy();
     };
   }, []);

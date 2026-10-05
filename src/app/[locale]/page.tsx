@@ -16,6 +16,7 @@ import { countdownLabel, validityText } from "@/lib/aktion";
 import { useBookingModal } from "@/context/BookingModalContext";
 import SmartImage from "@/components/SmartImage";
 import GoldDustEffect from "@/components/GoldDustEffect";
+import GoldDriftParticles from "@/components/GoldDriftParticles";
 
 // Pulls in gsap/ScrollTrigger — code-split into its own chunk so it loads in
 // parallel instead of bloating the main bundle. Keeps ssr:true (the default):
@@ -169,10 +170,6 @@ export default function HomePage() {
   const [slideKey, setSlideKey] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [heroParallax, setHeroParallax] = useState({ x: 0, y: 0 });
-  /* Slide 1's desktop cinematic pins the hero while it plays; hold the story
-     slider's auto-advance until it signals it's done (fires immediately on
-     mobile / reduced motion). */
-  const [cinematicDone, setCinematicDone] = useState(false);
 
   const handleHeroMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -192,12 +189,14 @@ export default function HomePage() {
   }, [heroSlides.length]);
 
   useEffect(() => {
-    // Don't advance off slide 1 until its cinematic reveal has finished.
-    if (currentSlide === 0 && !cinematicDone) return;
+    // Slide 1 times itself: its desktop cinematic pins the hero while the
+    // visitor scrubs, so HeroCinematicSlide decides when to move on and calls
+    // onDone (on mobile / reduced motion that's just the slide's duration).
+    if (currentSlide === 0) return;
     const durationMs = (heroSlides[currentSlide]?.duration || 10) * 1000;
     const timer = setTimeout(nextSlide, durationMs);
     return () => clearTimeout(timer);
-  }, [currentSlide, heroSlides, nextSlide, cinematicDone]);
+  }, [currentSlide, heroSlides, nextSlide]);
 
   const goToSlide = (idx: number) => {
     setCurrentSlide(idx);
@@ -428,7 +427,9 @@ export default function HomePage() {
                 active={i === currentSlide}
                 idleTimeoutMs={(slide.duration || 10) * 1000}
                 onCtaClick={() => booking.open()}
-                onDone={() => setCinematicDone(true)}
+                onDone={() => {
+                  if (currentSlide === 0) nextSlide();
+                }}
               />
             )}
 
@@ -531,8 +532,12 @@ export default function HomePage() {
       ══════════════════════════════════════════════════════ */}
       <section
         id="behandlungen"
-        className="py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
+        className="relative py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
       >
+        {/* Gold droplets carried down from the hero video — fade out before
+            the section ends. */}
+        <GoldDriftParticles />
+
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -544,7 +549,7 @@ export default function HomePage() {
           <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] block mb-3">
             {lc.servicesSectionLabel || t("services.sectionLabel")}
           </span>
-          <h2 className="font-display-lg text-display-lg font-bold text-primary mb-4">
+          <h2 data-gold-title className="font-display-lg text-display-lg font-bold text-primary mb-4">
             {lc.servicesSectionTitle || t("services.sectionTitle")}
           </h2>
           <div className="w-20 h-[2px] bg-primary-fixed-dim mx-auto" />

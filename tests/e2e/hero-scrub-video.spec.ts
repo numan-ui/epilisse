@@ -43,7 +43,9 @@ test.describe('hero scrub — desktop', () => {
     await waitForFirstFrame(page);
     expect(await frame(page)).toBe(0);
 
-    await page.evaluate(() => window.scrollTo(0, 6000));
+    // Stay inside the 4000px pin — once the scrub is left alone at its end
+    // the slide hands over to slide 2 and the pin is torn down.
+    await page.evaluate(() => window.scrollTo(0, 3000));
     await expect.poll(() => frame(page), { timeout: 5000 }).toBeGreaterThan(20);
     const forward = await frame(page);
 
@@ -61,7 +63,7 @@ test.describe('hero scrub — desktop', () => {
 
     await expect(page.locator(CARD)).toContainText('reinsten Form');
 
-    await page.evaluate(() => window.scrollTo(0, 9000));
+    await page.evaluate(() => window.scrollTo(0, 3500));
     await expect(page.locator(CARD)).toContainText(/erwacht|erweckt|Entfalte/i, {
       timeout: 5000,
     });
