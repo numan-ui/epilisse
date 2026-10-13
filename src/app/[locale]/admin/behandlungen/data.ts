@@ -179,7 +179,7 @@ export const INIT_LANDING_CONTENT: LandingContent = {
   ownerRole: 'Inhaberin & Lasertherapeutin',
   contactSectionLabel: 'KONTAKT & STANDORT', contactTitle: 'Besuchen Sie uns in München',
   contactAddressTitle: 'Studio Adresse', contactHoursTitle: 'Öffnungszeiten', contactPhoneTitle: 'Telefon',
-  footerTagline: 'Ihr Experte für exklusive Schönheit und dauerhafte Haarentfernung im Herzen von München. Qualität, Diskretion und Perfektion.',
+  footerTagline: 'Ihr Experte für exklusive Schönheit und dauerhafte Haarentfernung & PMU im Herzen von München. Qualität, Diskretion und Perfektion.',
   footerBehandlungenTitle: 'Behandlungen', footerStudioTitle: 'Studio', footerLegalTitle: 'Rechtliches',
   footerCopyright: '© 2026 EPILISSE – Luxury Beauty Care Munich.',
   footerBadge1: 'MADE IN MUNICH', footerBadge2: 'SECURE PAYMENT',

@@ -351,3 +351,120 @@ html.lenis body {
 @media (prefers-reduced-motion: reduce) {
   .price-glow { animation: none; }
 }
+
+/* Glass surfaces over the contact photo: blur + saturate, 1px light edge,
+   inset top highlight for refraction, shadow tinted by the dark backdrop. */
+.glass-panel {
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.05));
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: 16px;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    inset 0 0 0 1px rgb(255 255 255 / 0.04),
+    0 30px 60px -28px color-mix(in srgb, var(--color-inverse-surface) 85%, black);
+  transition: box-shadow 0.5s ease, transform 0.5s ease;
+}
+/* Same lift as .bento-card (treatment grid), minus the outline ring. */
+.glass-panel:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    inset 0 0 0 1px rgb(255 255 255 / 0.04),
+    0 38px 70px -26px color-mix(in srgb, var(--color-inverse-surface) 85%, black);
+}
+/* The centre card: a touch brighter so it reads as the nearest pane. */
+.glass-panel-lead {
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.08));
+  border-color: rgb(255 255 255 / 0.3);
+}
+.glass-chip {
+  background: rgb(255 255 255 / 0.1);
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: 10px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25);
+  transition: box-shadow 0.35s, border-color 0.35s, background-color 0.35s;
+}
+/* Card hover lights the icon instead of outlining the card. */
+.glass-chip .material-symbols-outlined { transition: filter 0.35s; }
+.glass-panel:hover .glass-chip {
+  background: color-mix(in srgb, var(--color-inverse-primary) 18%, transparent);
+  border-color: color-mix(in srgb, var(--color-inverse-primary) 60%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    0 0 22px 2px color-mix(in srgb, var(--color-inverse-primary) 55%, transparent);
+}
+.glass-panel:hover .glass-chip .material-symbols-outlined {
+  filter: drop-shadow(0 0 6px var(--color-inverse-primary));
+}
+.glass-btn {
+  background: rgb(255 255 255 / 0.1);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgb(255 255 255 / 0.3);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25);
+  transition: background-color 0.2s, border-color 0.2s, scale 0.2s;
+}
+.glass-btn:hover {
+  background: rgb(255 255 255 / 0.2);
+  border-color: rgb(255 255 255 / 0.5);
+}
+
+/* Top navbar slides away while the floating bottom pill (FloatingNav) is showing,
+   so the two menus never sit on screen together. */
+.nav-autohide {
+  transition: transform 0.4s ease, opacity 0.3s ease, visibility 0s linear 0s;
+}
+html[data-floating-nav] .nav-autohide {
+  transform: translateY(-100%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 0.4s ease, opacity 0.3s ease, visibility 0s linear 0.4s;
+}
+
+/* Footer emblem: the gold relief sits straight on the footer ground (transparent cut-out),
+   lifted only by shadows tinted to that ground — no plate, no frame. */
+.footer-emblem {
+  position: relative;
+  display: block;
+  height: clamp(160px, 14vw, 200px);
+  filter:
+    drop-shadow(1px 1px 0.5px rgb(84 46 28 / 0.55))
+    drop-shadow(3px 5px 4px rgb(84 46 28 / 0.38))
+    drop-shadow(10px 20px 18px rgb(84 46 28 / 0.3));
+  transition: transform 0.5s ease, filter 0.5s ease;
+}
+.footer-emblem img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Hover: one pass of light across the gold, clipped to the emblem's own outline. */
+.footer-emblem::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  -webkit-mask: url('/images/epilisse-emblem.webp') center / 100% 100% no-repeat;
+  mask: url('/images/epilisse-emblem.webp') center / 100% 100% no-repeat;
+  background: linear-gradient(115deg, transparent 40%, rgb(255 246 208 / 0.75) 50%, transparent 60%) no-repeat;
+  background-size: 300% 100%;
+  background-position: 130% 0;
+  pointer-events: none;
+}
+.group:hover .footer-emblem::after {
+  background-position: -30% 0;
+  transition: background-position 0.9s ease;
+}
+.group:hover .footer-emblem {
+  transform: translateY(-4px);
+  filter:
+    drop-shadow(1px 1px 0.5px rgb(84 46 28 / 0.55))
+    drop-shadow(4px 8px 6px rgb(84 46 28 / 0.36))
+    drop-shadow(14px 28px 24px rgb(84 46 28 / 0.3))
+    drop-shadow(0 0 16px rgb(232 192 104 / 0.6));
+}
+@media (prefers-reduced-motion: reduce) {
+  .footer-emblem, .group:hover .footer-emblem::after { transition: none; }
+}

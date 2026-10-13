@@ -31,6 +31,12 @@ export default function FloatingNav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Lets a page's top navbar step aside while this pill is on screen (.nav-autohide in globals.css).
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-floating-nav', visible);
+    return () => document.documentElement.removeAttribute('data-floating-nav');
+  }, [visible]);
+
   const items = [
     { href: '/', label: t('nav.home'), icon: 'home' },
     { href: '/behandlungen', label: lc.navBehandlungen || t('nav.behandlungen'), icon: 'spa' },

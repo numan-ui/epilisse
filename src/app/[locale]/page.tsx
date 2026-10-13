@@ -30,6 +30,7 @@ import TrustBar from "@/components/TrustBar";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import FloatingNav from "@/components/LazyFloatingNav";
 import SiteFooter from "@/components/SiteFooter";
+import ContactSection from "@/components/ContactSection";
 
 /* ── Image constants (Stitch AI – replace with real salon photos) ── */
 const IMG = {
@@ -103,23 +104,6 @@ export default function HomePage() {
   const heroSlides = useAdminHeroSlides();
   const banners = homeAktionen(useAktionen());
   const booking = useBookingModal();
-
-  /* ── Dynamic booking URLs from admin settings ─── */
-  const waRaw    = settings.whatsapp.replace(/[\s+\-()]/g, '');
-  const WA_URL   = waRaw
-    ? `https://wa.me/${waRaw}?text=${encodeURIComponent(settings.whatsappMsg)}`
-    : 'https://wa.me/4989XXXXXXXX';
-  const MAPS_URL = settings.address
-    ? `https://maps.google.com/?q=${encodeURIComponent(settings.address)}`
-    : 'https://maps.google.com/?q=München';
-
-  /* ── Contact display values: admin settings override i18n placeholders ─── */
-  const displayAddress = settings.address || t("contact.address");
-  const displayHours   = settings.hours
-    .map(d => `${d.day}: ${d.closed ? 'Geschlossen' : `${d.open} – ${d.close} Uhr`}`)
-    .join('\n');
-  const displayPhone   = settings.phone || t("contact.phone");
-  const phoneHref      = displayPhone.replace(/\s/g, '');
 
   /* ── Images: admin override or fallback to originals ─── */
   const getCatImage = (id: string) => categories.find(c => c.id === id)?.image || '';
@@ -217,7 +201,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════════════
           NAV BAR — Fixed glassmorphism (starts below the strip)
       ══════════════════════════════════════════════════════ */}
-      <nav className="fixed top-9 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 glass-nav bg-surface/95 border-b border-outline-variant/30 lux-shadow">
+      <nav className={`fixed top-9 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 glass-nav bg-surface/95 border-b border-outline-variant/30 lux-shadow ${menuOpen ? "" : "nav-autohide"}`}>
         {/* Logo */}
         <a href="#" className="font-display-lg text-[26px] tracking-wide epilisse-logo">
           {settings.name}
@@ -762,109 +746,7 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════════════
           KONTAKT — Contact & location
       ══════════════════════════════════════════════════════ */}
-      <section
-        id="kontakt"
-        className="py-section-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto"
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="flex flex-col items-center mb-12"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-            <span className="font-label-caps text-label-caps text-primary tracking-[0.2em]">
-              {lc.contactSectionLabel || t("contact.sectionLabel")}
-            </span>
-            <span className="w-16 h-[2px] bg-primary" />
-          </div>
-          <h2 className="font-display-lg text-headline-lg font-semibold text-on-surface">
-            {lc.contactTitle || t("contact.title")}
-          </h2>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-gutter"
-        >
-
-          {/* Address card */}
-          <div className="bento-card bg-surface-container-low border border-outline-variant/60 p-8 flex flex-col gap-4">
-            <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary">location_on</span>
-            </div>
-            <h3 className="font-headline-sm text-headline-sm font-medium text-on-surface">
-              {lc.contactAddressTitle || t("contact.addressTitle")}
-            </h3>
-            <address className="font-body-sm text-body-sm text-on-surface-variant not-italic whitespace-pre-line">
-              {displayAddress}
-            </address>
-          </div>
-
-          {/* Hours card */}
-          <div className="bento-card bg-surface-container-low border border-outline-variant/60 p-8 flex flex-col gap-4">
-            <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary">schedule</span>
-            </div>
-            <h3 className="font-headline-sm text-headline-sm font-medium text-on-surface">
-              {lc.contactHoursTitle || t("contact.hoursTitle")}
-            </h3>
-            <p className="font-body-sm text-body-sm text-on-surface-variant whitespace-pre-line">
-              {displayHours}
-            </p>
-          </div>
-
-          {/* Phone card */}
-          <div className="bento-card bg-surface-container-low border border-outline-variant/60 p-8 flex flex-col gap-4">
-            <div className="w-10 h-10 bg-primary/10 flex items-center justify-center">
-              <span className="material-symbols-outlined text-primary">phone</span>
-            </div>
-            <h3 className="font-headline-sm text-headline-sm font-medium text-on-surface">
-              {lc.contactPhoneTitle || t("contact.phoneTitle")}
-            </h3>
-            <a
-              href={`tel:${phoneHref}`}
-              className="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors"
-            >
-              {displayPhone}
-            </a>
-          </div>
-        </motion.div>
-
-        {/* CTA buttons row */}
-        <div className="flex flex-col sm:flex-row justify-center gap-4 mt-12">
-          <button
-            type="button"
-            onClick={() => booking.open()}
-            className="bg-cta text-on-cta px-10 py-5 font-label-caps text-label-caps tracking-widest hover:bg-cta-hover transition-all text-center lux-shadow rounded-[var(--radius-cta)]"
-          >
-            {t("contact.ctaCalendar")}
-          </button>
-          <a
-            href={WA_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 border border-primary text-primary px-10 py-5 font-label-caps text-label-caps tracking-widest hover:bg-primary/5 transition-all rounded-[var(--radius-cta)]"
-          >
-            <span className="material-symbols-outlined text-sm">chat</span>
-            {t("contact.ctaWhatsapp")}
-          </a>
-          <a
-            href={MAPS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 border border-outline-variant text-secondary px-10 py-5 font-label-caps text-label-caps tracking-widest hover:border-primary hover:text-primary transition-all rounded-[var(--radius-cta)]"
-          >
-            <span className="material-symbols-outlined text-sm">map</span>
-            {t("contact.ctaMaps")}
-          </a>
-        </div>
-      </section>
+      <ContactSection />
 
       {/* ══════════════════════════════════════════════════════
           FOOTER
