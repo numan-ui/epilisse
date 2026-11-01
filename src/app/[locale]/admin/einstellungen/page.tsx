@@ -277,6 +277,7 @@ export default function EinstellungenPage() {
                   { label: 'Google My Business', key: 'google'  as const, icon: 'location_on',  placeholder: 'https://g.page/epilisse-munich' },
                   { label: 'Treatwell Profil-URL', key: 'treatwellUrl' as const, icon: 'reviews', placeholder: 'https://www.treatwell.de/ort/...' },
                   { label: 'Treatwell Buchungs-URL (Termin-Fenster)', key: 'treatwellBookingUrl' as const, icon: 'event_available', placeholder: 'https://buchung.treatwell.de/ort/.../menue/' },
+                  { label: 'Treatwell Connect Kalender-URL (nur Admin)', key: 'treatwellConnectUrl' as const, icon: 'calendar_month', placeholder: 'https://connect.treatwell.de/de_DE/calendar' },
                 ].map(({ label, key, icon, placeholder }) => (
                   <div key={key}>
                     <label className="font-label-caps text-[10px] text-outline uppercase block mb-2">{label}</label>

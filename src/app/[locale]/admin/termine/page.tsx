@@ -2,7 +2,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CustomerPicker, type PickableCustomer } from '@/components/admin/CustomerPicker';
 import { useCategoryServices, parseDurationMin } from '@/hooks/useCategoryServices';
-import { CATEGORIES as CMS_CATEGORIES } from '@/app/[locale]/admin/behandlungen/data';
+import { CATEGORIES as CMS_CATEGORIES, INIT_SETTINGS } from '@/app/[locale]/admin/behandlungen/data';
+import { useAdminData } from '@/app/[locale]/admin/behandlungen/AdminDataContext';
 
 const CATEGORY_ICON: Record<string, string> = Object.fromEntries(CMS_CATEGORIES.map(c => [c.id, c.icon]));
 type ApptStep = 'category' | 'service' | 'details';
@@ -75,6 +76,8 @@ const EMPTY_NEW_APPT = { customerId: '', categoryId: '', serviceName: '', date: 
 const EMPTY_NEW_BLOCK = { date: TODAY.toISOString().slice(0, 10), time: '09:00', durationMin: 30, reason: '' };
 
 export default function TerminePage() {
+  const { settings } = useAdminData();
+  const treatwellConnectUrl = settings.treatwellConnectUrl?.trim() || INIT_SETTINGS.treatwellConnectUrl;
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [customers, setCustomers]       = useState<PickableCustomer[]>([]);
   const [categories, setCategories]     = useState<Category[]>([]);
@@ -284,6 +287,17 @@ export default function TerminePage() {
               Woche
             </button>
           </div>
+          {treatwellConnectUrl && (
+            <a
+              href={treatwellConnectUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 border border-outline-variant text-on-surface-variant py-2.5 px-5 font-label-caps text-label-caps hover:border-primary hover:text-primary transition-all"
+            >
+              <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+              Treatwell Kalender
+            </a>
+          )}
           <button
             onClick={() => setShowBlock(true)}
             className="flex items-center gap-2 border border-outline-variant text-on-surface-variant py-2.5 px-5 font-label-caps text-label-caps hover:border-error hover:text-error transition-all"

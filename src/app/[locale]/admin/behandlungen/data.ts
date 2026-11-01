@@ -107,6 +107,8 @@ export type SiteSettings = {
   treatwellUrl: string;
   /** Target of the booking modal's "über Treatwell" channel (categories with treatwellActive). Separate from treatwellUrl, which is the public profile/reviews link. */
   treatwellBookingUrl: string;
+  /** Salon-side Treatwell Connect calendar (login required), opened from the admin Termine page. Not shown on the public site. */
+  treatwellConnectUrl: string;
   aboutImage: string;
   /** Owner portrait for the manifesto block (homepage + /ueber-uns). Empty → monogram fallback. */
   ownerImage: string;
@@ -133,6 +135,7 @@ export const INIT_SETTINGS: SiteSettings = {
   google: '',
   treatwellUrl: 'https://www.treatwell.de/ort/studio-adisa-the-beauty-experience/',
   treatwellBookingUrl: 'https://buchung.treatwell.de/ort/543368/menue/',
+  treatwellConnectUrl: 'https://connect.treatwell.de/de_DE/calendar#venue/543368/appointment/week',
   aboutImage: '',
   ownerImage: '',
   googleRating: '4,9', googleReviewCount: '180+',
