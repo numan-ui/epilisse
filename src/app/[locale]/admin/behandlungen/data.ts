@@ -89,7 +89,6 @@ const a = (
 
 /** Seed for the unified Aktion model — the 3 seed campaigns + the 1 seed promo banner. */
 export const INIT_AKTIONEN: Aktion[] = [
-  a('cl1', 'laser',   'AKTIVE AKTION', 'Winter Glow Kombi-Paket', 'Ganzes Gesicht + Dekolleté inkl. Maske.', '120,00€', '149,00€', true, false, 'JETZT BUCHEN', 'auto_awesome'),
   a('cg1', 'gesicht', 'BESTSELLER',    'HydraFacial Duo-Paket',   '2× HydraFacial Premium zum Sonderpreis.', '249,00€', '298,00€', true, false, 'JETZT BUCHEN', 'spa'),
   a('cm1', 'mani',    'DUO DEAL',      'Mani & Pedi Paket',       'Gel-Maniküre + Spa-Pediküre zusammen.',   '99,00€',  '130,00€', true, false, 'JETZT BUCHEN', 'favorite'),
   // former homepage promo banner (promo1) — home-active, category best-guess 'gesicht'
